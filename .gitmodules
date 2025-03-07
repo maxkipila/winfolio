@@ -1,0 +1,4 @@
+[submodule "resources/js/Fragments/forms"]
+	path = resources/js/Fragments/forms
+	url = git@gitlab.com:synapse_hackers/gro/forms.git
+	branch = winfolio
