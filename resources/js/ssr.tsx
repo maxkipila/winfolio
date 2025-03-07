@@ -30,4 +30,5 @@ createServer((page) =>
             return <App {...props} />;
         },
     }),
+    import.meta.env.VITE_SSR_PORT ?? 13714
 );
