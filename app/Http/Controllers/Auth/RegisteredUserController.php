@@ -23,6 +23,17 @@ class RegisteredUserController extends Controller
         return Inertia::render('Auth/Register');
     }
 
+    public function exists(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|exists:users'
+        ]);
+
+        // dd($request);
+
+        return back();
+    }
+
     /**
      * Handle an incoming registration request.
      *

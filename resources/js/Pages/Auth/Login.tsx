@@ -1,110 +1,93 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import Img from '@/Components/Image'
+import ChangingCarousel from '@/Fragments/ChangingCarousel';
+import Form from '@/Fragments/forms/Form'
+import Checkbox from '@/Fragments/forms/inputs/Checkbox';
+import PasswordField from '@/Fragments/forms/inputs/PasswordField';
+import TextField from '@/Fragments/forms/inputs/TextField';
+import { Button } from '@/Fragments/UI/Button';
+import { useDebouncedCallback } from '@/hooks/useDebounceCallback';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import React, { useState } from 'react'
+import { useEffect } from 'react';
 
-export default function Login({
-    status,
-    canResetPassword,
-}: {
-    status?: string;
-    canResetPassword: boolean;
-}) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false as boolean,
+interface Props { }
+
+function Login(props: Props) {
+    const { } = props
+    const form = useForm({
+        email: ''
     });
+    const { data, post, clearErrors } = form;
+    let [inDB, setInDB] = useState(null)
+    const search = useDebouncedCallback((d: string) => {
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+        if (d?.length > 0) {
+            post('exists', {
+                onSuccess: (res) => {
+                    setInDB(true)
+                },
+                onError: () => { setInDB(false); clearErrors('email') }
+            })
+        } else {
+            setInDB(null)
+        }
+    }, 700);
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+    useEffect(() => {
+        if (data['email']?.includes('@')) {
+            search(data["email"]);
+        }
+
+    }, [data["email"]])
+
+    const login = (e) => {
+        post(route('login.account'), { preserveState: false });
     };
 
+    const register = (e) => {
+        post(route('register.account'));
+    };
     return (
-        <GuestLayout>
-            <Head title="Log in" />
-
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
+        <div className='flex items-center p-40px h-screen'>
+            <Head title="Login" />
+            <div className='w-full h-full flex flex-col'>
+                <div className='flex items-center justify-center'>
+                    <Link href={route('welcome')}><Img src="assets/img/logo.png" /></Link>
                 </div>
-            )}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
+                <div className='h-full justify-center items-center flex p-80px'>
+                    <Form className='w-full' form={form}>
+                        <div className='text-xl font-bold mb-16px text-center'>Začněte zadáním e-mailu</div>
+                        <TextField placeholder={'Váš e-mail'} className='w-full' name="email" />
+                        {
+                            inDB === true &&
+                            <>
+                                <PasswordField className='w-full' type='password' name="password" placeholder='Heslo' />
+                                <div className='flex gap-8px items-center justify-between w-full mb-32px'>
+                                    <Checkbox name="agree" label={"Zapamatuj si mě"} />
+                                </div>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); login(e) }}>Přihlásít se</Button>
+                            </>
+                        }
+                        {
+                            inDB === false &&
+                            <>
+                                <TextField className='w-full mt-16px' name="name" placeholder={'Jméno'} />
+                                <PasswordField className='w-full' type='password' name="password" placeholder='Heslo' />
+                                <PasswordField className='w-full' type='password' name="password_confirmation" placeholder='Heslo znovu' />
+                                <div className='flex gap-8px items-center justify-between w-full mb-32px'>
+                                    <Checkbox name="agree" label={"Souhlasím s podmínkami"} />
+                                </div>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); register(e) }}>Registrovat se</Button>
+                            </>
+                        }
+                    </Form>
                 </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+            </div>
+            <div className='w-full h-full'>
+                <ChangingCarousel />
+            </div>
+        </div>
+    )
 }
+
+export default Login

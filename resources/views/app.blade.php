@@ -15,6 +15,7 @@
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
+        @vite(['resources/sass/app.scss'])
         @inertiaHead
         @picturaHead
     </head>

@@ -4,7 +4,7 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
-        "strict": true,
+        "strict": false,
         "isolatedModules": true,
         "target": "ESNext",
         "esModuleInterop": true,
@@ -25,5 +25,9 @@
             "ziggy-js": ["vendor/tightenco/ziggy"],
         }
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.d.ts"]
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.d.ts"],
+    "exclude": [
+        "node_modules",
+        "public"
+    ]
 }

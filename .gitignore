@@ -5,6 +5,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+/public/robots.txt
+/bootstrap/robots.txt
 /storage/pail
 /vendor
 .env
