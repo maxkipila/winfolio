@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
@@ -20,6 +20,9 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
+                <Link href={route('logout')} as="button" method='post' className='flex'>
+                    <div className='whitespace-nowrap'>Odhlásit se</div>
+                </Link>
             </div>
         </AuthenticatedLayout>
     );

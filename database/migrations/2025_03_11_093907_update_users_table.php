@@ -27,7 +27,6 @@ return new class extends Migration
             $table->string('psc')->nullable();
             $table->string('city')->nullable();
             $table->string('country')->nullable();
-            
         });
     }
 
@@ -52,7 +51,6 @@ return new class extends Migration
             $table->dropColumn('psc');
             $table->dropColumn('city');
             $table->dropColumn('country');
-
         });
     }
 };
