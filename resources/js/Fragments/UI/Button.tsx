@@ -54,9 +54,9 @@ interface ButtonStylesProps {
 }
 
 function getButtonStyles({ disabled, primary, className, outlined = false, mini, color, disabledWhite = false }: ButtonStylesProps) {
-    return `w-max  ${mini ? "h-32px px-16px rounded-full" : "h-48px px-24px mob:px-8px rounded-md"}
+    return `${mini ? "h-32px px-16px rounded-full" : "h-48px px-24px mob:px-8px"}
      flex whitespace-nowrap justify-center items-center ${disabled ? `${disabledWhite ? "bg-app-yellow border border-app-yellow text-black opacity-40" : "bg-app-lighter/20"}
       pointer-events-none text-app-lighter cursor-not-allowed ` :
             (primary ? (outlined ? " hover:bg-app-lighter text-app hover:text-white border-app border cursor-pointer" : " bg-[#539648]  hover:bg-app-lighter text-white cursor-pointer") :
-                `${color ? ` bg-[#1A1A1A] text-black border-[#539648] border-app- bg-[${color}] hover:[#539648] border border-[${color}] hover:bg-opacity-80` : "text-black font-bold bg-app-yellow border border-app-yellow text-black hover:border-app-gray-999999"} cursor-pointer`)} gap-x-8px font-semibold ${className}`
+                `${color ? ` bg-[#1A1A1A] text-black border-[#539648] border-app- bg-[${color}] hover:[#539648] border border-[${color}] hover:bg-opacity-80` : "text-black font-bold bg-[#F7AA1A] border-2 border-black w-full text-black hover:border-app-gray-999999"} cursor-pointer`)} gap-x-8px font-semibold ${className}`
 }

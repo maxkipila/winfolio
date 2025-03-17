@@ -4,6 +4,7 @@ import Form from '@/Fragments/forms/Form'
 import Checkbox from '@/Fragments/forms/inputs/Checkbox';
 import PasswordField from '@/Fragments/forms/inputs/PasswordField';
 import TextField from '@/Fragments/forms/inputs/TextField';
+import Toggle from '@/Fragments/forms/inputs/Toggle';
 import { Button } from '@/Fragments/UI/Button';
 import { useDebouncedCallback } from '@/hooks/useDebounceCallback';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -55,29 +56,32 @@ function Login(props: Props) {
                     <Link href={route('welcome')}><Img src="assets/img/logo.png" /></Link>
                 </div>
                 <div className='h-full justify-center items-center flex p-80px'>
-                    <Form className='w-full' form={form}>
-                        <div className='text-xl font-bold mb-16px text-center'>Začněte zadáním e-mailu</div>
+                    <Form className='w-full gap-12px flex-col flex' form={form}>
+                        <div className='text-xl font-bold mb-16px text-center'>{inDB == null ? "Začněte zadáním e-mailu" : inDB == true ? "Přihlásit se" : "Začněte zadáním e-mailu"}</div>
                         <TextField placeholder={'Váš e-mail'} className='w-full' name="email" />
                         {
                             inDB === true &&
                             <>
-                                <PasswordField className='w-full' type='password' name="password" placeholder='Heslo' />
+                                <PasswordField label={'Heslo'} className='w-full' type='password' name="password" placeholder='Heslo' />
                                 <div className='flex gap-8px items-center justify-between w-full mb-32px'>
                                     <Checkbox name="agree" label={"Zapamatuj si mě"} />
                                 </div>
-                                <Button href="#" onClick={(e) => { e.preventDefault(); login(e) }}>Přihlásít se</Button>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); login(e) }}>Přihlásit se</Button>
                             </>
                         }
                         {
                             inDB === false &&
                             <>
                                 <TextField className='w-full mt-16px' name="name" placeholder={'Jméno'} />
-                                <PasswordField className='w-full' type='password' name="password" placeholder='Heslo' />
-                                <PasswordField className='w-full' type='password' name="password_confirmation" placeholder='Heslo znovu' />
-                                <div className='flex gap-8px items-center justify-between w-full mb-32px'>
+                                {/* <PasswordField label={'Heslo'} className='w-full' type='password' name="password" placeholder='Heslo' />
+                                <PasswordField label={'Heslo znovu'} className='w-full' type='password' name="password_confirmation" placeholder='Heslo znovu' /> */}
+                                {/* <div className='flex gap-8px items-center justify-between w-full mb-32px'>
                                     <Checkbox name="agree" label={"Souhlasím s podmínkami"} />
-                                </div>
+                                </div> */}
+                                <Toggle label={"Odebírat newsletter"} name="newsletter" />
+
                                 <Button href="#" onClick={(e) => { e.preventDefault(); register(e) }}>Registrovat se</Button>
+
                             </>
                         }
                     </Form>
