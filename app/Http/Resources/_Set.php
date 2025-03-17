@@ -14,6 +14,20 @@ class _Set extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id'              => $this->id,
+            'set_num'         => $this->set_num,
+            'name'            => $this->name,
+            'img_url'         => $this->img_url,
+            'year'            => $this->year,
+            'review_id'       => $this->review_id,
+            'theme_id'        => $this->theme_id,
+            'subscription_id' => $this->subscription_id,
+            'created_at'      => $this->created_at,
+            'updated_at'      => $this->updated_at,
+            'review' => new _Review($this->whenLoaded('review')),
+            'theme' => new _Theme($this->whenLoaded('theme')),
+            'subscription' => new _Subscription($this->whenLoaded('subscription')),
+        ];
     }
 }

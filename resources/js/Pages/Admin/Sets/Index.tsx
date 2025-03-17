@@ -1,92 +1,63 @@
 import { FormContext } from '@/Fragments/forms/FormContext'
-import OrderBy from '@/Fragments/forms/inputs/OrderBy'
-import Toggle from '@/Fragments/forms/inputs/Toggle'
-import { MetaBar } from '@/Fragments/MetaBar'
 import Table from '@/Fragments/Table/Table'
 import Td from '@/Fragments/Table/Td'
 import Th from '@/Fragments/Table/Th'
-import useLazyLoad from '@/hooks/useLazyLoad'
-import usePageProps from '@/hooks/usePageProps'
 import AdminLayout from '@/Layouts/AdminLayout'
 import { Link } from '@inertiajs/react'
-import { PencilSimple, Trash } from '@phosphor-icons/react'
 import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
-    users: Array<User>
+    sets: {
+        data: Array<SetLego>;
+    }
 }
 
-
-function Dashboard(props: Props) {
-    const { } = props
+function Index(props: Props) {
+    const { sets } = props
 
 
 
     return (
-        <AdminLayout title='Sety | Winfolio'>
-            <Usertable />
-        </AdminLayout>
+        <div className=''>
+            <AdminLayout title='Sety | Winfolio'>
+                <div className=' w-full p-16px'>
+                    <SetTable absolute_items={sets.data} />
+                </div>
+            </AdminLayout>
+        </div>
     )
 }
 
-export function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
+export function SetTable({ absolute_items, hide_meta }: { absolute_items?: Array<SetLego>, hide_meta?: boolean }) {
     return (
-        <Table<User> title="Sety" item_key='users' Row={Row} absolute_items={absolute_items}>
-            <Th></Th>
-            {/*   <Th order_by='id'>ID</Th>
-            <Th>Jméno a příjmení</Th>
-            <Th>Subscription</Th>
-            <Th order_by='first_name'>Username</Th>
-            <Th order_by='email'>E-mail</Th> */}
+        <Table<SetLego> title="Sety" item_key='sets' Row={Row} hide_meta={hide_meta} absolute_items={absolute_items}>
+            <Th order_by='id'>ID</Th>
+            <Th order_by='set_num'>Číslo setu</Th>
+            <Th order_by='name'>Název setu</Th>
+            <Th>Náhled</Th>
+            <Th>Počet dílků</Th>
+            <Th>Rok vydání</Th>
         </Table>
     )
 }
 
-function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[]>> }) {
-    const { id, first_name, last_name, email, phone, setItems } = props;
-    /*     const { open, close } = useContext(ModalsContext) */
-    const { setData } = useContext(FormContext);
-
-    /*   const removeItem = (e, id) => {
-          e.preventDefault();
-  
-          open(MODALS.CONFIRM, false, {
-              title: "Potvrdit smazání",
-              message: "Opravdu chcete smazat Uživatele?",
-              buttons: <DefaultButtons
-                  href={route('users.destroy', { user: id })}
-                  onCancel={close}
-                  onSuccess={() => {
-                      setItems(pr => pr.filter(f => f.id != id));
-                      close();
-                  }}
-              />
-          })
-      } */
-
-    useEffect(() => {
-        setData(d => ({ ...d, [`status-${id}`]: status }))
-    }, [])
-
+function Row(props: SetLego & { setItems: React.Dispatch<React.SetStateAction<SetLego[]>> }) {
+    const { id, year, name, set_num, theme_id, img_url } = props
     return (
-        <tr className='rounded group hover:bg-[#CCEEF0] '>
-            {/*             <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{id}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>Gold</Link></Td>
-            <Td><Link className='hover:underline text-app-button-light' href={route('users.edit', { user: id })}>{first_name} {last_name}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{email}</Link></Td> */}
-            {/* <Td>{prefix} {phone}</Td> */}
-            {/*   <Td>{props.received_payments_sum} Kč</Td> */}
-            {/*  <Td>{Math.floor((props.received_payments_sum ?? 0) * 0.05 * 100) / 100} Kč</Td> */}
-            {/* <Td><Toggle admin name={`status-${id}`} disabled /> </Td> */}
-            {/*  <Td>
-                <div className='flex gap-8px items-center justify-end'>
-                    <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
-                    <button onClick={(e) => removeItem(e, id)}><Trash className='text-app-input-error' /></button>
-                </div>
-            </Td> */}
+        <tr className='rounded-0  group hover:outline hover:outline-2 outline-black'>
+            <Td>{id}</Td>
+            <Td>{set_num}</Td>
+            <Td>{name}</Td>
+            <Td>
+                <Link className='hover:underline' href=/* {route('sets.show', { set: id })} */'#'>
+                    {img_url && <img src={img_url} alt={name} className='w-32px h-32px' />}
+                </Link>
+            </Td>
+            <Td>{theme_id}</Td>
+            <Td>{year}</Td>
         </tr>
     );
 }
 
-export default Dashboard
+export default Index

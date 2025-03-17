@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class _Theme extends JsonResource
+class _Award extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,14 +15,13 @@ class _Theme extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'        => $this->id,
-            'name'      => $this->name,
-            'parent_id' => $this->parent_id,
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'type'       => $this->type,
+            'description' => $this->description,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'parent'   => new _Theme($this->whenLoaded('parent')),
-            'children' => _Theme::collection($this->whenLoaded('children')),
-            'sets'     => _Set::collection($this->whenLoaded('sets')),
+            'users'      => _User::collection($this->whenLoaded('users')),
         ];
     }
 }

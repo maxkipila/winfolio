@@ -2,31 +2,29 @@
 
 namespace App\Models;
 
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Set extends Model
+class Minifig extends Model
 {
+    use HasFactory;
+
     protected $guarded = [];
-    protected $primaryKey = 'set_num';
+    protected $primaryKey = 'fig_num';
     protected $keyType = 'string';
     public $incrementing = false;
-
-    use HasFactory;
 
     public function review()
     {
         return $this->belongsTo(Review::class);
     }
-
-    public function theme()
-    {
-        return $this->belongsTo(Theme::class);
-    }
-
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

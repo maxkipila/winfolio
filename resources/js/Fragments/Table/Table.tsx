@@ -26,37 +26,41 @@ function Table<T>(props: Props<T>) {
 
     return (
         <>
-            <div className=' py-16px px-16px rounded-md max-w-limit w-full'>
+            <div>
                 {
                     title && (
                         typeof title == 'string'
-                            ? <div className='text-2xl font-bold mb-16px'>{title}</div>
+                            ? <div className='text-xl font-bold mb-24px'>{title}</div>
                             : title
                     )
                 }
-                <div className='w-full h-1px border-black border-2 bg-[#E5E9E9] mb-16px'></div>
-                <div className='border-collapse overflow-hidden flex-grow flex'>
-                    <table className='flex-grow border-collapse'>
-                        <thead>
-                            <FormContext.Provider value={{ ...form, hasElement: false }}>
-                                <tr className=''>
-                                    {children}
-                                </tr>
-                            </FormContext.Provider>
-                        </thead>
-                        <tbody>
-                            <FormContext.Provider value={{ ...search, hasElement: false }}>
-                                {
-                                    items.map(p =>
-                                        <Row key={`${item_key}-${p?.[id_key]}`} {...p} setItems={setItems} />
-                                    )
-                                }
-                            </FormContext.Provider>
-                        </tbody>
-                    </table>
+
+                <div className=' py-16px border-2 border-black rounded-sm px-16px  max-w-limit w-full'>
+
+
+                    <div className='border-collapse overflow-hidden flex-grow flex'>
+                        <table className='flex-grow border-collapse'>
+                            <thead>
+                                <FormContext.Provider value={{ ...form, hasElement: false }}>
+                                    <tr className=''>
+                                        {children}
+                                    </tr>
+                                </FormContext.Provider>
+                            </thead>
+                            <tbody>
+                                <FormContext.Provider value={{ ...search, hasElement: false }}>
+                                    {
+                                        items.map(p =>
+                                            <Row key={`${item_key}-${p?.[id_key]}`} {...p} setItems={setItems} />
+                                        )
+                                    }
+                                </FormContext.Provider>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            {!hide_meta && <MetaBar {...meta} button={button} />}
+                {!hide_meta && <MetaBar {...meta} button={button} />}
+            </div >
         </>
     )
 }
