@@ -30,12 +30,12 @@ function Table<T>(props: Props<T>) {
                 {
                     title && (
                         typeof title == 'string'
-                            ? <div className='text-xl font-bold mb-24px'>{title}</div>
+                            ? <div className="text-xl font-bold font-teko tracking-normal mb-24px">{title}</div>
                             : title
                     )
                 }
 
-                <div className=' py-16px border-2 border-black rounded-sm px-16px  max-w-limit w-full'>
+                <div className=' p-24px border-2 text-sm font-medium border-black rounded-sm px-16px  max-w-limit w-full'>
 
 
                     <div className='border-collapse overflow-hidden flex-grow flex'>

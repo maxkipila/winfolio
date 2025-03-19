@@ -25,8 +25,17 @@ class Set extends Model
         return $this->belongsTo(Theme::class);
     }
 
+    public function prices()
+    {
+        return $this->hasMany(Price::class);
+    }
+
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
+    }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'set_user');
     }
 }

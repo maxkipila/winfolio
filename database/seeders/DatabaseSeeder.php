@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Minifig;
+use App\Models\Price;
+use App\Models\Set;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;

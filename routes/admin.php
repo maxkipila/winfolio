@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AwardController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MinifigController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\NewsController;
@@ -19,17 +20,21 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware(['is_admin'])->group(function () {
-        Route::match(['POST', 'GET'], '/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::match(['POST', 'GET'], '/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroyAdmin'])->name('admin.auth.logout');
 
         Route::group(['prefix' => 'users'], function () {
             Route::match(['POST', 'GET'], '/', [UserController::class, 'index'])->name('admin.users.index');
             Route::match(['POST', 'GET'], '/create', [UserController::class, 'create'])->name('admin.users.create');
+
+            Route::match(['POST', 'GET'], '/show/{user}', [UserController::class, 'show'])->name('admin.users.show');
             Route::match(['POST', 'GET'], '/store', [UserController::class, 'store'])->name('admin.users.store');
-            Route::match(['POST', 'GET'], '/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+            Route::match(['POST', 'GET'], '/edit/{user}', [UserController::class, 'edit'])->name('admin.users.edit');
             Route::match(['POST', 'GET'], '/{user}', [UserController::class, 'update'])->name('admin.users.update');
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
         });
+
+
         Route::group(['prefix' => 'awards'], function () {
             Route::match(['POST', 'GET'], '/', [AwardController::class, 'index'])->name('admin.awards.index');
             Route::match(['POST', 'GET'], '/create', [AwardController::class, 'create'])->name('admin.awards.create');

@@ -33,10 +33,10 @@ class UserFactory extends Factory
             'month' => fake()->month(),
             'year' => fake()->year(),
             'street' => fake()->streetName(),
-            'street_2'=> fake()->streetName(),
+            'street_2' => fake()->streetName(),
             'psc' => fake()->postcode(),
-            'city'=> fake()->city(),
-            'country'=> 'CZ',
+            'city' => fake()->city(),
+            'country' => 'CZ',
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -49,7 +49,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

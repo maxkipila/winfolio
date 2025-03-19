@@ -10,9 +10,9 @@ class Minifig extends Model
     use HasFactory;
 
     protected $guarded = [];
-    protected $primaryKey = 'fig_num';
-    protected $keyType = 'string';
-    public $incrementing = false;
+    /*   protected $primaryKey = 'fig_num'; */
+    /*  protected $keyType = 'string';
+    public $incrementing = false; */
 
     public function review()
     {
@@ -26,5 +26,15 @@ class Minifig extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(Price::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'minifig_user', 'minifig_id', 'user_id', 'fig_num', 'id');
     }
 }

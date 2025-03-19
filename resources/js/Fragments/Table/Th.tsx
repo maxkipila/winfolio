@@ -11,11 +11,13 @@ function Th(props: Props) {
 
     return (
         <th className='p-12px text-left last:text-right align-middle whitespace-nowrap'>
-            {children}
-            {
-                order_by &&
-                <OrderBy value={order_by} name={''} />
-            }
+            <div className='flex items-center gap-8px'>
+                {children}
+                {
+                    order_by &&
+                    <OrderBy value={order_by} name={''} />
+                }
+            </div>
         </th>
     )
 }

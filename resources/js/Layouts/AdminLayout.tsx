@@ -1,10 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
-
-import { title } from 'process'
 import React, { ReactNode } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
-import Img from '@/Components/Image'
 
 type Props = {
     title?: string;
@@ -13,13 +10,12 @@ type Props = {
 }
 const AdminLayout = ({ title = 'Winfolio', children, rightChild }: Props) => {
     return (
-        <div className='flex gap-16px font-satoshi'>
-            <Sidebar /* auth={auth} */ />
+        <div className='flex font-nunito gap-16px flex-col font-satoshi'>
             <Head title={title} />
-            <div className='flex-grow flex flex-col mt-32px gap-16px'>
-
-                <Header rightChild={rightChild} />
-                <main className='flex flex-col flex-grow overflow-auto gap-16px items-center'>
+            <Header rightChild={rightChild} />
+            <div className='flex-grow flex flex-row gap-16px'>
+                <Sidebar /* auth={auth} */ />
+                <main className='w-full m-48px'>
                     {children}
                 </main>
             </div>

@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: "Teko-Variable";
+    src: url("/resources/fonts/Teko-VariableFont_wght.ttf")
+        format("truetype-variations");
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Nunito-Variable";
+    src: url("/resources/assets/fonts/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf")
+        format("truetype-variations");
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: normal;
+}

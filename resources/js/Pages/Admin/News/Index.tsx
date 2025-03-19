@@ -1,15 +1,7 @@
 import { FormContext } from '@/Fragments/forms/FormContext'
-import OrderBy from '@/Fragments/forms/inputs/OrderBy'
-import Toggle from '@/Fragments/forms/inputs/Toggle'
-import { MetaBar } from '@/Fragments/MetaBar'
 import Table from '@/Fragments/Table/Table'
-import Td from '@/Fragments/Table/Td'
 import Th from '@/Fragments/Table/Th'
-import useLazyLoad from '@/hooks/useLazyLoad'
-import usePageProps from '@/hooks/usePageProps'
 import AdminLayout from '@/Layouts/AdminLayout'
-import { Link } from '@inertiajs/react'
-import { PencilSimple, Trash } from '@phosphor-icons/react'
 import React, { useContext, useEffect } from 'react'
 
 
