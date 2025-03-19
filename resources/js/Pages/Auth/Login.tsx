@@ -53,7 +53,7 @@ function Login(props: Props) {
             <Head title="Login" />
             <div className='w-full h-full flex flex-col'>
                 <div className='flex items-center justify-center'>
-                    <Link href={route('welcome')}><Img src="assets/img/logo.png" /></Link>
+                    <Link href={route('welcome')}><Img src="/assets/img/logo.png" /></Link>
                 </div>
                 <div className='h-full justify-center items-center flex p-80px'>
                     <Form className='w-full gap-12px flex-col flex' form={form}>

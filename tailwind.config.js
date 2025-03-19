@@ -57,6 +57,9 @@ export default {
             '3/5': '60%',
             '4/5': '80%',
             'full': '100%',
+            '30vh':'30vh',
+            '40vh':'40vh',
+            '45vh':'45vh',
             '50vh': '50vh',
             '80vh': '80vh',
             '90vh': '90vh',
@@ -101,7 +104,7 @@ export default {
                         DEFAULT: '#5CB64F',
                         dark: '#428338',
                         light: '#80ff6e',
-                    }
+                    },
                 }
             }
         },
