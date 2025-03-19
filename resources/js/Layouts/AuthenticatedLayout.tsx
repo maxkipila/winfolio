@@ -1,6 +1,6 @@
 import Img from '@/Components/Image'
 import { Link, router } from '@inertiajs/react'
-import { BellSimple, Door, List, MagnifyingGlass, Sparkle, X } from '@phosphor-icons/react'
+import { BellSimple, Door, List, MagnifyingGlass, Sparkle, User, X } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
 
 
@@ -29,7 +29,7 @@ function AuthenticatedLayout(props: Props) {
     }
     let [open, setOpen] = useState(false)
     return (
-        <div className='relative'>
+        <div className='relative font-teko'>
             <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen transform duration-300  ${open ? "" : "-translate-x-full"}`}>
                 <div className='flex flex-col p-24px'>
                     <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
@@ -75,6 +75,9 @@ function AuthenticatedLayout(props: Props) {
                         <MagnifyingGlass size={24} />
                         <BellSimple size={24} />
                         <Door className='cursor-pointer' onClick={() => { logout() }} size={24} />
+                        <Link href={route('profile.index')}>
+                            <User size={24} />
+                        </Link>
                     </div>
                 </div>
             </div>
