@@ -2,7 +2,7 @@ import Icon from "@/Components/Icon";
 import Img from "@/Components/Image";
 import usePageProps from "@/hooks/usePageProps";
 import { Link } from "@inertiajs/react";
-import { ChartPie, Users, Medal, Cards, Lego, LegoSmiley } from "@phosphor-icons/react";
+import { ChartPie, Users, Medal, Cards, Lego, LegoSmiley, Newspaper } from "@phosphor-icons/react";
 import { ReactNode, useState } from "react";
 
 
@@ -34,33 +34,43 @@ function Sidebar(props: Props) {
     let [userOptions, setUserOptions] = useState(false);
 
     return (
-        <div className='bg-white w-[80px] border-r-[1px] border-[#DEDFE5] h-screen flex flex-col items-center p-16px justify-between sticky top-16px'>
+        <div className='bg-white w-[80px] border-r-[1px] border-[#DEDFE5] h-screen flex flex-col items-center  justify-between sticky '>
             <Link href={route('dashboard')}>
                 <Icon name='Logo' />
             </Link>
 
-            <div className='flex flex-col text-bold gap-12px'>
-                <MenuLink activeName='admin.dashboard' name="Statistiky" icon={<ChartPie size={24} />} href={route('admin.dashboard')} />
-                <MenuLink activeName='admin.users.index' name="Uživatelé" icon={<Users size={24} />} href={route('admin.users.index')} />
-                <MenuLink activeName='admin.awards.index' name="Ocenění" icon={<Medal size={24} />} href={route("admin.awards.index")} />
-                <MenuLink activeName='admin.news.index' name="Novinky a analýzy" icon={<Cards size={24} />} href={route("admin.news.index")} />
-                <MenuLink activeName='admin.sets.index' name="Sety" icon={<Lego size={24} />} href={route("admin.sets.index")} />
-                <MenuLink activeName='admin.minifigs.index' name="Minifigurky" icon={<LegoSmiley size={24} />} href={route("admin.minifigs.index")} />
+            <div className='flex flex-col text-bold gap-16px p-16px'>
+                <MenuLink activeName='admin.dashboard' name="Statistiky" icon={<ChartPie className="text-black" size={24} weight="bold" />} href={route('admin.dashboard')} />
+                <MenuLink activeName='admin.users.index' name="Uživatelé" icon={<Users size={24} className="text-black" weight="bold" />} href={route('admin.users.index')} />
+                <MenuLink activeName='admin.awards.index' name="Ocenění" icon={<Medal size={24} className="text-black" weight="bold" />} href={route("admin.awards.index")} />
+                <MenuLink activeName='admin.news.index' name="Novinky a analýzy" icon={<Newspaper className="text-black" weight="bold" size={24} />} href={route("admin.news.index")} />
+                <MenuLink activeName='admin.sets.index' name="Sety" icon={<Lego size={24} className="text-black" weight="bold" />} href={route("admin.sets.index")} />
+                <MenuLink activeName='admin.minifigs.index' name="Minifigurky" icon={<LegoSmiley className="text-black" weight="bold" size={24} />} href={route("admin.minifigs.index")} />
             </div>
 
-            <div className='relative'>
-                <Img onClick={() => setUserOptions((p) => !p)} src={auth?.user?.thumbnail ?? "/assets/img/user.png"} className='object-cover object-center rounded-full w-full h-full cursor-pointer' />
-                {
-                    userOptions &&
-                    <div className='absolute left-0 top-12 bg-white shadow-lg border rounded-md flex flex-col gap-12px p-12px min-w-[120px]'>
-                        <div>{auth?.user?.first_name} {auth?.user?.last_name}</div>
-                        <Link href={route('logout')} as="button" method='post' className='flex hover:bg-gray-200 p-8px rounded-md'>
-                            <div className='whitespace-nowrap'>Odhlásit se</div>
+            <div className="relative">
+                <Img
+                    onClick={() => setUserOptions(prev => !prev)}
+                    src={auth?.user?.thumbnail ?? "/assets/img/user.png"}
+                    alt="Profilový obrázek uživatele"
+                    className="object-cover object-center rounded-full w-full h-full cursor-pointer"
+                />
+                {userOptions && (
+                    <div className="absolute left-0 top-12 z-10 bg-white shadow-lg border rounded-md flex flex-col gap-[12px] p-[12px] min-w-[120px]">
+                        <div className="px-2 py-1" role="menuitem">
+                            {auth?.user?.first_name} {auth?.user?.last_name}
+                        </div>
+                        <Link
+                            href={route('logout.account')}
+                            as="button"
+                            method="post"
+                            className="flex items-center hover:bg-gray-200 p-2 rounded-md whitespace-nowrap"
+
+                        >
+                            Odhlásit se
                         </Link>
-
-
                     </div>
-                }
+                )}
             </div>
         </div>
     );

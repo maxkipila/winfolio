@@ -11,9 +11,7 @@ import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
-    minifigs: {
-        data: Array<Minifig>;
-    }
+    minifigs: Array<Minifig>
 }
 
 function Index(props: Props) {
@@ -25,7 +23,7 @@ function Index(props: Props) {
         <div className=''>
             <AdminLayout title='Minifigurky | Winfolio'>
                 <div className=' w-full p-16px'>
-                    <MinifigTable absolute_items={minifigs.data} />
+                    <MinifigTable />
                 </div>
             </AdminLayout>
         </div>
@@ -34,7 +32,7 @@ function Index(props: Props) {
 
 export function MinifigTable({ absolute_items, hide_meta }: { absolute_items?: Array<Minifig>, hide_meta?: boolean }) {
     return (
-        <Table<Minifig> title="Minifigurky" item_key='minifigs' Row={Row} hide_meta={hide_meta} absolute_items={absolute_items}>
+        <Table<Minifig> title="Minifigurky" item_key='minifigs' Row={Row} absolute_items={absolute_items}>
             <Th order_by='id'>ID</Th>
             <Th order_by='fig_num'>Číslo figurky</Th>
             <Th order_by='name'>Název figurky</Th>
@@ -51,7 +49,7 @@ function Row(props: Minifig & { setItems: React.Dispatch<React.SetStateAction<Mi
     const { setData } = useContext(FormContext);
 
     return (
-        <tr className='rounded-0  group hover:outline hover:outline-2 outline-black'>
+        <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
             <Td>{id}</Td>
             <Td>{fig_num}</Td>
             <Td>{name}</Td>

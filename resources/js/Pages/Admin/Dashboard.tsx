@@ -1,92 +1,228 @@
-import { FormContext } from '@/Fragments/forms/FormContext'
-import OrderBy from '@/Fragments/forms/inputs/OrderBy'
-import Toggle from '@/Fragments/forms/inputs/Toggle'
-import { MetaBar } from '@/Fragments/MetaBar'
-import Table from '@/Fragments/Table/Table'
-import Td from '@/Fragments/Table/Td'
-import Th from '@/Fragments/Table/Th'
-import useLazyLoad from '@/hooks/useLazyLoad'
-import usePageProps from '@/hooks/usePageProps'
-import AdminLayout from '@/Layouts/AdminLayout'
-import { Link } from '@inertiajs/react'
-import { PencilSimple, Trash } from '@phosphor-icons/react'
-import React, { useContext, useEffect } from 'react'
+import Form from '@/Fragments/forms/Form';
+import { FormContext } from '@/Fragments/forms/FormContext';
+import DateInput from '@/Fragments/forms/inputs/DateInput';
+import Submit from '@/Fragments/forms/inputs/Submit';
+import Td from '@/Fragments/Table/Td';
+import Th from '@/Fragments/Table/Th';
+import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, useForm } from '@inertiajs/react';
+import { Triangle, Users } from '@phosphor-icons/react';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    PointElement,
+    LineElement
+} from 'chart.js';
+import moment from 'moment';
+import { FormEventHandler, useContext, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    PointElement,
+    LineElement
+);
 
+interface UsersData {
+    total: number
+    before_total: number
+    percentage: number
+    diff: number
 
-interface Props {
-    users: Array<User>
+    active_total: number
+    active_before_total: number
+    active_percentage: number
+    active_diff: number
+
+    new_total: number
+    new_before_total: number
+    new_percentage: number
+    new_diff: number
 }
 
+interface Props {
+    data?: {
+        users?: UsersData
+        usersByDay?: Record<string, number>
+        p_start?: string
+        p_end?: string
+    }
+    start: string
+    end: string
+}
 
-function Dashboard(props: Props) {
-    const { } = props
+export default function Dashboard(props: Props) {
+    const { data = {}, start, end } = props;
+    const { users = null } = data || {};
+    const form = useForm({
+        start: start,
+        end: end
+    });
+    const { post, setData, data: form_data } = form;
 
+    let days: Record<string, number> = {};
+    let day = moment(start);
 
+    while (day.isBefore(moment(end))) {
+        let key = day.format('YYYY-MM-DD');
+        days[key] = Math.floor(Math.random() * 1000);
+        day.add(1, 'day');
+    }
+
+    let daysLabel = Object.keys(days ?? {}).map(d => moment(d, 'YYYY-MM-DD').format('D.'));
+    let max = Math.max(...Object.values(days ?? {}), 1);
+
+    const dummyData = {
+        labels: daysLabel,
+        datasets: [
+            {
+                label: 'Profit',
+                data: Object.values(days ?? {}),
+                stack: 'Stack 1',
+                borderColor: '#00686E',
+                backgroundColor: '#00686E',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 16
+            },
+        ]
+    };
+
+    let options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+                position: 'top' as const,
+            },
+            title: {
+                display: false,
+                text: 'Chart.js Bar Chart',
+            },
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                }
+            },
+            y: {
+                ticks: {
+                    callback: function (value: any) {
+                        return Math.floor(value) + ' Kč';
+                    },
+                    stepSize: max / 2
+                },
+                grid: {
+                    display: false
+                }
+            }
+        },
+        maintainAspectRatio: false,
+    };
+
+    const positive = (value?: number) => (value ?? -1) > 0 ? 'text-app-secondary' : 'text-[#E66C6C] rotate-180';
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post('?');
+    }
 
     return (
         <AdminLayout title='Dashboard | Winfolio'>
-            <Usertable />
-        </AdminLayout>
-    )
-}
+            <div className='flex flex-col bg-white rounded-xl h-min p-24px max-w-limit w-full'>
+                {/* Date selection form */}
+                <div className='h-full'>
+                    <Form className='flex items-center gap-8px' form={form} onSubmit={submit}>
+                        <div className='w-[130px]'>
+                            <DateInput placeholder='Vyberte datum' name='start' />
+                        </div>
+                        -
+                        <div className='w-[130px]'>
+                            <DateInput placeholder='Vyberte datum' name='end' />
+                        </div>
+                        <Submit />
+                    </Form>
 
-export function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
-    return (
-        <Table<User> title="Dashboard" item_key='users' Row={Row} absolute_items={absolute_items}>
-            <Th></Th>
-            {/*   <Th order_by='id'>ID</Th>
-            <Th>Jméno a příjmení</Th>
-            <Th>Subscription</Th>
-            <Th order_by='first_name'>Username</Th>
-            <Th order_by='email'>E-mail</Th> */}
-        </Table>
-    )
-}
-
-function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[]>> }) {
-    const { id, first_name, last_name, email, phone, setItems } = props;
-    /*     const { open, close } = useContext(ModalsContext) */
-    const { setData } = useContext(FormContext);
-
-    /*   const removeItem = (e, id) => {
-          e.preventDefault();
-  
-          open(MODALS.CONFIRM, false, {
-              title: "Potvrdit smazání",
-              message: "Opravdu chcete smazat Uživatele?",
-              buttons: <DefaultButtons
-                  href={route('users.destroy', { user: id })}
-                  onCancel={close}
-                  onSuccess={() => {
-                      setItems(pr => pr.filter(f => f.id != id));
-                      close();
-                  }}
-              />
-          })
-      } */
-
-    useEffect(() => {
-        setData(d => ({ ...d, [`status-${id}`]: status }))
-    }, [])
-
-    return (
-        <tr className='rounded group hover:bg-[#CCEEF0] '>
-            {/*             <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{id}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>Gold</Link></Td>
-            <Td><Link className='hover:underline text-app-button-light' href={route('users.edit', { user: id })}>{first_name} {last_name}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{email}</Link></Td> */}
-            {/* <Td>{prefix} {phone}</Td> */}
-            {/*   <Td>{props.received_payments_sum} Kč</Td> */}
-            {/*  <Td>{Math.floor((props.received_payments_sum ?? 0) * 0.05 * 100) / 100} Kč</Td> */}
-            {/* <Td><Toggle admin name={`status-${id}`} disabled /> </Td> */}
-            {/*  <Td>
-                <div className='flex gap-8px items-center justify-end'>
-                    <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
-                    <button onClick={(e) => removeItem(e, id)}><Trash className='text-app-input-error' /></button>
+                    {/* Bar chart */}
+                    <div className='w-full mt-24px'>
+                        <Line height={500} options={options} data={dummyData} />
+                    </div>
                 </div>
-            </Td> */}
-        </tr>
+            </div>
+
+            {/* Users statistics section */}
+            <div className='flex gap-16px max-w-limit w-full mt-16px'>
+                <div className='bg-white rounded-md p-24px w-full'>
+                    <div className='flex gap-16px items-center'>
+                        <div className='w-48px h-48px bg-app-lightbackground flex items-center justify-center rounded-md'>
+                            <Users size={24} color='#00686E' />
+                        </div>
+                        <div className='font-bold text-xl leading-[24px]'>Uživatelé</div>
+                    </div>
+
+                    {/* User statistics cards */}
+                    <div className='flex gap-16px mt-16px'>
+                        {/* Total users */}
+                        <div className='p-16px bg-app-lightbackground w-full rounded-md flex flex-col items-center justify-center'>
+                            <div className='font-bold'>Celkem</div>
+                            <div className='font-extrabold text-xl'>{users?.total || 0}</div>
+                            <div className='flex items-center gap-12px'>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.percentage)} />
+                                    <div>{users?.percentage || 0}%</div>
+                                </div>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.diff)} />
+                                    <div>{users?.diff || 0}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Active users */}
+                        <div className='p-16px bg-app-lightbackground w-full rounded-md flex flex-col items-center justify-center'>
+                            <div className='font-bold'>Aktivní</div>
+                            <div className='font-extrabold text-xl'>{users?.active_total || 0}</div>
+                            <div className='flex items-center gap-12px'>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.active_percentage)} />
+                                    <div>{users?.active_percentage || 0}%</div>
+                                </div>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.active_diff)} />
+                                    <div>{users?.active_diff || 0}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* New users */}
+                        <div className='p-16px bg-app-lightbackground w-full rounded-md flex flex-col items-center justify-center'>
+                            <div className='font-bold'>Noví</div>
+                            <div className='font-extrabold text-xl'>{users?.new_total || 0}</div>
+                            <div className='flex items-center gap-12px'>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.new_percentage)} />
+                                    <div>{users?.new_percentage || 0}%</div>
+                                </div>
+                                <div className='flex items-center gap-4px'>
+                                    <Triangle weight='fill' size={12} className={positive(users?.new_diff)} />
+                                    <div>{users?.new_diff || 0}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AdminLayout>
     );
 }
-
-export default Dashboard

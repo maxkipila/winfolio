@@ -33,40 +33,11 @@ function SearchCard({ name, type, image, href }) {
 function Header(props: Props) {
     const { rightChild } = props
 
-    const routes = (model, key) => {
-
-        switch (model) {
-            case 'Task':
-                return route('tasks.show', { task: key })
-            case 'JobOffer':
-                return route('jobs.show', { jobOffer: key })
-            case 'User':
-                return route('users.edit', { user: key })
-            case 'Admin':
-                return route('team.edit', { admin: key })
-        }
-
-    }
-
-    const types = (model) => {
-
-        switch (model) {
-            case 'JobOffer':
-                return "Joby"
-            case 'User':
-                return "Uživatelé"
-            case 'Task':
-                return "Tasky"
-            case 'Admin':
-                return "Adminy"
-        }
-
-    }
     const form = useForm({});
     const { data } = form;
 
     return (
-        <header className=" border-b-[1px] rounded-0 flex items-center justify-between  relative">
+        <header className=" border-b-[1px] px-16px py-32px rounded-0 flex items-center justify-between  relative">
             {/* Levá část: Logo */}
             <Link href={route('admin.dashboard')}>
                 <Img className="p-16px" src="/assets/img/logo.png" />
@@ -74,7 +45,7 @@ function Header(props: Props) {
 
             {/* Střed: Form se SearchHeaderem */}
             <Form form={form} className="flex items-center gap-4">
-                <TextField className="min-w-[300px] mb-8px flex justify-center border-2" placeholder="Vyhledat" name={"x"} />
+                <TextField className="min-w-[300px]  flex justify-center border-2" placeholder="Vyhledat" name={"x"} />
                 {/*  <SearchHeader
                     className="min-w-[300px] flex justify-center border-2"
                     name="search"
@@ -92,7 +63,6 @@ function Header(props: Props) {
                 <Button className='font-black bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px' href=/* {route('categories.create')}  */"#" icon={<Plus size={24} weight='bold' />}>Přidat položku</Button>
             </div>
 
-            {/* Pravá část: cokoliv co vložíš do {rightChild} */}
             {rightChild}
         </header>
     )

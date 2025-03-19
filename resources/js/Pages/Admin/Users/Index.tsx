@@ -10,11 +10,13 @@ import usePageProps from '@/hooks/usePageProps'
 import AdminLayout from '@/Layouts/AdminLayout'
 import { Link } from '@inertiajs/react'
 import { PencilSimple, Trash } from '@phosphor-icons/react'
+import { subscribe } from 'diagnostics_channel'
 import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
     users: Array<User>
+    subscriptions: Array<Subscription>
 }
 
 
@@ -33,19 +35,23 @@ function Index(props: Props) {
 export function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
     return (
         <Table<User> title="Uživatelé" item_key='users' Row={Row} absolute_items={absolute_items}>
-            <Th /* order_by='id' */>ID</Th>
+            <Th order_by='id'>ID</Th>
             <Th>Jméno a příjmení</Th>
-            <Th>Subscription</Th>
-            <Th /* order_by='first_name' */>Username</Th>
-            <Th /* order_by='email' */>E-mail</Th>
+            <Th order_by='first_name'>Přezdívka</Th>
+            <Th>Předplatné</Th>
+            <Th order_by='email'>E-mail</Th>
+
         </Table>
     )
 }
 
 function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[]>> }) {
-    const { id, first_name, last_name, email, phone, setItems } = props;
+    const { id, first_name, last_name, email, nickname, phone, setItems, subscriptions } = props;
     /*     const { open, close } = useContext(ModalsContext) */
     const { setData } = useContext(FormContext);
+    const userSubscriptions = props.subscriptions ?? [];
+    // If subscriptions is an array in the user object (assuming props structure is {data:[{subscriptions: [...]}]})
+    // For displaying in the table, we can join subscription names or IDs together
 
     /*   const removeItem = (e, id) => {
           e.preventDefault();
@@ -69,11 +75,13 @@ function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[
     }, [])
 
     return (
-        <tr className='rounded group hover:bg-[#CCEEF0] '>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{id}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>Gold</Link></Td>
-            <Td><Link className='hover:underline text-app-button-light' href={route('users.edit', { user: id })}>{first_name} {last_name}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{email}</Link></Td>
+        <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
+            <Td><Link className='hover:underline' href={route('admin.users.edit', { user: id })}>{id}</Link></Td>
+            <Td><Link className='hover:underline' href={route('admin.users.edit', { user: id })}> <div className='underline'>{first_name} {last_name}</div> </Link></Td>
+            <Td><Link className='hover:underline ' href={route('admin.users.edit', { user: id })}>{nickname}</Link></Td>
+            <Td><Link className='hover:underline' href={route('admin.users.edit', { user: id })}>{userSubscriptions.map(sub => sub.name).join(', ')}</Link></Td>
+            <Td><Link className='hover:underline' href={route('admin.users.edit', { user: id })}>{email}</Link></Td>
+            <Td><Link className='hover:underline' href={route('admin.users.edit', { user: id })}></Link></Td>
             {/* <Td>{prefix} {phone}</Td> */}
             {/*   <Td>{props.received_payments_sum} Kč</Td> */}
             {/*  <Td>{Math.floor((props.received_payments_sum ?? 0) * 0.05 * 100) / 100} Kč</Td> */}

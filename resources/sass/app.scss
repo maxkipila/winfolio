@@ -3,88 +3,88 @@
     src: url("/resources/assets/fonts/Aspekta-50.ttf") format("truetype");
     font-weight: 50;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-700.ttf") format("truetype");
     font-weight: 700;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-500.ttf") format("truetype");
     font-weight: 500;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-400.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-600.ttf") format("truetype");
     font-weight: 600;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-200.ttf") format("opentype");
     font-weight: 200;
     font-style: normal;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: "Aspekta";
     src: url("/resources/assets/fonts/Aspekta-300.ttf") format("opentype");
     font-weight: 300;
     font-style: normal;
-  }
-  
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
     appearance: none;
     -webkit-appearance: none;
     margin: 0;
-  }
-  
-  input[type=number] {
+}
+
+input[type="number"] {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: textfield;
-  }
-  
-  input {
+}
+
+input {
     appearance: none;
     -webkit-appearance: none;
-  }
-  
-  body {
+}
+
+body {
     scroll-behavior: smooth;
-    font-family: 'Aspekta' !important;
-  }
-  
-  .scroll-smooth {
+    font-family: "Aspekta" !important;
+}
+
+.scroll-smooth {
     scroll-behavior: smooth;
-  }
-  
-  html {
+}
+
+html {
     scroll-behavior: smooth;
-  }
-  
-  p {
-    a { 
-      text-decoration: underline;
+}
+
+p {
+    a {
+        text-decoration: underline;
     }
-  }
-  
-  .collapsable {
-    transition:height 0.3s ease-in-out;
-    height:auto;
-  }
+}
+
+.collapsable {
+    transition: height 0.3s ease-in-out;
+    height: auto;
+}
