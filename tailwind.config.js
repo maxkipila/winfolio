@@ -112,6 +112,9 @@ export default {
                     },
                 },
             },
+            zIndex: {
+                max:'99999'
+            }
         },
     },
 

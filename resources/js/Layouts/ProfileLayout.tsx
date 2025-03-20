@@ -1,6 +1,6 @@
 import Img from '@/Components/Image'
-import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, LockKey, UserCircle, XLogo } from '@phosphor-icons/react'
-import React, { ReactNode } from 'react'
+import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, List, LockKey, UserCircle, X, XLogo } from '@phosphor-icons/react'
+import React, { ReactNode, useState } from 'react'
 
 interface Props {
     children: ReactNode
@@ -8,10 +8,13 @@ interface Props {
 
 function ProfileLayout(props: Props) {
     const { children } = props
-
+    let [open, setOpen] = useState(false)
     return (
-        <div className='flex'>
-            <div className='flex-shrink-0 p-24px border-r border-[#E6E6E6] min-h-screen-no-header'>
+        <div className='nMob:flex mob:relative'>
+            <div className={`flex-shrink-0 p-24px mob:py-12px nMob:border-r nMob:border-[#E6E6E6] min-h-screen-no-header mob:fixed mob:top-[60px] mob:z-50 mob:bg-white mob:overflow-y-scroll mob:h-screen-no-header mob:w-full mob:transform mob:duration-300 ${open ? "" : "mob:-translate-x-full"}`}>
+                <div className='flex justify-start nMob:hidden mb-24px'>
+                    <X onClick={() => { setOpen((p) => !p) }} size={24} />
+                </div>
                 <div className='flex items-center gap-16px w-[345px]'>
                     <Img className='w-[84px] h-[84px]' src="/assets/img/user.png" />
                     <div>
@@ -113,7 +116,12 @@ function ProfileLayout(props: Props) {
                 </div>
             </div>
             <div className='w-full'>
-                {children}
+                <div className='flex justify-start px-24px nMob:hidden'>
+                    <List onClick={() => { setOpen((p) => !p) }} size={24} />
+                </div>
+                <div className='w-full'>
+                    {children}
+                </div>
             </div>
         </div>
     )

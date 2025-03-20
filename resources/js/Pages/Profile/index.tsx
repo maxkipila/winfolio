@@ -19,7 +19,7 @@ function Index(props: Props) {
             <ProfileLayout>
                 <div className='pt-24px flex flex-col'>
                     <div className='text-center font-bold text-xl'>Upravit profil</div>
-                    <Form className='w-1/2 mx-auto mt-32px flex flex-col gap-8px' form={form}>
+                    <Form className='w-1/2 mob:w-full mob:px-24px mx-auto mt-32px flex flex-col gap-8px' form={form}>
                         <TextField name="first_name" placeholder={'Jméno'} />
                         <TextField name="last_name" placeholder={'Příjmení'} />
                         <TextField name="username" placeholder={'@username'} />
