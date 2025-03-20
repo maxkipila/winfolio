@@ -10,16 +10,16 @@ class ThemeImport implements ToModel, WithHeadingRow
 {
     public function model(array $row)
     {
+        $parentId = !empty($row['parent_id']) && Theme::find($row['parent_id'])
+            ? $row['parent_id']
+            : null;
 
-        $parentId = $row['parent_id'] ?? null;
-        if ($parentId && !Theme::find($parentId)) {
-            $parentId = null;
-        }
-
-        return new Theme([
-            'id'        => $row['id'],
-            'name'      => $row['name'],
-            'parent_id' => $parentId,
-        ]);
+        return Theme::updateOrCreate(
+            ['id' => $row['id']],
+            [
+                'name'      => $row['name'],
+                'parent_id' => $parentId
+            ]
+        );
     }
 }
