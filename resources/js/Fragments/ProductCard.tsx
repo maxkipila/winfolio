@@ -2,15 +2,17 @@ import Img from '@/Components/Image'
 import { ArrowUpRight } from '@phosphor-icons/react'
 import React from 'react'
 
-interface Props extends Product {}
+interface Props extends Product {
+    wide?: boolean
+}
 
 function ProductCard(props: Props) {
-    const {} = props
+    const { wide = false } = props
 
     return (
         <div className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
-                <Img className='w-80px h-80px' src="/assets/img/atat.png"  />
+                <Img className='w-80px h-80px' src="/assets/img/atat.png" />
                 <div>
                     <div className='flex justify-between items-center'>
                         <div className='font-bold'>75313 AT-AT</div>
@@ -20,7 +22,7 @@ function ProductCard(props: Props) {
                     <div className='pt-8px border-t border-[#D0D4DB]'>2021</div>
                 </div>
             </div>
-            <div className='p-16px w-full grid grid-cols-2 gap-16px'>
+            <div className={`p-16px w-full grid ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>
                 <div>
                     <div className='text-[#4D4D4D]'>Retail</div>
                     <div className='mt-6px font-bold'>$ 849,00</div>
@@ -32,9 +34,9 @@ function ProductCard(props: Props) {
                 <div>
                     <div className='text-[#4D4D4D]'>Growth</div>
                     <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center mt-6px'>
-                            <ArrowUpRight color="white" />
-                            <div className='text-white'>+4,1 %</div>
-                        </div>
+                        <ArrowUpRight color="white" />
+                        <div className='text-white'>+4,1 %</div>
+                    </div>
                 </div>
                 <div>
                     <div className='text-[#4D4D4D]'>Annual</div>

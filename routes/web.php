@@ -33,6 +33,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('blog');
     })->name('blog-layout');
 
+    Route::match(['GET', 'POST'], '/chest', function(){
+        return Inertia::render('chest');
+    })->name('chest');
+
     Route::match(['GET','POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

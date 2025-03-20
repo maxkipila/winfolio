@@ -1,6 +1,6 @@
 import Img from '@/Components/Image'
 import { Link, router } from '@inertiajs/react'
-import { BellSimple, Door, List, MagnifyingGlass, Sparkle, User, X } from '@phosphor-icons/react'
+import { BellSimple, Door, House, List, MagnifyingGlass, ShippingContainer, Sparkle, Star, User, X } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
 
 
@@ -30,17 +30,31 @@ function AuthenticatedLayout(props: Props) {
     let [open, setOpen] = useState(false)
     return (
         <div className='relative font-teko'>
-            <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen transform duration-300  ${open ? "" : "-translate-x-full"}`}>
+            <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen z-max transform duration-300  ${open ? "" : "-translate-x-full"}`}>
                 <div className='flex flex-col p-24px'>
                     <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
                     <MenuItem text="Catalogue" link='#' />
-                    <MenuItem text="Chest" link='#' />
+                    <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
                     <MenuItem text="Awards" link='#' />
                 </div>
             </div>
-            <div className='flex fixed top-0 justify-between items-center px-24px mob:py-16px w-full border-b border-[#E6E6E6] bg-white'>
+            <div className='nMob:hidden fixed bottom-0 left-0 flex w-full bg-white'>
+                <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('dashboard') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <House size={24} />
+                </Link>
+                <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('catalog') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <MagnifyingGlass size={24} />
+                </Link>
+                <Link href={route('chest')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('chest') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <ShippingContainer size={24} />
+                </Link>
+                <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('awards') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Star size={24} />
+                </Link>
+            </div>
+            <div className='flex fixed top-0 justify-between items-center px-24px mob:py-16px w-full border-b z-50  border-[#E6E6E6] bg-white'>
                 <div className='flex items-center gap-24px mob:hidden'>
-                    <List className='nMob:hidden' size={24} />
+
                     <Img src="/assets/img/logo.png" />
                     <div className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px'>
                         <Sparkle size={24} />
@@ -53,14 +67,8 @@ function AuthenticatedLayout(props: Props) {
                         <div className='font-bold text-sm'>Premium</div>
                     </div>
                     <Img src="/assets/img/logo.png" />
-                    <div onClick={() => { setOpen((p) => !p) }} className='w-100px flex justify-end'>
-                        {
-                            open ?
-                                <X size={24} />
-                                :
-                                <List size={24} />
-
-                        }
+                    <div className='w-100px flex justify-end'>
+                        <BellSimple size={24} />
                     </div>
                 </div>
 
@@ -68,7 +76,7 @@ function AuthenticatedLayout(props: Props) {
                     <div className='flex gap-24px'>
                         <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
                         <MenuItem text="Catalogue" link='#' />
-                        <MenuItem text="Chest" link='#' />
+                        <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
                         <MenuItem text="Awards" link='#' />
                     </div>
                     <div className='flex gap-16px items-center'>
@@ -81,7 +89,7 @@ function AuthenticatedLayout(props: Props) {
                     </div>
                 </div>
             </div>
-            <div className='mt-[72px]'>
+            <div className='mt-[72px] mob:pb-50px'>
                 {children}
             </div>
 
