@@ -31,42 +31,48 @@ function SearchCard({ name, type, image, href }) {
 }
 
 function Header(props: Props) {
-    const { rightChild } = props
-
+    const { rightChild } = props;
     const form = useForm({});
-    const { data } = form;
 
     return (
-        <header className=" border-b-[1px] px-16px py-32px rounded-0 flex items-center justify-between  relative">
+        <header className="border-b-[1px] px-16px py-32px flex items-center justify-between relative">
             {/* Levá část: Logo */}
             <Link href={route('admin.dashboard')}>
                 <Img className="p-16px" src="/assets/img/logo.png" />
             </Link>
 
-            {/* Střed: Form se SearchHeaderem */}
-            <Form form={form} className="flex items-center gap-4">
-                <TextField className="min-w-[300px]  flex justify-center border-2" placeholder="Vyhledat" name={"x"} />
-                {/*  <SearchHeader
-                    className="min-w-[300px] flex justify-center border-2"
-                    name="search"
-                    placeholder="Vyhledat"
-                    keyName="search_all" optionsCallback={function (data: unknown): { text: string; value: string | number; element?: any; model: unknown; header?: string; } {
-                        throw new Error("Function not implemented.");
-                    }}                    optionsCallback={(data) => ({
-                        text: data?.name || `${data.id} | ${data.model}`,
-                        value: data.id ?? '',
-                        model: data,
-                    })}
-                /> */}
-            </Form>
-            <div>
-                <Button className='font-black bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px' href=/* {route('categories.create')}  */"#" icon={<Plus size={24} weight='bold' />}>Přidat položku</Button>
+            <div className="flex mx-auto">
+                <Form form={form} className="flex  items-center gap-4">
+                    <TextField
+                        className="min-w-[300px] flex justify-center border-2"
+                        placeholder="Vyhledat"
+                        name={"x"}
+                    />
+                </Form>
             </div>
 
-            {rightChild}
-        </header>
-    )
+            {rightChild === false ? null : (
+                <>
+                    {/* Střed: Form se SearchHeaderem */}
 
+
+                    {/* Tlačítko „Přidat položku“ */}
+                    <div>
+                        <Button
+                            className="font-black bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px"
+                            href="#"
+                            icon={<Plus size={24} weight='bold' />}
+                        >
+                            Přidat položku
+                        </Button>
+                    </div>
+                </>
+            )}
+
+
+            {typeof rightChild !== 'boolean' && rightChild}
+        </header>
+    );
 }
 
 export default Header

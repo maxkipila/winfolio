@@ -81,6 +81,7 @@ export default {
             fontSize: {
                 sm: ["14px", "16px"],
                 xl: ["20px", "24px"],
+                "4xl": ["32px", "40px"],
             },
             fontFamily: {
                 nunito: ["Nunito", ...defaultTheme.fontFamily.sans],

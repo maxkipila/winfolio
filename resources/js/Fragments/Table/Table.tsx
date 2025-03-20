@@ -12,10 +12,11 @@ interface Props<T> {
     title?: string | ReactNode
     absolute_items?: Array<T>
     hide_meta?: boolean
+    custom?: string
 }
 
 function Table<T>(props: Props<T>) {
-    const { children, Row, title, item_key, id_key = 'id', absolute_items, hide_meta } = props
+    const { children, Row, custom, title, item_key, id_key = 'id', absolute_items, hide_meta } = props
 
     const [_itms, button, meta, form, setItems] = useLazyLoad<T>(item_key);
 
@@ -35,7 +36,7 @@ function Table<T>(props: Props<T>) {
                     )
                 }
 
-                <div className=' p-24px border-2 text-sm font-medium border-black rounded-sm px-16px  max-w-limit w-full'>
+                <div className={` p-24px border-2 text-sm font-medium border-black rounded-sm px-16px  max-w-limit w-full ${custom}`}>
 
 
                     <div className='border-collapse overflow-hidden flex-grow flex'>

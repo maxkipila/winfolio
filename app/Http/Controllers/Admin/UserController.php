@@ -40,6 +40,12 @@ class UserController extends Controller
     }
 
 
+    public function edit(Request $request, User $user)
+    {
+
+        $user = new _User($user->load('subscriptions'));
+        return Inertia::render('Admin/Users/Detail', compact('user'));
+    }
 
 
 

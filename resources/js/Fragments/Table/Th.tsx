@@ -4,13 +4,14 @@ import OrderBy from '../forms/inputs/OrderBy'
 interface Props {
     children?: ReactNode
     order_by?: string
+    custom?: string
 }
 
 function Th(props: Props) {
     const { children, order_by } = props
 
     return (
-        <th className='p-12px text-left last:text-right align-middle whitespace-nowrap'>
+        <th className={`p-12px text-left last:text-right align-middle whitespace-nowrap `}>
             <div className='flex items-center gap-8px'>
                 {children}
                 {
