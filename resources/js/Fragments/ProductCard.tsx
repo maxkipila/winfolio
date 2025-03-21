@@ -1,4 +1,5 @@
 import Img from '@/Components/Image'
+import { Link } from '@inertiajs/react'
 import { ArrowUpRight } from '@phosphor-icons/react'
 import React from 'react'
 
@@ -10,7 +11,7 @@ function ProductCard(props: Props) {
     const { wide = false } = props
 
     return (
-        <div className='border-2 border-black divide-y-2 divide-black'>
+        <Link href={route('product')} className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
                 <Img className='w-80px h-80px' src="/assets/img/atat.png" />
                 <div>
@@ -43,7 +44,7 @@ function ProductCard(props: Props) {
                     <div className='mt-6px font-bold'>6,1 %</div>
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }
 

@@ -38,6 +38,15 @@ Route::middleware('auth:web')->group(function () {
     })->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
+    Route::match(['GET', 'POST'], '/catalog', function () {
+        return Inertia::render('catalog');
+    })->name('catalog');
+
+    Route::match(['GET', 'POST'], '/product', function () {
+        return Inertia::render('product');
+    })->name('product');
+
+    Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

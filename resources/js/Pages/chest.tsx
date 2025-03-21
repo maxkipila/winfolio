@@ -81,11 +81,13 @@ let options = {
     },
     scales: {
         x: {
+            display: false,
             grid: {
                 display: false
             }
         },
         y: {
+            display: false,
             ticks: {
                 callback: function (value: any) {
                     return Math.floor(value) + ' Kč';

@@ -49,7 +49,7 @@ function Login(props: Props) {
         post(route('register.account'));
     };
     return (
-        <div className='flex items-center p-40px h-screen'>
+        <div className='flex items-center p-40px h-screen font-teko'>
             <Head title="Login" />
             <div className='w-full h-full flex flex-col'>
                 <div className='flex items-center justify-center'>
