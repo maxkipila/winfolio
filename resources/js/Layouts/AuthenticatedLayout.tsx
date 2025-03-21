@@ -33,7 +33,7 @@ function AuthenticatedLayout(props: Props) {
             <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen z-max transform duration-300  ${open ? "" : "-translate-x-full"}`}>
                 <div className='flex flex-col p-24px'>
                     <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
-                    <MenuItem text="Catalogue" link='#' />
+                    <MenuItem text="Catalogue" link={route('catalog')} active={route()?.current()?.includes('catalog')} />
                     <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
                     <MenuItem text="Awards" link='#' />
                 </div>
@@ -42,7 +42,7 @@ function AuthenticatedLayout(props: Props) {
                 <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('dashboard') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
                     <House size={24} />
                 </Link>
-                <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('catalog') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                <Link href={route('catalog')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('catalog') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
                     <MagnifyingGlass size={24} />
                 </Link>
                 <Link href={route('chest')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('chest') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
@@ -75,7 +75,7 @@ function AuthenticatedLayout(props: Props) {
                 <div className='flex gap-48px mob:hidden'>
                     <div className='flex gap-24px'>
                         <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
-                        <MenuItem text="Catalogue" link='#' />
+                        <MenuItem text="Catalogue" link={route('catalog')} active={route()?.current()?.includes('catalog')} />
                         <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
                         <MenuItem text="Awards" link='#' />
                     </div>

@@ -37,6 +37,14 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('chest');
     })->name('chest');
 
+    Route::match(['GET', 'POST'], '/catalog', function(){
+        return Inertia::render('catalog');
+    })->name('catalog');
+
+    Route::match(['GET', 'POST'], '/product', function(){
+        return Inertia::render('product');
+    })->name('product');
+
     Route::match(['GET','POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
