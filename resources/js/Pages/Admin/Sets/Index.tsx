@@ -37,14 +37,18 @@ export function SetTable({ absolute_items, hide_meta }: { absolute_items?: Array
             <Th>Série / Téma</Th>
             <Th>Počet dílků</Th>
             <Th>Cena</Th>
-            <Th>Email</Th>
-            <Th>Rok vydání</Th>
+            {/*   <Th>Email</Th> */}
+            <Th></Th>
+            <Th></Th>
+            <div className='flex items-end justify-end'>
+                <Th>Rok vydání</Th>
+            </div>
         </Table>
     )
 }
 
 function Row(props: SetLego & { setItems: React.Dispatch<React.SetStateAction<SetLego[]>> }) {
-    const { id, year, name, set_num, theme_id, img_url } = props
+    const { id, year, name, set_num, num_parts, theme_id, img_url } = props
     return (
         <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
             <Td>{id}</Td>
@@ -55,10 +59,13 @@ function Row(props: SetLego & { setItems: React.Dispatch<React.SetStateAction<Se
                     {img_url && <img src={img_url} alt={name} className='w-32px h-32px' />}
                 </Link>
             </Td>
-            <Td></Td>
-            <Td>{theme_id}</Td>
+            <Td>{props.theme_id}</Td>
+            <Td>{num_parts}</Td>
+
             <Td>$ 560.00</Td>
-            <Td>email</Td>
+            {/* <Td>email</Td> */}
+            <Td></Td>
+            <Td></Td>
             <Td>{year}</Td>
         </tr>
     );

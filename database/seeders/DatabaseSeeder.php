@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use App\Models\Minifig;
 use App\Models\Price;
 use App\Models\Set;
@@ -38,23 +39,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        User::factory()->create([
+        Admin::create([
             'first_name' => 'Admin',
             'last_name' => 'Admin',
             'email' => 'admin@admin.com',
-            'nickname' => 'AdminUser',
-            'prefix' => '+420',
-            'phone' => '111111111',
-            'day' => '01',
-            'month' => '06',
-            'year' => '2000',
-            'street' => 'Ulice',
-            'street_2' => 'Ulice 2',
-            'psc' => '831 03',
-            'city' => 'Město',
-            'country' => 'CZ',
             'password' => '$2y$12$om7tnIs/OfsjdMBln3bVwec/4HOHEC159cceb1mP572BtEdXjeLKe',
-            'is_admin' => 1,
+
         ]);
+
+        $this->call(DataSeeder::class);
     }
 }

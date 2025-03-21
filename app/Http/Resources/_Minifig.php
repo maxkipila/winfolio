@@ -27,6 +27,7 @@ class _Minifig extends JsonResource
             'review'          => new _Review($this->whenLoaded('review')),
             'subscription'    => new _Subscription($this->whenLoaded('subscription')),
             'user' => new _User($this->whenLoaded('user')),
+            'model' => (new \ReflectionClass($this->resource))->getShortName(),
         ];
     }
 }

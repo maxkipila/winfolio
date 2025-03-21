@@ -1,6 +1,5 @@
 interface User extends Resource {
     id: number;
-    name: string;
     first_name: string;
     last_name: string;
     nickname: string;
@@ -17,4 +16,7 @@ interface User extends Resource {
     user: User;
     thumbnail: string;
     subscriptions: Array<Subscription>;
+    day: number;
+    month: number;
+    year: number;
 }

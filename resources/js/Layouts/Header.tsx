@@ -31,22 +31,61 @@ function SearchCard({ name, type, image, href }) {
 }
 
 function Header(props: Props) {
-    const { rightChild } = props;
+    const { rightChild } = props
+
+    const routes = (model, key) => {
+
+        switch (model) {
+            case 'Minifig':
+                return route('admin.minifigs.index', { minifig: key })
+            case 'SetLego':
+                return route('admin.sets.index', { setLego: key })
+            case 'User':
+                return route('admin.users.edit', { user: key })
+            /* case 'Admin':
+                return route('team.edit', { admin: key }) */
+        }
+
+    }
+
+    const types = (model) => {
+
+        switch (model) {
+            case 'Minifig':
+                return "Minifigurky"
+            case 'SetLego':
+                return "Sety"
+            case 'User':
+                return "Uživatelé"
+        }
+
+    }
     const form = useForm({});
+    const { data } = form;
 
     return (
-        <header className="border-b-[1px] px-16px py-32px flex items-center justify-between relative">
+        <header className="border-b-[1px] w-full px-16px py-32px flex items-center justify-between relative">
             {/* Levá část: Logo */}
             <Link href={route('admin.dashboard')}>
                 <Img className="p-16px" src="/assets/img/logo.png" />
             </Link>
 
             <div className="flex mx-auto">
-                <Form form={form} className="flex  items-center gap-4">
-                    <TextField
-                        className="min-w-[300px] flex justify-center border-2"
+                <Form form={form} className="flex  items-center gap-4px">
+                    <SearchHeader<User | SetLego | Minifig>
+                        className="min-w-[300px]"
+                        name="search"
                         placeholder="Vyhledat"
-                        name={"x"}
+                        keyName="search_all"
+                        optionsCallback={(r) => ({
+                            text: ('name' in r ? (r.name as string) : `${r.id} | ${r.model}`),
+                            element: (
+                                <SearchCard name={('name' in r ? r.name : `${r.id}`)} type={types(r.model)} image={'thumbnail' in r ? r?.thumbnail : undefined} href={routes(r.model, r.id)} />
+                            ),
+                            value: r.id ?? '',
+                            model: r,
+                            header: types(r.model)
+                        })}
                     />
                 </Form>
             </div>

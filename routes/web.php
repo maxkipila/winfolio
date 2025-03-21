@@ -7,7 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest:web')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 });
@@ -27,17 +27,17 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:web')->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-    Route::get('/blog-layout', function(){
+    Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');
 
-    Route::match(['GET', 'POST'], '/chest', function(){
+    Route::match(['GET', 'POST'], '/chest', function () {
         return Inertia::render('chest');
     })->name('chest');
 
-    Route::match(['GET','POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
+    Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

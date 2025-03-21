@@ -43,8 +43,16 @@ class UserController extends Controller
     public function edit(Request $request, User $user)
     {
 
-        $user = new _User($user->load('subscriptions'));
-        return Inertia::render('Admin/Users/Detail', compact('user'));
+        $user->load(['sets', 'minifigs']);
+
+        $resource = new _User($user);
+
+        return Inertia::render('Admin/Users/Detail', [
+            'user' => $resource,
+        ]);
+
+        /* $user = new _User($user->load('subscriptions'));
+        return Inertia::render('Admin/Users/Detail', compact('user')); */
     }
 
 

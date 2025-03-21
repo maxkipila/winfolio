@@ -3,7 +3,7 @@ import Img from "@/Components/Image";
 import usePageProps from "@/hooks/usePageProps";
 import { Link } from "@inertiajs/react";
 import { ChartPie, Users, Medal, Cards, Lego, LegoSmiley, Newspaper } from "@phosphor-icons/react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 
 interface MenuLinkProps {
@@ -31,7 +31,19 @@ interface Props {
 
 function Sidebar(props: Props) {
     const { auth } = props;
-    let [userOptions, setUserOptions] = useState(false);
+    const [userOptions, setUserOptions] = useState(false);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setUserOptions(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <div className='bg-white w-[80px] border-r-[1px] border-[#DEDFE5] h-screen flex flex-col items-center  justify-between sticky '>
@@ -48,7 +60,7 @@ function Sidebar(props: Props) {
                 <MenuLink activeName='admin.minifigs.index' name="Minifigurky" icon={<LegoSmiley className="text-black" weight="bold" size={24} />} href={route("admin.minifigs.index")} />
             </div>
 
-            <div className="relative">
+            <div className="relative" ref={menuRef}>
                 <Img
                     onClick={() => setUserOptions(prev => !prev)}
                     src={auth?.user?.thumbnail ?? "/assets/img/user.png"}
@@ -61,11 +73,10 @@ function Sidebar(props: Props) {
                             {auth?.user?.first_name} {auth?.user?.last_name}
                         </div>
                         <Link
-                            href={route('logout.account')}
+                            href={route('admin.logout.account')}
                             as="button"
                             method="post"
                             className="flex items-center hover:bg-gray-200 p-2 rounded-md whitespace-nowrap"
-
                         >
                             Odhlásit se
                         </Link>
@@ -73,7 +84,8 @@ function Sidebar(props: Props) {
                 )}
             </div>
         </div>
-    );
+    )
 }
+
 
 export default Sidebar
