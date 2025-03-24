@@ -36,6 +36,6 @@ class Set extends Model
     }
     public function users()
     {
-        return $this->belongsToMany(User::class, 'set_user');
+        return $this->belongsToMany(User::class, 'set_user', 'set_id', 'user_id');
     }
 }

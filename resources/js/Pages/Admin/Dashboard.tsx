@@ -210,7 +210,7 @@ export default function Dashboard(props: Props) {
         <AdminLayout rightChild={false} title='Dashboard | Winfolio'>
             <Form className='flex items-center w-full' form={form} onSubmit={submit}>
                 <div className='w-full'>
-                    <div className='flex w-full justify-end mb-24px items-center text-end mx-auto gap-8px'>
+                    <div className='flex w-full -z-10  justify-end mb-24px items-center text-end mx-auto gap-8px'>
                         <DateFilter userId={0} />
                     </div>
                 </div>

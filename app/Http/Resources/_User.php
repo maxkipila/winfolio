@@ -41,10 +41,13 @@ class _User extends JsonResource
             'is_admin' => $this->is_admin,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'sets' => _Set::collection($this->whenLoaded('sets')),
+            'minifigs' => _Minifig::collection($this->whenLoaded('minifigs')),
             'news' => _News::collection($this->whenLoaded('news')),
             'reviews' => _Review::collection($this->whenLoaded('reviews')),
             'subscriptions' => _Subscription::collection($this->whenLoaded('subscriptions')),
             'awards' => _Award::collection($this->whenLoaded('awards')),
+            'model' => (new \ReflectionClass($this->resource))->getShortName(),
         ];
     }
 }

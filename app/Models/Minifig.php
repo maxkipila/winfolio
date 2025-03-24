@@ -35,6 +35,6 @@ class Minifig extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'minifig_user', 'minifig_id', 'user_id', 'fig_num', 'id');
+        return $this->belongsToMany(User::class, 'minifig_user', 'minifig_id', 'user_id');
     }
 }

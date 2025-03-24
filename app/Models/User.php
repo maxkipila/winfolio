@@ -52,17 +52,7 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
-    public function sets()
-    {
-        return $this->belongsToMany(
-            Set::class,
-            'set_user',
-            'user_id',
-            'set_id',
-            'id',
-            'set_num'
-        );
-    }
+
     public function minifig()
     {
         return $this->belongsTo(Minifig::class, 'minifig_id', 'id');
@@ -77,9 +67,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Award::class)->withTimestamps();
     }
+    public function sets()
+    {
+        return $this->belongsToMany(Set::class, 'set_user', 'user_id', 'set_id');
+    }
+
     public function minifigs()
     {
-
-        return $this->belongsToMany(Minifig::class, 'minifig_user');
+        return $this->belongsToMany(Minifig::class, 'minifig_user', 'user_id', 'minifig_id');
     }
 }

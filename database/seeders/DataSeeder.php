@@ -17,18 +17,10 @@ class DataSeeder extends Seeder
      */
     public function run(): void
     {
-
         $users = User::factory(50)->create();
 
         $sets = Set::orderBy('id')->limit(50)->get();
-        if ($sets->isEmpty()) {
-            $sets = Set::factory(50)->create();
-        }
-
         $minifigs = Minifig::orderBy('id')->limit(50)->get();
-        if ($minifigs->isEmpty()) {
-            $minifigs = Minifig::factory(50)->create();
-        }
 
         $sets->each(function ($set) {
             Price::factory()->create([
@@ -43,12 +35,17 @@ class DataSeeder extends Seeder
                 'minifig_id' => $minifig->id,
             ]);
         });
-        $users->each(function ($user) use ($sets, $minifigs) {
-            $randomSet = $sets->random();
-            $user->sets()->attach($randomSet->id);
 
-            $randomFig = $minifigs->random();
-            $user->minifigs()->attach($randomFig->id);
+        $users->each(function ($user) use ($sets, $minifigs) {
+            if ($sets->isNotEmpty()) {
+                $randomSet = $sets->random();
+                $user->sets()->attach($randomSet->id);
+            }
+
+            if ($minifigs->isNotEmpty()) {
+                $randomFig = $minifigs->random();
+                $user->minifigs()->attach($randomFig->id);
+            }
 
             Subscription::factory()->create([
                 'user_id' => $user->id,

@@ -1,78 +1,122 @@
+import Img from '@/Components/Image'
+import Breadcrumbs from '@/Fragments/forms/Breadcrumbs'
+import { FormContext } from '@/Fragments/forms/FormContext'
+import Table from '@/Fragments/Table/Table'
+import Td from '@/Fragments/Table/Td'
+import Th from '@/Fragments/Table/Th'
 import AdminLayout from '@/Layouts/AdminLayout'
-import React from 'react'
+import { Link } from '@inertiajs/react'
+
+import React, { useContext, useEffect } from 'react'
 
 type Props = {
     user: User
+    minifig: Array<Minifig>
 }
 
-const Detail = (props: Props) => {
+/* function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
+    return (
+        <Table<User> title="Truhla" item_key='users' Row={Row} absolute_items={absolute_items}>
+            <Th order_by='id'>ID</Th>
+            <Th>Set / Minifigurka</Th>
+            <Th order_by='first_name'>ID setu/minifigurky</Th>
+            <Th>Nazev setu/minifigurky</Th>
+            <Th order_by='email'>Rok</Th>
+            <Th order_by='email'>Retail</Th>
+            <Th order_by='email'>Cena</Th>
+            <Th order_by='email'>Stav</Th>
+
+        </Table>
+    )
+} */
+function JobbertRow(props: User & { received_payments_sum: number } & { setItems: React.Dispatch<React.SetStateAction<Array<User & { received_payments_sum: number }>>> }) {
+    const { id, status, email, first_name, last_name, phone, prefix, thumbnail, received_payments_sum, setItems } = props;
+    /* const { open, close } = useContext(ModalsContext) */
+    const { setData } = useContext(FormContext);
+
+
+    useEffect(() => {
+        setData(d => ({ ...d, [`status-${id}`]: status }))
+    }, [])
+
+    return (
+        <tr className='rounded group'>
+            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{id}</Link></Td>
+            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{first_name} {last_name}</Link></Td>
+            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{/* {job_offers_count} */}</Link></Td>
+            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{received_payments_sum} Kč</Link></Td>
+            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{Math.floor(received_payments_sum * 0.05 * 100) / 100} Kč</Link></Td>
+            {/* <Td>
+                <div className='flex gap-8px items-center justify-end'>
+                    <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
+                    <button onClick={(e) => removeItem(e, id)}><Trash className='text-app-input-error' /></button>
+                </div>
+            </Td> */}
+        </tr>
+    );
+}
+
+function Detail(props: Props) {
+
+    const { first_name, email, street, street_2, city, country, psc, prefix, phone, nickname, day, month, year, id, last_name } = props.user
+
     return (
         <>
             <AdminLayout rightChild={false} title='Detail | Winfolio'>
-                <div className="p-16px border-2 border-black rounded-sm bg-white w-full flex flex-col gap-16px">
-                    {/* Karta s uživatelem */}
-                    <div className="border-2 border-black">
-                        {/* Horní řádek: avatar, jméno, přezdívka, datum registrace */}
-                        <div className="flex items-center justify-between px-16px py-8px border-b-2 border-black">
-                            <div className="flex items-center gap-12px">
-                                {/* Avatar (nahraďte vlastní cestou k obrázku) */}
-                                <img
-                                    src="/assets/img/user.png"
-                                    alt="avatar"
-                                    className="w-64px h-64px border-2 border-black"
-                                />
-                                <div>
-                                    <div className="font-bold text-lg">{props.user.first_name}{props.user.last_name}</div>
-                                    <div className="text-gray-600">{props.user.email}</div>
+                <Breadcrumbs previous={{ name: 'Uživatelé', href: route('admin.users.index') }} current={`${first_name} ${last_name}`} />
+                <div className="p-16px mt-24px   bg-gray w-full flexgap-16px">
+                    <div className="border-2 flex flex-col p-16px border-black">
+                        <div className="flex  w-full items-center ">
+                            <Img
+                                src="/assets/img/user.png"
+                                alt="avatar"
+                                className="w-[80px] h-[80px]"
+                            />
+                            <div className="w-full flex-col flex p-[16px]">
+                                <div className="flex flex-col  items-start mb-4px gap-[12px]">
+                                    <div className="relative">
+                                        <div className="font-bold text-lg">{first_name} {last_name}</div>
+                                        <div className="text-[#4D4D4D] text-[14px] font-bold leading-[20px]">@{nickname}</div>
+                                    </div>
+
+                                </div>
+                                <div className='border-b border-[#D0D4DB] w-full' />
+
+                                <div className='flex flex-row justify-between mt-8px  border-black'>
+                                    <div className="text-[14px] font-medium leading-[20px] text-[#4D4D4D]">Registrován 10. 8. 2024</div>
+                                    <div className="text-[#4D4D4D]">ID: 1</div>
                                 </div>
                             </div>
-                            <div className="text-sm text-gray-600">Registrován 10. 8. 2024</div>
-                        </div>
 
-                        {/* Spodní řádek: Telefon, Datum narození, Adresa */}
-                        <div className="px-16px py-12px flex flex-wrap gap-24px">
-                            <div>
-                                <div className="text-gray-500">{props.user.prefix}</div>
-                                <div className="font-bold">{props.user.phone}</div>
-                            </div>
-                            <div>
-                                <div className="text-gray-500">Datum narození</div>
-                                <div className="font-bold">29. 1. 1987</div>
-                            </div>
-                            <div>
-                                <div className="text-gray-500">Adresa</div>
-                                <div className="font-bold">Jindřichove 16, 745 09 Brno<br />Česká republika</div>
-                            </div>
+
+                        </div>
+                    </div>
+                    <div className="border-2 border-black border-t-0 py-[12px] px-[16px] w-full flex flex-row">
+                        <div className="w-1/3">
+                            <div className="text-[14px] font-medium leading-[20px] text-[#4D4D4D]">Telefon</div>
+                            <div className="font-bold">{prefix} {phone}</div>
+                        </div>
+                        <div className="w-1/3">
+                            <div className="text-[14px] font-medium leading-[20px] text-[#4D4D4D]">Datum narození</div>
+                            <div className="font-bold">{day}.{month}.{year}</div>
+                        </div>
+                        <div className="w-1/3">
+                            <div className="text-[14px] font-medium leading-[20px] text-[#4D4D4D]">Adresa</div>
+                            <div className="font-bold">{street} {psc} {city} <br />{country}</div>
                         </div>
                     </div>
 
 
-                    <div className="text-lg font-bold">Truhla</div>
+                    {/* <div className="text-xl font-teko font-bold mb-16px mt-40px">Truhla</div> */}
 
+                    <Table<User & { received_payments_sum: number }> item_key='users' Row={JobbertRow}>
+                        <Th order_by='id'>ID</Th>
+                        <Th order_by='first_name'>Uživatel</Th>
+                        <Th>Jobs</Th>
+                        <Th>Tržba</Th>
+                        <Th>Provize</Th>
+                    </Table>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-2 border-black">
-                            <thead>
-                                <tr className="border-b-2 border-black bg-gray-100">
-                                    <th className="text-left py-8px px-12px">ID</th>
-                                    <th className="text-left py-8px px-12px">Pojmenování</th>
-                                    <th className="text-left py-8px px-12px">Rok</th>
-                                    <th className="text-left py-8px px-12px">Cena</th>
-                                    <th className="text-left py-8px px-12px">Stav</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="border-b border-black">
-                                    <td className="py-8px px-12px">75313 AT-AT</td>
-                                    <td className="py-8px px-12px">Star Wars // Ultimate Collector...</td>
-                                    <td className="py-8px px-12px">2021</td>
-                                    <td className="py-8px px-12px">$ 849.00</td>
-                                    <td className="py-8px px-12px">Dobrý</td>
-                                </tr>
-                                {/* Další řádky dle potřeby */}
-                            </tbody>
-                        </table>
-                    </div>
 
                     {/* Tlačítka dole */}
                     <div className="flex flex-wrap gap-12px justify-end">

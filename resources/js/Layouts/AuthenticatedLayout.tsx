@@ -25,8 +25,11 @@ interface Props {
 function AuthenticatedLayout(props: Props) {
     const { children } = props
     function logout() {
-        router.post(route('logout.account'))
+        console.log('logout')
+        /* router.post(route('logout.account')) */
+        router.post(route('logout.user.account'))
     }
+
     let [open, setOpen] = useState(false)
     return (
         <div className='relative font-teko'>

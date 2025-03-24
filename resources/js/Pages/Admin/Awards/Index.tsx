@@ -25,12 +25,12 @@ function Index(props: Props) {
 
     return (
         <AdminLayout title='Přidat nové ocenění | Winfolio'>
-            <Usertable />
+            <Awardable />
         </AdminLayout>
     )
 }
 
-export function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
+export function Awardable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
     return (
         <Table<User> title="Přidat nové ocenění" item_key='users' Row={Row} absolute_items={absolute_items}>
             <Th /* order_by='id' */>ID</Th>
