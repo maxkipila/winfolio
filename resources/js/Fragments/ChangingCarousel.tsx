@@ -6,9 +6,9 @@ interface Props { }
 function ChangingCarousel(props: Props) {
     const { } = props
     let slides = [
-        { src: 'assets/img/brick-placeholder.png', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: 'assets/img/heads-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: 'assets/img/orange-bricks-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/brick-placeholder.png', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/heads-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/orange-bricks-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
     ]
     let index = useRef(0)
     useEffect(() => {
