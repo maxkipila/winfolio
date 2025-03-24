@@ -40,11 +40,6 @@ while (day.isBefore(moment().add('days', "30"))) {
 let daysLabel = Object.keys(days ?? {}).map(d => moment(d, 'YYYY-MM-DD').format('D.'));
 let max = Math.max(...Object.values(days ?? {}), 1);
 
-// var ctx = document.getElementById('chart').getContext('2d');
-
-// var gradient = ctx.createLinearGradient(0, 0, 0, 300);
-// gradient.addColorStop(0, 'rgba(224, 195, 155, 1)');
-// gradient.addColorStop(1, 'rgba(100, 100, 0,0)');
 
 const dummyData = {
     labels: daysLabel,
