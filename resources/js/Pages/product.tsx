@@ -8,10 +8,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosphor-icons/react'
 import React, { useState } from 'react'
 
-interface Props { }
+interface Props {
+    set: Product
+}
 
 function Product(props: Props) {
-    const { } = props
+    const { set } = props
     let [quickBuy, setQuickBuy] = useState(true)
     return (
         <AuthenticatedLayout>
@@ -19,20 +21,20 @@ function Product(props: Props) {
                 <div className='w-2/3 flex-shrink-0 mob:w-full'>
                     <div className='flex gap-24px mob:flex-col'>
                         <div className='border-2 border-black w-full'>
-                            <Img className='w-full object-cover' src="/assets/img/product-placeholder.png" />
+                            <Img className='w-full object-cover' src={set?.img_url} />
                         </div>
                         <div className='flex flex-col gap-24px mob:flex-row mob:overflow-x-auto'>
-                            <Img className='max-w-[200px] border-2 border-black' src="/assets/img/product-placeholder.png" />
-                            <Img className='max-w-[200px] border-2 border-black' src="/assets/img/product-placeholder.png" />
+                            <Img className='max-w-[200px] border-2 border-black' src={set?.img_url} />
+                            <Img className='max-w-[200px] border-2 border-black' src={set?.img_url} />
                         </div>
                     </div>
                     <div className='mt-24px'>
-                        <div className='font-nunito font-bold'>75313 AT-AT</div>
-                        <div className='font-bold text-4xl'>Dom’s Charger</div>
+                        <div className='font-nunito font-bold'>{set?.set_num}</div>
+                        <div className='font-bold text-4xl'>{set?.name}</div>
                     </div>
                     <div className='mt-12px flex items-center justify-between w-full'>
                         <div className='flex gap-8px items-center'>
-                            <div className='font-nunito font-bold'>2021</div>
+                            <div className='font-nunito font-bold'>{set?.year}</div>
                             <div className='h-16px w-16px bg-[#46BD0F] rounded-full'></div>
                         </div>
                         <div className='flex gap-16px'>
@@ -198,8 +200,9 @@ function Product(props: Props) {
                     </div>
                     <div className='mt-40px font-bold text-xl'>Other sets in Theme</div>
                     <div className='grid grid-cols-2 mob:grid-cols-1 mt-16px gap-12px'>
-                        <ProductCard wide />
-                        <ProductCard wide />
+                        {/* <ProductCard wide />
+                        <ProductCard wide /> */}
+                        <div className='font-bold text-xl'>No other sets in theme</div>
                     </div>
                 </div>
                 <div className='w-full'>

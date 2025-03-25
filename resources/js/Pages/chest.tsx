@@ -11,10 +11,12 @@ import {
     Tooltip,
     Legend,
     PointElement,
-    LineElement
+    LineElement,
+    Filler
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
+import useLazyLoad from '@/hooks/useLazyLoad';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -23,7 +25,8 @@ ChartJS.register(
     Tooltip,
     Legend,
     PointElement,
-    LineElement
+    LineElement,
+    Filler
 );
 interface Props { }
 
@@ -100,6 +103,7 @@ let options = {
 function Chest(props: Props) {
     const { } = props
     let [portfolio, setPortfolio] = useState(true)
+    const [sets, button, meta, setItems] = useLazyLoad<SetLego>('sets');
     return (
         <AuthenticatedLayout>
             <div className='w-full pt-32px mob:pt-24px px-24px'>
@@ -134,11 +138,17 @@ function Chest(props: Props) {
                     <div className='w-full border-b-2 border-[#E6E6E6]'></div>
                 </div>
                 <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
+                    {
+                        sets?.map((s)=>
+                            <ProductCard wide {...s} />
+                        )
+                    }
+                    {/* <ProductCard wide />
                     <ProductCard wide />
                     <ProductCard wide />
                     <ProductCard wide />
-                    <ProductCard wide />
-                    <ProductCard wide />
+                    <ProductCard wide /> */}
+                    {/* <div className='font-bold text-xl'>No products</div> */}
                 </div>
             </div>
         </AuthenticatedLayout>

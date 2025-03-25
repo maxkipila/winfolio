@@ -1,6 +1,7 @@
 import Img from '@/Components/Image';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
+import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
@@ -96,6 +97,9 @@ function CardsMobile() {
 }
 
 export default function Dashboard() {
+
+    const [sets, button, meta, setItems] = useLazyLoad<SetLego>('sets');
+    // const [minifigs, button: _button, meta, setItems] = useLazyLoad<SetLego>('sets');
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
@@ -110,10 +114,12 @@ export default function Dashboard() {
                             <div className='font-bold text-xl'>Momentálně trendují</div>
                         </div>
                         <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
-                            <ProductCard />
-                            <ProductCard />
-                            <ProductCard />
-                            <ProductCard />
+                            {
+                                sets?.map((s) =>
+                                    <ProductCard {...s} />
+                                )
+                            }
+
                         </div>
                     </div>
                     <div className='py-24px pl-24px mob:pl-0 w-full'>
@@ -122,10 +128,11 @@ export default function Dashboard() {
                             <div className='font-bold text-xl'>Top Movers</div>
                         </div>
                         <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
-                            <ProductCard />
-                            <ProductCard />
-                            <ProductCard />
-                            <ProductCard />
+                            {
+                                sets?.map((s) =>
+                                    <ProductCard {...s} />
+                                )
+                            }
                         </div>
                     </div>
 

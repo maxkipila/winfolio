@@ -58,13 +58,13 @@ const dummyData = {
             pointRadius: 4,
             fill: false
         },
-        {
-            label: 'Filled',
-            backgroundColor: 'rgba(196, 234, 178, 0.3)',
-            borderColor: 'rgba(196, 234, 178, 0.3)',
-            data: Object.values(days ?? {}),
-            fill: true,
-          }
+        // {
+        //     label: 'Filled',
+        //     backgroundColor: 'rgba(196, 234, 178, 0.3)',
+        //     borderColor: 'rgba(196, 234, 178, 0.3)',
+        //     data: Object.values(days ?? {}),
+        //     fill: true,
+        //   }
     ]
 };
 
