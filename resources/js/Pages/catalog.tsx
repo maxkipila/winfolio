@@ -2,6 +2,7 @@ import Form from '@/Fragments/forms/Form';
 import TextField from '@/Fragments/forms/inputs/TextField';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
+import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { useForm } from '@inertiajs/react';
 import { MagnifyingGlass, SlidersHorizontal, SpinnerGap, TrendUp, X } from '@phosphor-icons/react';
@@ -13,7 +14,7 @@ function Catalog(props: Props) {
     const { } = props
     const form = useForm({});
     const { data } = form;
-
+    const [sets, button, meta, setItems] = useLazyLoad<SetLego>('sets');
     return (
         <AuthenticatedLayout>
 
@@ -80,9 +81,12 @@ function Catalog(props: Props) {
                     </div>
                 </div>
                 <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
-                    <ProductCard wide />
-                    <ProductCard wide />
-                    <ProductCard wide />
+                    
+                    {
+                        sets?.map((s)=>
+                            <ProductCard wide {...s} />
+                        )
+                    }
                 </div>
                 <div className='flex items-center justify-center w-full mt-24px'>
                     <div>

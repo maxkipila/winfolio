@@ -4,19 +4,20 @@ import { ArrowUpRight } from '@phosphor-icons/react'
 import React from 'react'
 
 interface Props extends Product {
-    wide?: boolean
+    wide?: boolean,
+
 }
 
 function ProductCard(props: Props) {
-    const { wide = false } = props
+    const { wide = false, id, img_url, name, num_parts, set_num, theme_id, thumbnail, year } = props
 
     return (
-        <Link href={route('product')} className='border-2 border-black divide-y-2 divide-black'>
+        <Link href={route('product.detail', { set: id })} className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
-                <Img className='w-80px h-80px' src="/assets/img/atat.png" />
+                <Img className='w-80px h-80px object-contain' src={img_url} />
                 <div>
                     <div className='flex justify-between items-center'>
-                        <div className='font-bold'>75313 AT-AT</div>
+                        <div className='font-bold'>{name}</div>
                         <div className='w-16px h-16px bg-[#46BD0F] rounded-full'></div>
                     </div>
                     <div className='mt-4px mb-8px'>Star Wars / Ultimate Collecto…</div>
