@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class Set extends Model
 {
     protected $guarded = [];
-    protected $primaryKey = 'set_num';
-    protected $keyType = 'string';
+    /* protected $primaryKey = 'set_num'; */
+    /*   protected $keyType = 'string'; */
     public $incrementing = false;
 
     use HasFactory;

@@ -37,9 +37,9 @@ function Header(props: Props) {
 
         switch (model) {
             case 'Minifig':
-                return route('admin.minifigs.index', { minifig: key })
+                return route('admin.products.index.minifig', { minifig: key })
             case 'SetLego':
-                return route('admin.sets.index', { setLego: key })
+                return route('admin.products.index.set', { product: key })
             case 'User':
                 return route('admin.users.edit', { user: key })
             /* case 'Admin':
@@ -51,9 +51,7 @@ function Header(props: Props) {
     const types = (model) => {
 
         switch (model) {
-            case 'Minifig':
-                return "Minifigurky"
-            case 'SetLego':
+            case 'ProductLego':
                 return "Sety"
             case 'User':
                 return "Uživatelé"
@@ -72,7 +70,7 @@ function Header(props: Props) {
 
             <div className="flex mx-auto">
                 <Form form={form} className="flex  items-center gap-4px">
-                    <SearchHeader<User | SetLego | Minifig>
+                    <SearchHeader<User | ProductLego >
                         className="min-w-[300px]"
                         name="search"
                         placeholder="Vyhledat"
@@ -80,11 +78,19 @@ function Header(props: Props) {
                         optionsCallback={(r) => ({
                             text: ('name' in r ? (r.name as string) : `${r.id} | ${r.model}`),
                             element: (
-                                <SearchCard name={('name' in r ? r.name : `${r.id}`)} type={types(r.model)} image={'thumbnail' in r ? r?.thumbnail : undefined} href={routes(r.model, r.id)} />
+                                <SearchCard name={('name' in r ? r.name : `${r.id}`)}
+                                    type={types(r.model)}
+                                    image={'thumbnail' in r ? r?.thumbnail : undefined}
+                                    href={routes(r.model, r.id)}
+
+
+                                />
+
                             ),
                             value: r.id ?? '',
                             model: r,
                             header: types(r.model)
+
                         })}
                     />
                 </Form>
@@ -92,10 +98,6 @@ function Header(props: Props) {
 
             {rightChild === false ? null : (
                 <>
-                    {/* Střed: Form se SearchHeaderem */}
-
-
-                    {/* Tlačítko „Přidat položku“ */}
                     <div>
                         <Button
                             className="font-black bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px"
@@ -107,7 +109,6 @@ function Header(props: Props) {
                     </div>
                 </>
             )}
-
 
             {typeof rightChild !== 'boolean' && rightChild}
         </header>

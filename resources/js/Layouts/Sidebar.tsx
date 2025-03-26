@@ -56,8 +56,8 @@ function Sidebar(props: Props) {
                 <MenuLink activeName='admin.users.index' name="Uživatelé" icon={<Users size={24} className="text-black" weight="bold" />} href={route('admin.users.index')} />
                 <MenuLink activeName='admin.awards.index' name="Ocenění" icon={<Medal size={24} className="text-black" weight="bold" />} href={route("admin.awards.index")} />
                 <MenuLink activeName='admin.news.index' name="Novinky a analýzy" icon={<Newspaper className="text-black" weight="bold" size={24} />} href={route("admin.news.index")} />
-                <MenuLink activeName='admin.sets.index' name="Sety" icon={<Lego size={24} className="text-black" weight="bold" />} href={route("admin.sets.index")} />
-                <MenuLink activeName='admin.minifigs.index' name="Minifigurky" icon={<LegoSmiley className="text-black" weight="bold" size={24} />} href={route("admin.minifigs.index")} />
+                <MenuLink activeName='admin.products.index.set' name="Sety" icon={<Lego size={24} className="text-black" weight="bold" />} href={route("admin.products.index.set")} />
+                <MenuLink activeName='admin.profucts.index.minifig' name="Minifigurky" icon={<LegoSmiley className="text-black" weight="bold" size={24} />} href={route("admin.products.index.minifig")} />
             </div>
 
             <div className="relative" ref={menuRef}>

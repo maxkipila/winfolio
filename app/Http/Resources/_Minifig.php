@@ -9,14 +9,13 @@ class _Minifig extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id'         => $this->id,
-            'fig_num' => $this->fig_num,
+            'fig_num'    => $this->product_num,
+
             'name'       => $this->name,
             'num_parts'  => $this->num_parts,
             'img_url'    => $this->img_url,
@@ -24,9 +23,11 @@ class _Minifig extends JsonResource
             'subscription_id' => $this->subscription_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'review'          => new _Review($this->whenLoaded('review')),
-            'subscription'    => new _Subscription($this->whenLoaded('subscription')),
-            'user' => new _User($this->whenLoaded('user')),
+
+            'review'       => new _Review($this->whenLoaded('review')),
+            'subscription' => new _Subscription($this->whenLoaded('subscription')),
+            'user'         => new _User($this->whenLoaded('user')),
+
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
         ];
     }

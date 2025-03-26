@@ -64,7 +64,7 @@ function Detail(props: Props) {
         <>
             <AdminLayout rightChild={false} title='Detail | Winfolio'>
                 <Breadcrumbs previous={{ name: 'Uživatelé', href: route('admin.users.index') }} current={`${first_name} ${last_name}`} />
-                <div className="p-16px mt-24px   bg-gray w-full flexgap-16px">
+                <div className="p-16px mt-24px bg-gray w-full  gap-16px">
                     <div className="border-2 flex flex-col p-16px border-black">
                         <div className="flex  w-full items-center ">
                             <Img

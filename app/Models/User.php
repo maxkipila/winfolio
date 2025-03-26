@@ -76,4 +76,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Minifig::class, 'minifig_user', 'user_id', 'minifig_id');
     }
+
+    public function products()
+    {
+        return $this->belongsToMany(\App\Models\Product::class, 'product_user')
+            ->withTimestamps();
+    }
 }

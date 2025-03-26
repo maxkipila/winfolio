@@ -4,10 +4,14 @@ namespace App\Http\Middleware;
 
 use App\Http\Resources\_Admin;
 use App\Http\Resources\_Minifig;
+use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
+use App\Http\Resources\_Theme;
 use App\Http\Resources\_User;
 use App\Models\Minifig;
+use App\Models\Product;
 use App\Models\Set;
+use App\Models\Theme;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -48,10 +52,19 @@ class HandleInertiaRequests extends Middleware
 
         $is_admin_section = Str::startsWith(Route::currentRouteName(), 'admin.');
         $users = fn(): AnonymousResourceCollection => _User::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
-        $minifigs = fn(): AnonymousResourceCollection => _Minifig::collection(Minifig::search(['id', 'fig_num', 'name'], $request->q ?? '', 6, App::getLocale())->get());
+        /*         $minifigs = fn(): AnonymousResourceCollection => _Minifig::collection(Minifig::search(['id', 'fig_num', 'name'], $request->q ?? '', 6, App::getLocale())->get());
         $sets = fn(): AnonymousResourceCollection => _Set::collection(Set::search(['id', 'set_num', 'name'], $request->q ?? '', 6, App::getLocale())->get());
-        $themes = fn(): AnonymousResourceCollection => _Minifig::collection(Minifig::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
-
+ */
+        $themes = fn(): AnonymousResourceCollection => _Theme::collection(Theme::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
+        /* $admins = fn(): AnonymousResourceCollection => _Admin::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
+        $activities = fn(): AnonymousResourceCollection => _Activity::collection(Activity::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
+    */
+        $products = fn(): AnonymousResourceCollection => _Product::collection(
+            Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get()
+        );
+        $searchProducts = fn(): AnonymousResourceCollection => _Product::collection(
+            Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get()
+        );
 
 
         return [
@@ -70,12 +83,14 @@ class HandleInertiaRequests extends Middleware
             "search_all" => Inertia::lazy(
                 fn() => collect()
                     ->merge($users())
-                    ->merge($minifigs())
-                    ->merge($sets())
+                    ->merge($products())
                     ->merge($themes())
+                /*  ->merge($minifigs())
+                    ->merge($sets()) */
                 /* ->merge($admins()) */
                 /* ->merge($activities()) */
             ),
+            'searchProducts' => Inertia::lazy($products),
             /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
             'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),
             'searchAllMinifigs' => Inertia::lazy($this->searchByModel(Minifig::class, 'name', _Minifig::class, $request->q ?? "")), */

@@ -1,10 +1,7 @@
-interface SetLego extends Resource {
+interface ProductLego {
     id: number;
-    set_num: string;
     name: string;
-    year: number;
-    num_parts: number;
-    theme_id: number;
+    model: string;
     thumbnail: string;
     img_url: string;
     release_date: string;
@@ -17,4 +14,7 @@ interface SetLego extends Resource {
     product_num: string;
     forecast: string;
     theme: Theme;
+    num_parts: number;
+    theme_id: number;
+    type: string;
 }

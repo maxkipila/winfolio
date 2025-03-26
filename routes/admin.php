@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MinifigController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SetController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
@@ -47,22 +48,33 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/{news}', [NewsController::class, 'update'])->name('news.update');
             Route::delete('/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
         });
-        Route::group(['prefix' => 'sets'], function () {
-            Route::match(['POST', 'GET'], '/', [SetController::class, 'index'])->name('sets.index');
-            Route::match(['POST', 'GET'], '/create', [SetController::class, 'create'])->name('sets.create');
-            Route::match(['POST', 'GET'], '/store', [SetController::class, 'store'])->name('sets.store');
-            Route::match(['POST', 'GET'], '/{set}/edit', [SetController::class, 'edit'])->name('sets.edit');
-            Route::match(['POST', 'GET'], '/{set}', [SetController::class, 'update'])->name('sets.update');
-            Route::delete('/{set}', [SetController::class, 'destroy'])->name('sets.destroy');
-            /* Route::post('/import-sets', [SetController::class, 'importSets'])->name('sets.import'); */
+        Route::group(['prefix' => 'products', 'as' => 'products.'], function () {
+            Route::match(['POST', 'GET'], '/sety', [ProductController::class, 'indexSet'])->name('index.set');
+            Route::match(['POST', 'GET'], '/minifig', [ProductController::class, 'indexMinifig'])->name('index.minifig');
+            Route::match(['POST', 'GET'], '/set/{product}', [ProductController::class, 'showSet'])
+                ->name('show.set');
+            Route::match(['POST', 'GET'], '/minifig/{product}', [ProductController::class, 'showMinifig'])
+                ->name('show.minifig');
+            Route::match(['POST', 'GET'], '/create', [ProductController::class, 'create'])->name('create');
+            /* Route::post('/', [ProductController::class, 'store'])->name('store'); */
         });
-        Route::group(['prefix' => 'minifigs'], function () {
-            Route::match(['POST', 'GET'], '/', [MinifigController::class, 'index'])->name('minifigs.index');
-            Route::match(['POST', 'GET'], '/create', [MinifigController::class, 'create'])->name('minifigs.create');
-            Route::match(['POST', 'GET'], '/store', [MinifigController::class, 'store'])->name('minifigs.store');
-            Route::match(['POST', 'GET'], '/{minifig}/edit', [MinifigController::class, 'edit'])->name('minifigs.edit');
-            Route::match(['POST', 'GET'], '/{minifig}', [MinifigController::class, 'update'])->name('minifigs.update');
-            Route::delete('/{minifig}', [MinifigController::class, 'destroy'])->name('minifigs.destroy');
+        // Route::group(['prefix' => 'sets', 'as' => 'sets.'], function () {
+        //     Route::match(['POST', 'GET'], '/', [SetController::class, 'index'])->name('index');
+        //     Route::match(['POST', 'GET'], '/create', [SetController::class, 'create'])->name('create');
+        //     Route::match(['POST', 'GET'], '/store', [SetController::class, 'store'])->name('store');
+        //     Route::get('/detail/{legoSet}', [SetController::class, 'show'])->name('show');       // Detail
+        //     Route::match(['POST', 'GET'], '/edit/{set}', [SetController::class, 'edit'])->name('edit');
+        //     /* Route::match(['POST', 'GET'], '/{set}', [SetController::class, 'update'])->name('update');*/
+        //     /*Route::delete('/{set}', [SetController::class, 'destroy'])->name('sets.destroy'); */
+        // });
+        Route::group(['prefix' => 'minifigs', 'as' => 'minifigs.'], function () {
+            Route::match(['POST', 'GET'], '/', [MinifigController::class, 'index'])->name('index');
+            Route::match(['POST', 'GET'], '/create', [MinifigController::class, 'create'])->name('create');
+            Route::match(['POST', 'GET'], '/store', [MinifigController::class, 'store'])->name('store');
+            Route::match(['POST', 'GET'], '/{minifig}/edit', [MinifigController::class, 'edit'])->name('edit');
+            Route::match(['POST', 'GET'], '/{minifig}', [MinifigController::class, 'update'])->name('update');
+            Route::match(['POST', 'GET'], '/{minifig}/show', [MinifigController::class, 'show'])->name('show');
+            Route::delete('/{minifig}', [MinifigController::class, 'destroy'])->name('destroy');
         });
 
         /*   Route::post('/import', [ImportController::class, 'import'])->name('import');

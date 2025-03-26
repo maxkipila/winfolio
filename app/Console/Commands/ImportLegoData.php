@@ -17,7 +17,25 @@ class ImportLegoData extends Command
     protected $description = 'Stáhne a importuje LEGO data (themes, sets, minifigs). Standardně aktualizuje existující záznamy.';
 
     protected $baseUrl = 'https://cdn.rebrickable.com/media/downloads/';
+
     protected $datasets = [
+        'themes' => [
+            'file'   => 'themes.csv.gz',
+            'import' => ThemeImport::class,
+            'model'  => \App\Models\Theme::class
+        ],
+        'sets' => [
+            'file'   => 'sets.csv.gz',
+            'import' => SetImport::class,
+            'model'  => \App\Models\Product::class
+        ],
+        'minifigs' => [
+            'file'   => 'minifigs.csv.gz',
+            'import' => MinifigImport::class,
+            'model'  => \App\Models\Product::class
+        ]
+    ];
+    /*  protected $datasets = [
         'themes' => [
             'file' => 'themes.csv.gz',
             'import' => ThemeImport::class,
@@ -33,7 +51,7 @@ class ImportLegoData extends Command
             'import' => MinifigImport::class,
             'model' => \App\Models\Minifig::class
         ]
-    ];
+    ]; */
 
     public function handle()
     {

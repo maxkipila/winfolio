@@ -9,16 +9,15 @@ class _Set extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id'              => $this->id,
-            'set_num'         => $this->set_num,
+            'set_num'         => $this->product_num,
+
             'name'            => $this->name,
-            'num_parts' => $this->num_parts,
+            'num_parts'       => $this->num_parts,
             'img_url'         => $this->img_url,
             'year'            => $this->year,
             'review_id'       => $this->review_id,
@@ -26,9 +25,11 @@ class _Set extends JsonResource
             'subscription_id' => $this->subscription_id,
             'created_at'      => $this->created_at,
             'updated_at'      => $this->updated_at,
-            'review' => new _Review($this->whenLoaded('review')),
-            'theme' => new _Theme($this->whenLoaded('theme')),
+
+            'review'       => new _Review($this->whenLoaded('review')),
+            'theme'        => new _Theme($this->whenLoaded('theme')),
             'subscription' => new _Subscription($this->whenLoaded('subscription')),
+
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
         ];
     }

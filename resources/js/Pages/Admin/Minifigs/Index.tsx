@@ -50,9 +50,14 @@ function Row(props: Minifig & { setItems: React.Dispatch<React.SetStateAction<Mi
 
     return (
         <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
-            <Td>{id}</Td>
+            <Link href={route('admin.products.show.minifig', { product: id })} >
+                <Td>{id}</Td>
+            </Link>
+
             <Td>{fig_num}</Td>
-            <Td>{name}</Td>
+            <Link href={route('admin.products.show.minifig', { product: id })} >
+                <Td>{name}</Td>
+            </Link>
             <Td>
                 <Link className='hover:underline' href=/* {route('sets.show', { set: id })} */'#'>
                     {img_url && <Img src={img_url} alt={name} className='w-32px h-32px' />}

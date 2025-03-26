@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Minifig;
 use App\Models\Price;
-use App\Models\Set;
+use App\Models\Product;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -19,32 +18,28 @@ class DataSeeder extends Seeder
     {
         $users = User::factory(50)->create();
 
-        $sets = Set::orderBy('id')->limit(50)->get();
-        $minifigs = Minifig::orderBy('id')->limit(50)->get();
+        $sets = Product::where('product_type', 'set')->orderBy('id')->limit(50)->get();
+        $minifigs = Product::where('product_type', 'minifig')->orderBy('id')->limit(50)->get();
 
         $sets->each(function ($set) {
             Price::factory()->create([
-                'set_id'     => $set->id,
-                'minifig_id' => null,
+                'product_id' => $set->id,
             ]);
         });
-
         $minifigs->each(function ($minifig) {
             Price::factory()->create([
-                'set_id'     => null,
-                'minifig_id' => $minifig->id,
+                'product_id' => $minifig->id,
             ]);
         });
-
         $users->each(function ($user) use ($sets, $minifigs) {
             if ($sets->isNotEmpty()) {
                 $randomSet = $sets->random();
-                $user->sets()->attach($randomSet->id);
+                $user->products()->attach($randomSet->id);
             }
 
             if ($minifigs->isNotEmpty()) {
                 $randomFig = $minifigs->random();
-                $user->minifigs()->attach($randomFig->id);
+                $user->products()->attach($randomFig->id);
             }
 
             Subscription::factory()->create([

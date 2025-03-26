@@ -11,7 +11,7 @@ function Th(props: Props) {
     const { children, order_by } = props
 
     return (
-        <th className={`p-12px text-left last:text-right align-middle whitespace-nowrap `}>
+        <th className={`p-12px text-left last:text-right align-middle whitespace-nowrap ${props.custom}`}>
             <div className='flex items-center gap-8px'>
                 {children}
                 {

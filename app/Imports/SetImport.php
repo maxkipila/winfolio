@@ -3,6 +3,7 @@
 
 namespace App\Imports;
 
+use App\Models\Product;
 use App\Models\Set;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -14,7 +15,7 @@ class SetImport implements ToModel, WithHeadingRow, WithChunkReading
     {
         // $themeId = \App\Models\Theme::find($row['theme_id']) ? $row['theme_id'] : null; //existuje ?
 
-        return Set::updateOrCreate(
+        /*  return Set::updateOrCreate(
             ['set_num' => $row['set_num']],
             [
                 'name'      => $row['name'],
@@ -22,6 +23,17 @@ class SetImport implements ToModel, WithHeadingRow, WithChunkReading
                 'theme_id'  => $row['theme_id'],
                 'num_parts' => $row['num_parts'],
                 'img_url'   => $row['img_url'] ?? null,
+            ]
+        ); */
+        return Product::updateOrCreate(
+            ['product_num' => $row['set_num']],
+            [
+                'product_type' => 'set',
+                'name'         => $row['name'],
+                'year'         => $row['year'] ?? null,
+                'theme_id'     => $row['theme_id'] ?? null,
+                'num_parts'    => $row['num_parts'] ?? null,
+                'img_url'      => $row['img_url'] ?? null,
             ]
         );
     }
