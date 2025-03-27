@@ -19,4 +19,6 @@ interface User extends Resource {
     day: number;
     month: number;
     year: number;
+    created_at: string;
+    updated_at: string;
 }

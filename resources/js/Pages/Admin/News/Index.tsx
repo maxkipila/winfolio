@@ -16,7 +16,7 @@ function Dashboard(props: Props) {
 
 
     return (
-        <AdminLayout title='Novinky a analýzy | Winfolio'>
+        <AdminLayout rightChild={false} title='Novinky a analýzy | Winfolio'>
             <Usertable />
         </AdminLayout>
     )

@@ -26,7 +26,7 @@ function Index(props: Props) {
 
 
     return (
-        <AdminLayout title='Uživatelé | Winfolio'>
+        <AdminLayout rightChild={false} title='Uživatelé | Winfolio'>
             <Usertable />
         </AdminLayout>
     )

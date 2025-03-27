@@ -17,4 +17,9 @@ interface ProductLego {
     num_parts: number;
     theme_id: number;
     type: string;
+    price: number;
+    year: number;
+    retail: string;
+    value: string;
+    condition: string;
 }

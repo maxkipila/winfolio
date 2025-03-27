@@ -24,7 +24,7 @@ function Index(props: Props) {
 
 
     return (
-        <AdminLayout title='Přidat nové ocenění | Winfolio'>
+        <AdminLayout rightChild={false} title='Přidat nové ocenění | Winfolio'>
             <Awardable />
         </AdminLayout>
     )

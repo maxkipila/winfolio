@@ -11,7 +11,7 @@ import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
-    minifigs: Array<Minifig>
+    minifigs: Array<ProductLego>
 }
 
 function Index(props: Props) {
@@ -21,7 +21,7 @@ function Index(props: Props) {
 
     return (
         <div className=''>
-            <AdminLayout title='Minifigurky | Winfolio'>
+            <AdminLayout rightChild={false} title='Minifigurky | Winfolio'>
                 <div className=' w-full p-16px'>
                     <MinifigTable />
                 </div>
@@ -30,9 +30,9 @@ function Index(props: Props) {
     )
 }
 
-export function MinifigTable({ absolute_items, hide_meta }: { absolute_items?: Array<Minifig>, hide_meta?: boolean }) {
+export function MinifigTable({ absolute_items, hide_meta }: { absolute_items?: Array<ProductLego>, hide_meta?: boolean }) {
     return (
-        <Table<Minifig> title="Minifigurky" item_key='minifigs' Row={Row} absolute_items={absolute_items}>
+        <Table<ProductLego> title="Minifigurky" item_key='minifigs' Row={Row} absolute_items={absolute_items}>
             <Th order_by='id'>ID</Th>
             <Th order_by='fig_num'>Číslo figurky</Th>
             <Th order_by='name'>Název figurky</Th>
@@ -43,18 +43,18 @@ export function MinifigTable({ absolute_items, hide_meta }: { absolute_items?: A
     )
 }
 
-function Row(props: Minifig & { setItems: React.Dispatch<React.SetStateAction<Minifig[]>> }) {
-    const { id, name, fig_num, num_parts, img_url } = props
+function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateAction<ProductLego[]>> }) {
+    const { id, name, product_num, num_parts, img_url } = props
 
     const { setData } = useContext(FormContext);
 
     return (
-        <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
+        <tr className='odd:bg-[#F5F5F5]  hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
             <Link href={route('admin.products.show.minifig', { product: id })} >
                 <Td>{id}</Td>
             </Link>
+            <Td>{product_num}</Td>
 
-            <Td>{fig_num}</Td>
             <Link href={route('admin.products.show.minifig', { product: id })} >
                 <Td>{name}</Td>
             </Link>

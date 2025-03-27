@@ -31,7 +31,7 @@ function Table<T>(props: Props<T>) {
                 {
                     title && (
                         typeof title == 'string'
-                            ? <div className="text-xl font-bold font-teko tracking-normal mb-24px">{title}</div>
+                            ? <div className="text-xl  font-bold font-teko tracking-normal mb-24px">{title}</div>
                             : title
                     )
                 }

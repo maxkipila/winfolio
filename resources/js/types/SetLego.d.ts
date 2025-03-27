@@ -17,4 +17,5 @@ interface SetLego extends Resource {
     product_num: string;
     forecast: string;
     theme: Theme;
+    price: number;
 }

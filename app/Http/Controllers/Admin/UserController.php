@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\_Subscription;
 use App\Http\Resources\_User;
-use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -30,32 +28,29 @@ class UserController extends Controller
         return Inertia::render('Admin/Users/Index', compact('users', /* 'subscriptions' */));
     }
 
-    public function show(Request $request, User $user)
-    {
-        $user = _User::init($user);
-
-        return Inertia::render('Admin/Users/Detail', [
-            'user' => $user
-        ]);
-    }
-
-
-    public function edit(Request $request, User $user)
+    public function show(User $user)
     {
 
-        $user->load(['sets', 'minifigs']);
+        $user->load('products');
 
-        $resource = new _User($user);
+        $userResource = _User::init($user);
 
         return Inertia::render('Admin/Users/Detail', [
-            'user' => $resource,
+            'user' => $userResource,
         ]);
-
-        /* $user = new _User($user->load('subscriptions'));
-        return Inertia::render('Admin/Users/Detail', compact('user')); */
     }
+    public function edit(User $user)
+    {
+        $products = $user->products;
+        $user->load('products');
 
+        $userResource = new _User($user);
 
+        return Inertia::render('Admin/Users/Detail', [
+            'user' => $userResource,
+            'products' => $products,
+        ]);
+    }
 
     /*    public function create()
     {

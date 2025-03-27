@@ -79,7 +79,6 @@ class User extends Authenticatable
 
     public function products()
     {
-        return $this->belongsToMany(\App\Models\Product::class, 'product_user')
-            ->withTimestamps();
+        return $this->belongsToMany(Product::class, 'product_user', 'user_id', 'product_id');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\_User;
 use App\Models\User;
 use App\Traits\HasUtils;
 use Carbon\Carbon;
@@ -32,8 +33,10 @@ class DashboardController extends Controller
 
             $users = $data->users;
         }
+        $top_users = User::orderBy('created_at', 'desc');
+        $top_users_collection = fn() => _User::collection($top_users->paginate($request->paginate ?? 5));
 
-        return Inertia::render('Admin/Dashboard', compact('start', 'end', 'data', 'users'));
+        return Inertia::render('Admin/Dashboard', compact('start', 'end', 'data', 'users', 'top_users_collection'));
     }
 
     public function calculate($request)

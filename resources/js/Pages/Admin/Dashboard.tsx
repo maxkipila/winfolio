@@ -76,10 +76,10 @@ function UserRow(props: User & { sent_payments_sum: number } & { setItems: React
     }, [])
 
     return (
-        <tr className='rounded group hover:bg-[#CCEEF0] '>
-            <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{id}id</Link></Td>
+        <tr className='odd:bg-[#F5F5F5] hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black w-full '>
+            <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{id}</Link></Td>
             <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{first_name}{last_name}</Link></Td>
-            <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{/* {Math.floor((sent_payments_sum ?? 0) * 0.05 * 100) / 100} */} Kč</Link></Td>
+            <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{/* {Math.floor((sent_payments_sum ?? 0) * 0.05 * 100) / 100} */} {/* Kč */}</Link></Td>
             {/* <Td>
                 <div className='flex gap-8px items-center justify-end'>
                     <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
@@ -264,7 +264,6 @@ export default function Dashboard(props: Props) {
 
                             {/* Pravá část - Šipka + procento + zlatá tečka */}
                             <div className="flex items-center flex-col gap-8px">
-
                                 <div className="w-16px h-16px rounded-full bg-yellow-500"></div>
                                 <div className="flex items-center gap-4px">
                                     <ArrowCircleUpRight weight='bold' size={20} className={`${positive(users?.active_percentage)} text-[#46BD0F]`} />
@@ -309,25 +308,25 @@ export default function Dashboard(props: Props) {
                         </div>
 
                     </div>
-                    <div className='flex w-full gap-24px'>
+                    <div className='flex gap-24px'>
                         <div className=' w-1/2 rounded-sm border-2 border-black'>
-                            <div className=' bg-white p-24px w-full'>
+                            <div className='p-24px w-full'>
                                 <div className='flex gap-16px items-center'>
                                     <div className='w-48px h-48px bg-[#F5F5F5] rounded-sm bg-app-lightbackground flex items-center justify-center '>
                                         <Fire size={24} weight='bold' />
                                     </div>
                                     <div className='font-bold font-teko text-xl'>Nejaktivnější uživatelé</div>
                                 </div>
-                                <Table<User>
-                                    item_key="joberts"
-                                    custom="border-none m-0"
-                                    Row={UserRow}>
-
-                                    <Th order_by='id'>ID</Th>
-                                    <Th order_by='first_name'>Uživatel</Th>
-                                    <Th>Tržba</Th>
-                                    <Th>Provize</Th>
-                                </Table>
+                                <div className=''>
+                                    <Table<User>
+                                        item_key="top_users_collection"
+                                        custom="border-none m-0 w-full table-auto"
+                                        Row={UserRow}
+                                    >
+                                        <Th order_by='id'>ID</Th>
+                                        <Th order_by='first_name'>Uživatel</Th>
+                                    </Table>
+                                </div>
                             </div>
                         </div>
                         <div className="p-24px border-2 w-1/2 border-black rounded-sm bg-white">

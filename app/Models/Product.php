@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -16,9 +17,13 @@ class Product extends Model
         return $this->belongsTo(\App\Models\Theme::class);
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class, 'product_user')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            User::class,
+            'product_user',
+            'product_id',
+            'user_id'
+        );
     }
 }

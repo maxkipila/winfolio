@@ -45,8 +45,9 @@ class ProductController extends Controller
     {
         $setsQuery = Product::where('product_type', 'set')
             ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale());
-        $sets = fn() => _Set::collection($setsQuery->paginate($request->paginate ?? 10));
-
+        $sets = fn() => _Product::collection($setsQuery->paginate($request->paginate ?? 10));
+        // Load themes for filtering
+        $setsQuery->with('theme');
         $themes = fn() => _Theme::collection(
             Theme::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())->get()
         );
@@ -58,7 +59,7 @@ class ProductController extends Controller
     {
         $minifigsQuery = Product::where('product_type', 'minifig')
             ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale());
-        $minifigs = fn() => _Set::collection($minifigsQuery->paginate($request->paginate ?? 10));
+        $minifigs = fn() => _Product::collection($minifigsQuery->paginate($request->paginate ?? 10));
 
         $themes = fn() => _Theme::collection(
             Theme::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())->get()
