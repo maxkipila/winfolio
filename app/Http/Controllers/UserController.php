@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\_Minifig;
+use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
 use App\Models\Minifig;
+use App\Models\Product;
 use App\Models\Set;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,9 +14,9 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     public function dashboard(Request $request){
-        $sets = _Set::collection(Set::latest()->paginate($request->paginate ?? 10));
-        $minifigs = _Minifig::collection(Minifig::latest()->paginate($request->paginate ?? 10));
-        return Inertia::render('Dashboard', compact('sets', 'minifigs'));
+        
+        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+        return Inertia::render('Dashboard', compact('products'));
     }
 
     public function profile(Request $request){

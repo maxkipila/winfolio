@@ -12,7 +12,7 @@ function ProductCard(props: Props) {
     const { wide = false, id, img_url, name, num_parts, set_num, theme_id, thumbnail, year } = props
 
     return (
-        <Link href={route('product.detail', { set: id })} className='border-2 border-black divide-y-2 divide-black'>
+        <Link href={route('product.detail', { product: id })} className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
                 <Img className='w-80px h-80px object-contain' src={img_url} />
                 <div>

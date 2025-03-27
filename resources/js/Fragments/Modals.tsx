@@ -1,11 +1,13 @@
 import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import { useContext, useEffect, useState } from 'react';
 import NotificationsModal from './NotificationsModal';
+import ReviewsModal from './ReviewsModal';
 
 interface Props { }
 
 export enum MODALS {
     NOTIFICATION,
+    REVIEW
 }
 
 export function ModalsProvider(props) {
@@ -78,6 +80,7 @@ function Modals(props: Props) {
     return (
         <>
             {(modal?.modal == MODALS.NOTIFICATION) && <NotificationsModal  {...modal.data} />}
+            {(modal?.modal == MODALS.REVIEW) && <ReviewsModal  {...modal.data} />}
         </>
     )
 }

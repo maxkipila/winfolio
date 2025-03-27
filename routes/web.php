@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
+use App\Models\Product;
 use App\Models\Set;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -47,10 +49,10 @@ Route::middleware('auth:web')->group(function () {
         return Inertia::render('catalog', compact('sets'));
     })->name('catalog');
 
-    Route::match(['GET', 'POST'], '/product/{set}', function (Request $request, Set $set) {
-        $set = _Set::init($set);
+    Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
+        $product = _Product::init($product);
         // dd($set);
-        return Inertia::render('product', compact('set'));
+        return Inertia::render('product', compact('product'));
     })->name('product.detail');
 
     /*   Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index'); */
