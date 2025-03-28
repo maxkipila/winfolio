@@ -10,6 +10,7 @@ import React, { useContext, useEffect } from 'react'
 
 interface Props {
     sets: Array<ProductLego>
+    prices: Array<Prices>
 }
 
 function Index(props: Props) {
@@ -36,13 +37,16 @@ export function SetTable({ absolute_items, hide_meta }: { absolute_items?: Array
             <Th>Série / Téma</Th>
             <Th>Rok vydání</Th>
             <Th>Počet dílků</Th>
-            <Th>Cena</Th>
+            <div className='flex justify-end'>
+                <Th>Cena</Th>
+
+            </div>
 
         </Table>
     );
 }
 function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateAction<ProductLego[]>> }) {
-    const { id, name, product_num, price, year, num_parts, theme_id, img_url } = props;
+    const { id, name, product_num, prices, year, num_parts, theme_id, img_url } = props;
 
     return (
         <tr className="odd:bg-[#F5F5F5] hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black">
@@ -62,7 +66,7 @@ function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateActio
             <Td>{props.theme?.name}</Td>
             <Td>{year}</Td>
             <Td>{num_parts}</Td>
-            <Td>{price ? `$ ${price}` : '—'}</Td>
+            <Td >$ {prices?.[0]?.value ?? '—'}</Td>
         </tr>
     );
 }

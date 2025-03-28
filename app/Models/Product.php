@@ -26,4 +26,24 @@ class Product extends Model
             'user_id'
         );
     }
+    public function prices()
+    {
+        return $this->hasMany(Price::class);
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    public function set()
+    {
+        return $this->hasMany(Set::class);
+    }
+    public function news()
+    {
+        return $this->hasMany(News::class);
+    }
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

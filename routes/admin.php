@@ -31,7 +31,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         });
 
-
         Route::group(['prefix' => 'awards'], function () {
             Route::match(['POST', 'GET'], '/', [AwardController::class, 'index'])->name('awards.index');
             Route::match(['POST', 'GET'], '/create', [AwardController::class, 'create'])->name('awards.create');
@@ -47,6 +46,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/{news}/edit', [NewsController::class, 'edit'])->name('news.edit');
             Route::match(['POST', 'GET'], '/{news}', [NewsController::class, 'update'])->name('news.update');
             Route::delete('/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
+        });
+
+        Route::group(['prefix' => 'news', 'as' => 'news.'], function () {
+            Route::match(['POST', 'GET'], '/', [NewsController::class, 'index'])->name('index');
+            Route::match(['POST', 'GET'], '/create', [NewsController::class, 'create'])->name('create');
+            Route::match(['POST', 'GET'], '/store', [NewsController::class, 'store'])->name('store');
+            Route::match(['POST', 'GET'], '/{news}/edit', [NewsController::class, 'edit'])->name('edit');
+            Route::match(['POST', 'GET'], '/{news}', [NewsController::class, 'update'])->name('update');
+            Route::delete('/{news}', [NewsController::class, 'destroy'])->name('destroy');
         });
         Route::group(['prefix' => 'products', 'as' => 'products.'], function () {
             Route::match(['POST', 'GET'], '/sety', [ProductController::class, 'indexSet'])->name('index.set');

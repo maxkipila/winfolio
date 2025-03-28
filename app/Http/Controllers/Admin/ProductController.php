@@ -44,10 +44,13 @@ class ProductController extends Controller
     public function indexSet(Request $request)
     {
         $setsQuery = Product::where('product_type', 'set')
-            ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale());
-        $sets = fn() => _Product::collection($setsQuery->paginate($request->paginate ?? 10));
-        // Load themes for filtering
-        $setsQuery->with('theme');
+            ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())
+            ->with(['theme', 'prices']); // <— Přidáno eager loading pro "prices"
+
+        $sets = fn() => _Product::collection(
+            $setsQuery->paginate($request->paginate ?? 10)
+        );
+
         $themes = fn() => _Theme::collection(
             Theme::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())->get()
         );

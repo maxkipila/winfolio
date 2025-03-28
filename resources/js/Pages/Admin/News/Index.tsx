@@ -1,42 +1,46 @@
 import { FormContext } from '@/Fragments/forms/FormContext'
+import Toggle from '@/Fragments/forms/inputs/Toggle'
 import Table from '@/Fragments/Table/Table'
+import Td from '@/Fragments/Table/Td'
 import Th from '@/Fragments/Table/Th'
 import AdminLayout from '@/Layouts/AdminLayout'
+import { Link } from '@inertiajs/react'
+import { PencilSimple, Trash } from '@phosphor-icons/react'
 import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
-    users: Array<User>
+    news: Array<News>
 }
 
 
-function Dashboard(props: Props) {
+function Index(props: Props) {
     const { } = props
 
 
 
     return (
         <AdminLayout rightChild={false} title='Novinky a analýzy | Winfolio'>
-            <Usertable />
+            <NewsTable />
         </AdminLayout>
     )
 }
 
-export function Usertable({ absolute_items, hide_meta }: { absolute_items?: Array<User>, hide_meta?: boolean }) {
+export function NewsTable({ absolute_items, hide_meta }: { absolute_items?: Array<News>, hide_meta?: boolean }) {
     return (
-        <Table<User> title="Novinky a analýzy" item_key='users' Row={Row} absolute_items={absolute_items}>
-            <Th></Th>
-            {/*   <Th order_by='id'>ID</Th>
-            <Th>Jméno a příjmení</Th>
-            <Th>Subscription</Th>
-            <Th order_by='first_name'>Username</Th>
-            <Th order_by='email'>E-mail</Th> */}
+        <Table<News> title="Novinky a analýzy" item_key='news' Row={Row} absolute_items={absolute_items}>
+            <Th order_by='id'>ID</Th>
+            <Th>Titulek</Th>
+            <Th>Kategorie</Th>
+            <Th order_by='content'>Popis</Th>
+            <Th ></Th>
+            <Th order_by='is_active'>Stav</Th>
         </Table>
     )
 }
 
-function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[]>> }) {
-    const { id, first_name, last_name, email, phone, setItems } = props;
+function Row(props: News & { setItems: React.Dispatch<React.SetStateAction<News[]>> }) {
+    const { id, title, category, content, is_active, status } = props;
     /*     const { open, close } = useContext(ModalsContext) */
     const { setData } = useContext(FormContext);
 
@@ -62,23 +66,19 @@ function Row(props: User & { setItems: React.Dispatch<React.SetStateAction<User[
     }, [])
 
     return (
-        <tr className='rounded group hover:bg-[#CCEEF0] '>
-            {/*             <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{id}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>Gold</Link></Td>
-            <Td><Link className='hover:underline text-app-button-light' href={route('users.edit', { user: id })}>{first_name} {last_name}</Link></Td>
-            <Td><Link className='hover:underline' href={route('users.edit', { user: id })}>{email}</Link></Td> */}
-            {/* <Td>{prefix} {phone}</Td> */}
+        <tr className='odd:bg-[#F5F5F5]  hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
+            <Td><Link className='hover:underline' href={'#'}>{id}</Link></Td>
+            <Td><Link className='hover:underline' href={'#'}>{title}</Link></Td>
+            <Td><Link className='hover:underline ' href={'#'}>{category}</Link></Td>
+            <Td><Link className='hover:underline' href={'#'}>{content?.split('.')[0]}...</Link></Td>
+            <Td><Link className='hover:underline' href={'#'}>{is_active}</Link></Td>
+            <Td><Toggle admin name={`status-${id}`} disabled /> </Td>
             {/*   <Td>{props.received_payments_sum} Kč</Td> */}
             {/*  <Td>{Math.floor((props.received_payments_sum ?? 0) * 0.05 * 100) / 100} Kč</Td> */}
             {/* <Td><Toggle admin name={`status-${id}`} disabled /> </Td> */}
-            {/*  <Td>
-                <div className='flex gap-8px items-center justify-end'>
-                    <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
-                    <button onClick={(e) => removeItem(e, id)}><Trash className='text-app-input-error' /></button>
-                </div>
-            </Td> */}
+
         </tr>
     );
 }
 
-export default Dashboard
+export default Index

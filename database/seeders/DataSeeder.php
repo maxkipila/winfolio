@@ -6,7 +6,6 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\Subscription;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DataSeeder extends Seeder
@@ -21,22 +20,21 @@ class DataSeeder extends Seeder
         $sets = Product::where('product_type', 'set')->orderBy('id')->limit(50)->get();
         $minifigs = Product::where('product_type', 'minifig')->orderBy('id')->limit(50)->get();
 
-        $sets->each(function ($set) {
-            Price::factory()->create([
-                'product_id' => $set->id,
-            ]);
+        $priceSeeder = new PriceSeeder();
+        $sets->each(function ($set) use ($priceSeeder) {
+            $priceSeeder->seedPrices($set);
         });
-        $minifigs->each(function ($minifig) {
-            Price::factory()->create([
-                'product_id' => $minifig->id,
-            ]);
+
+        $minifigs->each(function ($minifig) use ($priceSeeder) {
+            $priceSeeder->seedPrices($minifig);
         });
+
+        // Pro každého uživatele přiřadíme jeden set a jednu minifigu
         $users->each(function ($user) use ($sets, $minifigs) {
             if ($sets->isNotEmpty()) {
                 $randomSet = $sets->random();
                 $user->products()->attach($randomSet->id);
             }
-
             if ($minifigs->isNotEmpty()) {
                 $randomFig = $minifigs->random();
                 $user->products()->attach($randomFig->id);

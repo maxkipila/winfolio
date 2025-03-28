@@ -13,13 +13,28 @@ class Price extends Model
     protected $keyType = 'string';
     public $incrementing = false; */
 
-    public function set()
+    public function product()
     {
-        return $this->belongsTo(Set::class);
+        return $this->belongsTo(Product::class);
     }
 
-    public function minifig()
+    /**
+     * Scope to find prices for a specific product
+     */
+    public function scopeForProduct($query, $productId)
     {
-        return $this->belongsTo(Minifig::class, 'minifig_id', 'id');
+        return $query->where('product_id', $productId);
     }
+
+    /**
+     * Scope to find prices by condition
+     */
+    public function scopeByCondition($query, $condition)
+    {
+        return $query->where('condition', $condition);
+    }
+
+    /**
+     * Scope to find prices by type
+     */
 }

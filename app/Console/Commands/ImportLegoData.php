@@ -81,8 +81,11 @@ class ImportLegoData extends Command
         return 0;
     }
 
+
+
     protected function importDataset($type)
     {
+        ini_set('memory_limit', '512M'); // Increase memory limit
 
         if ($this->option('truncate')) {
             $this->info("Vyprazdňuji tabulku {$type} před importem");
@@ -138,11 +141,73 @@ class ImportLegoData extends Command
         }
         $this->info("Soubor existuje na cestě: {$csvFilePath}");
 
-        Excel::import(new $dataset['import'], $csvFilePath);
-        $this->info("Data {$type} byla úspěšně importována do databáze");
+        // Process the CSV file in chunks
+        $this->processCsvInChunks($csvFilePath, $dataset['import']);
 
         unlink($gzFilePath);
         unlink($csvFilePath);
         $this->info("Dočasné soubory pro {$type} byly smazány");
+    }
+
+    protected function processCsvInChunks($filePath, $importClass)
+    {
+        $chunkSize = 1000; // Adjust the chunk size as needed
+        $header = null;
+        $rowCount = 0;
+
+        if (($handle = fopen($filePath, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                if ($header === null) {
+                    $header = $data;
+                    continue;
+                }
+
+                $rowCount++;
+                $rows[] = array_combine($header, $data);
+
+                if ($rowCount % $chunkSize === 0) {
+                    // Create a temporary CSV file for the current chunk
+                    $tempFilePath = tempnam(sys_get_temp_dir(), 'chunk') . '.csv';
+                    $tempHandle = fopen($tempFilePath, 'w');
+                    fputcsv($tempHandle, $header);
+                    foreach ($rows as $row) {
+                        fputcsv($tempHandle, $row);
+                    }
+                    fclose($tempHandle);
+
+                    // Import the temporary CSV file
+                    Excel::import(new $importClass, $tempFilePath);
+
+                    // Clean up the temporary file
+                    unlink($tempFilePath);
+
+                    $rows = [];
+                    $this->info("Processed {$rowCount} rows");
+                }
+            }
+
+            if (!empty($rows)) {
+                // Create a temporary CSV file for the final chunk
+                $tempFilePath = tempnam(sys_get_temp_dir(), 'chunk') . '.csv';
+                $tempHandle = fopen($tempFilePath, 'w');
+                fputcsv($tempHandle, $header);
+                foreach ($rows as $row) {
+                    fputcsv($tempHandle, $row);
+                }
+                fclose($tempHandle);
+
+                // Import the temporary CSV file
+                Excel::import(new $importClass, $tempFilePath);
+
+                // Clean up the temporary file
+                unlink($tempFilePath);
+
+                $this->info("Processed final batch of rows");
+            }
+
+            fclose($handle);
+        } else {
+            $this->error("Nepodařilo se otevřít soubor {$filePath}");
+        }
     }
 }

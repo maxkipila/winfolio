@@ -31,6 +31,7 @@ class _Set extends JsonResource
             'review'       => new _Review($this->whenLoaded('review')),
             'theme'        => new _Theme($this->whenLoaded('theme')),
             'subscription' => new _Subscription($this->whenLoaded('subscription')),
+            'prices'       => _Price::collection($this->whenLoaded('prices')),
 
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
         ];

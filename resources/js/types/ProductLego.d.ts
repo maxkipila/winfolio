@@ -22,4 +22,5 @@ interface ProductLego {
     retail: string;
     value: string;
     condition: string;
+    prices: Prices;
 }

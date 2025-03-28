@@ -22,7 +22,16 @@ class _Product extends JsonResource
             'year'        => $this->year,
             'num_parts'   => $this->num_parts,
             'img_url'     => $this->img_url,
-            'theme'       => new _Theme($this->whenLoaded('theme'))
+            'theme'       => new _Theme($this->whenLoaded('theme')),
+            'availability' => $this->availability,
+            'created_at'  => $this->created_at,
+            'updated_at'  => $this->updated_at,
+            'prices'      => _Price::collection($this->whenLoaded('prices')),
+            'model'       => (new \ReflectionClass($this->resource))->getShortName(),
+            'review'      => new _Review($this->whenLoaded('review')),
+            'subscription' => new _Subscription($this->whenLoaded('subscription')),
+            'users'       => _User::collection($this->whenLoaded('users')),
+
         ];
     }
 }

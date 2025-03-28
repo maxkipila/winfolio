@@ -9,6 +9,7 @@ use App\Models\Set;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,7 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Artisan::call('import:lego-data');
 
         User::factory()->create([
             'first_name' => 'Test',
@@ -47,6 +48,10 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-        /*  $this->call(DataSeeder::class); */
+
+        $this->call(DataSeeder::class);
+        $this->call(PriceSeeder::class);
+        $this->call(ReviewSeeder::class);
+        $this->call(NewsSeeder::class);
     }
 }

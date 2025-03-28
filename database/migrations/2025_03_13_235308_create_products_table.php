@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('product_num')->unique();
-            $table->string('product_type');
+            $table->enum('product_type', ['minifig', 'set']);
             $table->string('name');
             $table->year('year')->nullable();
             $table->foreignId('theme_id')->nullable()->constrained();
             $table->integer('num_parts')->nullable();
             $table->string('img_url')->nullable();
+            $table->enum('availability', ['Retail', 'Retired', 'Retiring soon', 'Unavailable', 'Coming soon'])->nullable();
             $table->timestamps();
         });
     }

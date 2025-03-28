@@ -15,16 +15,16 @@ class SetController extends Controller
 {
     public function index(Request $request)
     {
-
         $setsQuery = Product::where('product_type', 'set')
             ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale());
-        $sets = fn() => _Set::collection($setsQuery->paginate($request->paginate ?? 10));
-
+        $sets = fn() => _Set::collection(
+            $setsQuery->with('prices')->paginate($request->paginate ?? 10)
+        )->additional(['whenLoaded' => true]);
         $themes = fn() => _Theme::collection(
             Theme::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())->get()
         );
 
-        return Inertia::render('Admin/Sets/Index', compact('sets', 'themes'));
+        return Inertia::render('Admin/Sets/Index', compact('sets', 'themes', 'prices'));
     }
 
     public function show(Product $product)
