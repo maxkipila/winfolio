@@ -1,12 +1,14 @@
 import { PaperPlaneTilt, Star } from '@phosphor-icons/react'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Button } from './UI/Button'
+import { ModalsContext } from '@/Components/contexts/ModalsContext'
+import { MODALS } from './Modals'
 
 interface Props { }
 
 function ReviewCard(props: Props) {
     const { } = props
-
+    let { open } = useContext(ModalsContext)
     return (
         <div className='border-2 border-black p-32px mt-32px'>
             <div className='font-bold'>Fauna’s House Reviews</div>
@@ -58,7 +60,7 @@ function ReviewCard(props: Props) {
                 </div>
             </div>
             <div className='max-w-[180px] mob:max-w-full mt-16px'>
-                <Button href={"#"} icon={<PaperPlaneTilt size={24} />}>Submit Reviews</Button>
+                <Button onClick={(e) => { e.preventDefault(); open(MODALS.REVIEW, false) }} href={"#"} icon={<PaperPlaneTilt size={24} />}>Submit Reviews</Button>
             </div>
         </div>
     )

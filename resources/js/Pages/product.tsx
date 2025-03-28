@@ -9,11 +9,11 @@ import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosph
 import React, { useState } from 'react'
 
 interface Props {
-    set: Product
+    product: Product
 }
 
 function Product(props: Props) {
-    const { set } = props
+    const { product } = props
     let [quickBuy, setQuickBuy] = useState(true)
     return (
         <AuthenticatedLayout>
@@ -21,20 +21,20 @@ function Product(props: Props) {
                 <div className='w-2/3 flex-shrink-0 mob:w-full'>
                     <div className='flex gap-24px mob:flex-col'>
                         <div className='border-2 border-black w-full'>
-                            <Img className='w-full object-cover' src={set?.img_url} />
+                            <Img className='w-full object-cover' src={product?.img_url} />
                         </div>
                         <div className='flex flex-col gap-24px mob:flex-row mob:overflow-x-auto'>
-                            <Img className='max-w-[200px] border-2 border-black' src={set?.img_url} />
-                            <Img className='max-w-[200px] border-2 border-black' src={set?.img_url} />
+                            <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} />
+                            <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} />
                         </div>
                     </div>
                     <div className='mt-24px'>
-                        <div className='font-nunito font-bold'>{set?.set_num}</div>
-                        <div className='font-bold text-4xl'>{set?.name}</div>
+                        <div className='font-nunito font-bold'>{product?.set_num}</div>
+                        <div className='font-bold text-4xl'>{product?.name}</div>
                     </div>
                     <div className='mt-12px flex items-center justify-between w-full'>
                         <div className='flex gap-8px items-center'>
-                            <div className='font-nunito font-bold'>{set?.year}</div>
+                            <div className='font-nunito font-bold'>{product?.year}</div>
                             <div className='h-16px w-16px bg-[#46BD0F] rounded-full'></div>
                         </div>
                         <div className='flex gap-16px'>

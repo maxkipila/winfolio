@@ -72,13 +72,13 @@ function Login(props: Props) {
                         {
                             inDB === false &&
                             <>
-                                <TextField className='w-full mt-16px' name="name" placeholder={'Jméno'} />
+                                {/* <TextField className='w-full mt-16px' name="name" placeholder={'Jméno'} /> */}
                                 {/* <PasswordField label={'Heslo'} className='w-full' type='password' name="password" placeholder='Heslo' />
                                 <PasswordField label={'Heslo znovu'} className='w-full' type='password' name="password_confirmation" placeholder='Heslo znovu' /> */}
                                 {/* <div className='flex gap-8px items-center justify-between w-full mb-32px'>
                                     <Checkbox name="agree" label={"Souhlasím s podmínkami"} />
                                 </div> */}
-                                <Toggle label={"Odebírat newsletter"} name="newsletter" />
+                                {/* <Toggle label={"Odebírat newsletter"} name="newsletter" /> */}
 
                                 <Button href="#" onClick={(e) => { e.preventDefault(); register(e) }}>Registrovat se</Button>
 

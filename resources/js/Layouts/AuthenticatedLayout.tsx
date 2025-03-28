@@ -34,7 +34,7 @@ function AuthenticatedLayout(props: Props) {
 
     let [open, setOpen] = useState(false)
     let { open: _OpenModal, modal } = useContext(ModalsContext)
-    
+
     return (
         <div className='font-teko'>
             <div className='relative'>
@@ -64,13 +64,13 @@ function AuthenticatedLayout(props: Props) {
                     <div className='flex items-center gap-24px mob:hidden'>
 
                         <Img src="/assets/img/logo.png" />
-                        <div className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px'>
+                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px cursor-pointer'>
                             <Sparkle size={24} />
                             <div className='font-bold'>Premium</div>
                         </div>
                     </div>
                     <div className='flex items-center gap-24px nMob:hidden w-full justify-between'>
-                        <div className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px'>
+                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px'>
                             <Sparkle size={14} />
                             <div className='font-bold text-sm'>Premium</div>
                         </div>
