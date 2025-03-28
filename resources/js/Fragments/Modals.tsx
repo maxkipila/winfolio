@@ -2,12 +2,18 @@ import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import { useContext, useEffect, useState } from 'react';
 import NotificationsModal from './NotificationsModal';
 import ReviewsModal from './ReviewsModal';
+import ReviewPostedModal from './ReviewPostedModal';
+import BuyPremiumModal from './BuyPremiumModal';
+import SuccessModal from './SuccessModal';
 
 interface Props { }
 
 export enum MODALS {
     NOTIFICATION,
-    REVIEW
+    REVIEW,
+    SUCCESS,
+    REVIEW_POSTED,
+    GET_PREMIUM
 }
 
 export function ModalsProvider(props) {
@@ -81,6 +87,9 @@ function Modals(props: Props) {
         <>
             {(modal?.modal == MODALS.NOTIFICATION) && <NotificationsModal  {...modal.data} />}
             {(modal?.modal == MODALS.REVIEW) && <ReviewsModal  {...modal.data} />}
+            {(modal?.modal == MODALS.SUCCESS) && <SuccessModal  {...modal.data} />}
+            {(modal?.modal == MODALS.GET_PREMIUM) && <BuyPremiumModal  {...modal.data} />}
+            {(modal?.modal == MODALS.REVIEW_POSTED) && <ReviewPostedModal  {...modal.data} />}
         </>
     )
 }

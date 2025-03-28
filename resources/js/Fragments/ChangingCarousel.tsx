@@ -1,6 +1,8 @@
 import Img from '@/Components/Image'
 import React, { useEffect, useRef, useState } from 'react'
 
+
+
 interface Props { }
 
 function ChangingCarousel(props: Props) {
@@ -9,45 +11,56 @@ function ChangingCarousel(props: Props) {
         { src: '/assets/img/brick-placeholder.png', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
         { src: '/assets/img/heads-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
         { src: '/assets/img/orange-bricks-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+
     ]
-    let index = useRef(0)
+
+    let interval;
+    const [slide, setSlide] = useState(0);
+    const [elapsed, setElapsed] = useState(0);
+    const [paused, setPaused] = useState(false);
+
     useEffect(() => {
 
-        let timer = setInterval(() => {
-            if (index.current + 1 > slides.length - 1) {
-                index.current = 0
-            } {
-                index.current = index.current + 1
-            }
+        if (!paused)
+            interval = setInterval(() => {
+                setElapsed(e => Math.min(e + 1, 10));
+            }, 500);
 
-        }, 1200)
+        return () => clearInterval(interval);
 
-        return () => {
-            clearInterval(timer)
+    }, [paused]);
+
+    useEffect(() => {
+        if (elapsed >= 9) {
+            setSlide(s => {
+                setElapsed(0);
+                return ((s + 1) % slides.length)
+            });
+
         }
-    }, [])
-
+    }, [elapsed])
+    // console.log(slide, slides?.length - 1)
     return (
         <div className='grid h-full'>
             <div className='row-start-1 col-start-1 w-full h-full flex  justify-center relative'>
-                <Img className='w-[90%] object-cover' src={slides[0].src} />
+                <Img className='w-[90%] object-cover' src={slides[slide == 1 ? 2 : 2 - slide].src} />
                 <div className='absolute top-0 left-0 w-full h-full  text-white p-40px'>
-                    <div className='font-bold text-3xl text-center'>{slides[0].headline}</div>
-                    <div className='text-center'>{slides[0].text}</div>
+                    <div className='font-bold text-3xl text-center'>{slides[slide == 1 ? 2 : 2 - slide].headline}</div>
+                    <div className='text-center'>{slides[slide == 1 ? 2 : 2 - slide].text}</div>
                 </div>
             </div>
             <div className='row-start-1 col-start-1  w-full h-full flex  justify-center relative'>
-                <Img className='w-[95%] object-cover mb-24px' src={slides[1].src} />
+                <Img className='w-[95%] object-cover mb-24px' src={slides[slide == 2 ? 1 : 1 - slide].src} />
                 <div className='absolute top-0 left-0 w-[95%] h-[90%]  text-white p-40px'>
-                    <div className='font-bold text-3xl text-center'>{slides[1].headline}</div>
-                    <div className='text-center'>{slides[1].text}</div>
+                    <div className='font-bold text-3xl text-center'>{slides[slide == 2 ? 1 : 1 - slide].headline}</div>
+                    <div className='text-center'>{slides[slide == 2 ? 1 : 1 - slide].text}</div>
                 </div>
             </div>
-            <div className='row-start-1 col-start-1  w-full h-full flex justify-center relative '>
-                <Img className='w-full object-cover mb-48px' src={slides[2].src} />
+            <div className={`row-start-1 col-start-1  w-full h-full flex justify-center relative`}>
+                <Img className='w-full object-cover mb-48px' src={slides[slide].src} />
                 <div className='absolute top-0 left-0 w-full h-[90%]  text-white p-40px'>
-                    <div className='font-bold text-3xl text-center'>{slides[2].headline}</div>
-                    <div className='text-center'>{slides[2].text}</div>
+                    <div className='font-bold text-3xl text-center'>{slides[slide].headline}</div>
+                    <div className='text-center'>{slides[slide].text}</div>
                 </div>
             </div>
 
