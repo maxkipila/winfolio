@@ -46,7 +46,7 @@ function Sidebar(props: Props) {
     }, []);
 
     return (
-        <div className='bg-white w-[80px] border-r-[1px] border-[#DEDFE5] h-screen flex flex-col items-center  justify-between sticky '>
+        <div className='bg-white w-[80px] border-r-[1px] pb-24px border-[#DEDFE5] h-[1120px] flex flex-col items-center  justify-between sticky '>
             <Link href={route('dashboard')}>
                 <Icon name='Logo' />
             </Link>
@@ -67,15 +67,15 @@ function Sidebar(props: Props) {
                     className="object-cover object-center rounded-full w-full h-full cursor-pointer"
                 />
                 {userOptions && (
-                    <div className="absolute left-0 top-12 z-10 bg-white shadow-lg border rounded-md flex flex-col gap-[12px] p-[12px] min-w-[120px]">
-                        <div className="px-2 py-1" role="menuitem">
+                    <div className="absolute left-[70px] bottom-0 o z-10 bg-[#F7AA1A] font-nunito shadow-lg border rounded-sm flex flex-col  min-w-[120px]">
+                        <div className="" role="menuitem">
                             {auth?.user?.first_name} {auth?.user?.last_name}
                         </div>
                         <Link
                             href={route('admin.logout.account')}
                             as="button"
                             method="post"
-                            className="flex items-center hover:bg-gray-200 p-2 rounded-md whitespace-nowrap"
+                            className="flex items-center p-12px justify-center mx-aut font-nunito font-bold  hover:scale-105  rounded-sm whitespace-nowrap"
                         >
                             Odhlásit se
                         </Link>

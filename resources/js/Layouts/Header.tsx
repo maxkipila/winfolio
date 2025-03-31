@@ -13,6 +13,9 @@ interface Props {
     children?: ReactNode;
     title?: string;
     rightChild?: ReactNode;
+    addButtonText?: ReactNode;
+    customButtonClassName?: string;
+    customButtonHref?: string;
 }
 
 
@@ -31,7 +34,7 @@ function SearchCard({ name, type, image, href }) {
 }
 
 function Header(props: Props) {
-    const { rightChild } = props
+    const { rightChild, addButtonText, customButtonClassName } = props
 
     const routes = (model, key) => {
 
@@ -62,7 +65,7 @@ function Header(props: Props) {
     const { data } = form;
 
     return (
-        <header className="border-b-[1px] w-full px-16px py-32px flex items-center justify-between relative">
+        <header className="border-b-[1px] w-full flex items-center justify-between relative">
             {/* Levá část: Logo */}
             <Link href={route('admin.dashboard')}>
                 <Img className="p-16px" src="/assets/img/logo.png" />
@@ -82,15 +85,11 @@ function Header(props: Props) {
                                     type={types(r.model)}
                                     image={'thumbnail' in r ? r?.thumbnail : undefined}
                                     href={routes(r.model, r.id)}
-
-
                                 />
-
                             ),
                             value: r.id ?? '',
                             model: r,
                             header: types(r.model)
-
                         })}
                     />
                 </Form>
@@ -98,15 +97,18 @@ function Header(props: Props) {
 
             {rightChild === false ? null : (
                 <>
-                    <div>
-                        <Button
-                            className="font-black bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px"
-                            href="#"
-                            icon={<Plus size={24} weight='bold' />}
-                        >
-                            Přidat položku
-                        </Button>
-                    </div>
+                    {!form.isDirty && (
+                        <div className="pr-16px">
+                            <Link
+                                preserveScroll
+                                className={`font-black py-12px px-16px bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px2 flex items-center gap-8px ${customButtonClassName}`}
+                                href={props.customButtonHref || "#"}
+                            >
+                                <Plus size={24} weight="bold" />
+                                {addButtonText || "Přidat položku"}
+                            </Link>
+                        </div>
+                    )}
                 </>
             )}
 
