@@ -17,6 +17,9 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store'])->name('register.account');
 
+    Route::post('preregister', [RegisteredUserController::class, 'preregister'])->name('preregister.account');
+    Route::post('confirmEmail', [RegisteredUserController::class, 'confirmEmail'])->name('confirmEmail.account');
+    
     Route::post('exists', [RegisteredUserController::class, 'exists'])->name('exists');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])

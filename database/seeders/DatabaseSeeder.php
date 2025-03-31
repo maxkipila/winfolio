@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Artisan::call('import:lego-data');
+        
 
         User::factory()->create([
             'first_name' => 'Test',
@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
+        Artisan::call('import:lego-data');
 
         $this->call(DataSeeder::class);
         $this->call(PriceSeeder::class);

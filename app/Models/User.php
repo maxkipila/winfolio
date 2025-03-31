@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -40,6 +41,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function generateTwoFactorCode(): void
+    {
+        if ($this->two_fa_expires_at && now()->lt($this->two_fa_expires_at)) {
+            return;
+        }
+
+        $this->timestamps = false;
+        $code = 123456;
+        $this->two_fa_code = Hash::make($code);
+        $this->two_fa_expires_at = now()->addMinutes(10);
+        $this->save();
+        // $this->sendTwoFactorCode($code);
     }
 
     public function news()
