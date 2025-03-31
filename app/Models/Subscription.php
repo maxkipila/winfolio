@@ -15,12 +15,8 @@ class Subscription extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function sets()
+    public function product()
     {
-        return $this->hasMany(Set::class);
-    }
-    public function minifigs()
-    {
-        return $this->hasMany(Minifig::class);
+        return $this->belongsTo(Product::class);
     }
 }

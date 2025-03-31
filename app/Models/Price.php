@@ -35,6 +35,10 @@ class Price extends Model
     }
 
     /**
-     * Scope to find prices by type
+     * Scope to find prices by currency
      */
+    public function scopeByCurrency($query, $currency)
+    {
+        return $query->where('currency', $currency);
+    }
 }

@@ -34,9 +34,10 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
-    public function set()
+
+    public function review()
     {
-        return $this->hasMany(Set::class);
+        return $this->hasOne(Review::class);
     }
     public function news()
     {
@@ -45,5 +46,9 @@ class Product extends Model
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
+    }
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
     }
 }

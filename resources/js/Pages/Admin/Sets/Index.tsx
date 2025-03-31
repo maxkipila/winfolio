@@ -54,7 +54,7 @@ function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateActio
                 <Td>{id}</Td>
             </Link>
             <Td>
-                <Link className='hover:underline' href='#'>
+                <Link className='hover:underline' href={route('admin.products.show.set', { product: id })}>
                     {img_url && <Img src={img_url} alt={name} className='w-32px h-32px' />}
                 </Link>
             </Td>

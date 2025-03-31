@@ -22,7 +22,7 @@ class _Theme extends JsonResource
             'updated_at' => $this->updated_at,
             'parent'   => new _Theme($this->whenLoaded('parent')),
             'children' => _Theme::collection($this->whenLoaded('children')),
-            'sets'     => _Set::collection($this->whenLoaded('sets')),
+
         ];
     }
 }

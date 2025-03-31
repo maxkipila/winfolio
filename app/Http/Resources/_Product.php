@@ -33,7 +33,8 @@ class _Product extends JsonResource
             'review'      => new _Review($this->whenLoaded('review')),
             'subscription' => new _Subscription($this->whenLoaded('subscription')),
             'users'       => _User::collection($this->whenLoaded('users')),
-
+            'reviews'     => _Review::collection($this->whenLoaded('reviews')),
+            'news'        => _News::collection($this->whenLoaded('news')),
         ];
     }
 }

@@ -21,8 +21,9 @@ class _Review extends JsonResource
             'comment' => $this->comment,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'user'       => new _User($this->whenLoaded('user')),
-            'sets'       => _Set::collection($this->whenLoaded('sets')),
+            'user' => _User::init($this->user),
+            'product'    => new _Product($this->whenLoaded('product')),
+            'role'       => $this->role,
         ];
     }
 }

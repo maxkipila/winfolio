@@ -51,11 +51,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
-
-
-    public function minifig()
+    public function review()
     {
-        return $this->belongsTo(Minifig::class, 'minifig_id', 'id');
+        return $this->hasOne(Review::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
     }
 
     public function subscriptions()
@@ -66,15 +69,6 @@ class User extends Authenticatable
     public function awards()
     {
         return $this->belongsToMany(Award::class)->withTimestamps();
-    }
-    public function sets()
-    {
-        return $this->belongsToMany(Set::class, 'set_user', 'user_id', 'set_id');
-    }
-
-    public function minifigs()
-    {
-        return $this->belongsToMany(Minifig::class, 'minifig_user', 'user_id', 'minifig_id');
     }
 
     public function products()
