@@ -8,16 +8,20 @@ use App\Http\Resources\_News;
 use App\Http\Resources\_Review;
 use App\Http\Resources\_Subscription;
 use App\Http\Resources\_Award;
+use App\Traits\isNullable;
 
 class _User extends JsonResource
 {
+    use isNullable;
     /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
+
     public function toArray(Request $request): array
     {
+
         if (!$this->resource) {
             return [];
         }
@@ -41,14 +45,12 @@ class _User extends JsonResource
             'is_admin' => $this->is_admin,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'sets' => _Set::collection($this->whenLoaded('sets')),
-            'minifigs' => _Minifig::collection($this->whenLoaded('minifigs')),
             'news' => _News::collection($this->whenLoaded('news')),
             'reviews' => _Review::collection($this->whenLoaded('reviews')),
             'subscriptions' => _Subscription::collection($this->whenLoaded('subscriptions')),
             'awards' => _Award::collection($this->whenLoaded('awards')),
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
-            'products' => _Product::collection($this->whenLoaded('products')),
+            'products' => _Product::collection($this->whenLoaded('products'))
         ];
     }
 }

@@ -22,9 +22,9 @@ class _Subscription extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'user' => new _User($this->whenLoaded('user')),
-            'sets' => _Set::collection($this->whenLoaded('sets')),
-            'minifigs' => _Minifig::collection($this->whenLoaded('minifigs')),
+            'user' => _User::init($this->user),
+            'products' => _Product::collection($this->whenLoaded('products')),
+
         ];
     }
 }

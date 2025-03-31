@@ -7,12 +7,15 @@ type Props = {
     title?: string;
     children?: ReactNode;
     rightChild?: ReactNode;
+    addButtonText?: ReactNode;
+    customButtonClassName?: string;
+    customButtonHref?: string;
 }
-const AdminLayout = ({ title = 'Winfolio', children, rightChild }: Props) => {
+const AdminLayout = ({ title = 'Winfolio', children, rightChild, addButtonText, customButtonHref, customButtonClassName }: Props) => {
     return (
-        <div className='flex font-nunito gap-16px flex-col font-satoshi'>
+        <div className="flex flex-col min-h-screen font-nunito">
             <Head title={title} />
-            <Header rightChild={rightChild} />
+            <Header customButtonHref={customButtonHref} addButtonText={addButtonText} customButtonClassName={customButtonClassName} rightChild={rightChild} />
             <div className='flex-grow flex flex-row gap-16px w-full'>
                 <Sidebar /* auth={auth} */ />
                 <main className='w-full m-48px'>

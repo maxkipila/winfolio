@@ -39,20 +39,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/{award}', [AwardController::class, 'update'])->name('awards.update');
             Route::delete('/{award}', [AwardController::class, 'destroy'])->name('awards.destroy');
         });
-        Route::group(['prefix' => 'news'], function () {
-            Route::match(['POST', 'GET'], '/', [NewsController::class, 'index'])->name('news.index');
-            Route::match(['POST', 'GET'], '/create', [NewsController::class, 'create'])->name('news.create');
-            Route::match(['POST', 'GET'], '/store', [NewsController::class, 'store'])->name('news.store');
-            Route::match(['POST', 'GET'], '/{news}/edit', [NewsController::class, 'edit'])->name('news.edit');
-            Route::match(['POST', 'GET'], '/{news}', [NewsController::class, 'update'])->name('news.update');
-            Route::delete('/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
-        });
 
         Route::group(['prefix' => 'news', 'as' => 'news.'], function () {
             Route::match(['POST', 'GET'], '/', [NewsController::class, 'index'])->name('index');
             Route::match(['POST', 'GET'], '/create', [NewsController::class, 'create'])->name('create');
             Route::match(['POST', 'GET'], '/store', [NewsController::class, 'store'])->name('store');
-            Route::match(['POST', 'GET'], '/{news}/edit', [NewsController::class, 'edit'])->name('edit');
+            Route::match(['POST', 'GET'], '/edit/{news}', [NewsController::class, 'edit'])->name('edit');
             Route::match(['POST', 'GET'], '/{news}', [NewsController::class, 'update'])->name('update');
             Route::delete('/{news}', [NewsController::class, 'destroy'])->name('destroy');
         });

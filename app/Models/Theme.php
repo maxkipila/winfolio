@@ -24,8 +24,8 @@ class Theme extends Model
         return $this->hasMany(Theme::class, 'parent_id');
     }
 
-    public function sets()
+    public function products()
     {
-        return $this->hasMany(Set::class);
+        return $this->hasMany(Product::class);
     }
 }

@@ -91,6 +91,7 @@ export default {
             colors: {
                 app: {
                     input: {
+                        green: "#46BD0F",
                         border: {
                             DEFAULT: "#444444",
                             dark: "#222222",
@@ -114,8 +115,8 @@ export default {
                 },
             },
             zIndex: {
-                max:'99999'
-            }
+                max: "99999",
+            },
         },
     },
 

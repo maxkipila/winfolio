@@ -22,8 +22,8 @@ class _News extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'is_active' => (bool)$this->is_active,
-            'user' => new _User($this->whenLoaded('user')),
-
+            'user' => _User::init($this->user),
+            /* 'product' => new _Product($this->whenLoaded('product')), */
         ];
     }
 }
