@@ -30,6 +30,11 @@ class Product extends Model
     {
         return $this->hasMany(Price::class);
     }
+
+    public function price()
+    {
+        return $this->hasOne(Price::class);
+    }
     public function reviews()
     {
         return $this->hasMany(Review::class);

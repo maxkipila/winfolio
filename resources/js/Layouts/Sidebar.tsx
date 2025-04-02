@@ -46,7 +46,7 @@ function Sidebar(props: Props) {
     }, []);
 
     return (
-        <div className='bg-white w-[80px] border-r-[1px] pb-24px border-[#DEDFE5] h-[1120px] flex flex-col items-center  justify-between sticky '>
+        <div className='bg-white w-[80px] border-r-[1px] h-[calc(100vh-32px)] pb-24px border-[#DEDFE5] h-[1120px] flex flex-col items-center  justify-between sticky '>
             <Link href={route('dashboard')}>
                 <Icon name='Logo' />
             </Link>

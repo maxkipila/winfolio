@@ -92,6 +92,7 @@ export default {
                 app: {
                     input: {
                         green: "#46BD0F",
+                        orange: "#F7AA1A",
                         border: {
                             DEFAULT: "#444444",
                             dark: "#222222",
