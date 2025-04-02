@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -85,6 +86,11 @@ class HandleInertiaRequests extends Middleware
 
             ),
             'searchProducts' => Inertia::lazy($products),
+            'flash' => Session::get('flash'),
+            /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
+            'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),
+            'searchAllMinifigs' => Inertia::lazy($this->searchByModel(Minifig::class, 'name', _Minifig::class, $request->q ?? "")), */
+
         ];
     }
 }
