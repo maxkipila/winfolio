@@ -74,7 +74,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => fn() => (
                     Gate::allows('admin')
                     ? ($is_admin_section ? _Admin::make($request->user()) : null)
-                    : _User::make($request->user())
+                    : _User::make($request->user()?->load('products'))
                 ),
             ],
             'ziggy' => fn() => [

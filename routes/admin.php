@@ -67,15 +67,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         //     /* Route::match(['POST', 'GET'], '/{set}', [SetController::class, 'update'])->name('update');*/
         //     /*Route::delete('/{set}', [SetController::class, 'destroy'])->name('sets.destroy'); */
         // });
-        Route::group(['prefix' => 'minifigs', 'as' => 'minifigs.'], function () {
-            Route::match(['POST', 'GET'], '/', [MinifigController::class, 'index'])->name('index');
-            Route::match(['POST', 'GET'], '/create', [MinifigController::class, 'create'])->name('create');
-            Route::match(['POST', 'GET'], '/store', [MinifigController::class, 'store'])->name('store');
-            Route::match(['POST', 'GET'], '/{minifig}/edit', [MinifigController::class, 'edit'])->name('edit');
-            Route::match(['POST', 'GET'], '/{minifig}', [MinifigController::class, 'update'])->name('update');
-            Route::match(['POST', 'GET'], '/{minifig}/show', [MinifigController::class, 'show'])->name('show');
-            Route::delete('/{minifig}', [MinifigController::class, 'destroy'])->name('destroy');
-        });
+
+        // Route::group(['prefix' => 'minifigs', 'as' => 'minifigs.'], function () {
+        //     Route::match(['POST', 'GET'], '/', [MinifigController::class, 'index'])->name('index');
+        //     Route::match(['POST', 'GET'], '/create', [MinifigController::class, 'create'])->name('create');
+        //     Route::match(['POST', 'GET'], '/store', [MinifigController::class, 'store'])->name('store');
+        //     Route::match(['POST', 'GET'], '/{minifig}/edit', [MinifigController::class, 'edit'])->name('edit');
+        //     Route::match(['POST', 'GET'], '/{minifig}', [MinifigController::class, 'update'])->name('update');
+        //     Route::match(['POST', 'GET'], '/{minifig}/show', [MinifigController::class, 'show'])->name('show');
+        //     Route::delete('/{minifig}', [MinifigController::class, 'destroy'])->name('destroy');
+        // });
 
         /*   Route::post('/import', [ImportController::class, 'import'])->name('import');
         Route::get('/user', fn(Request $request) => $request->user())->middleware('auth:sanctum'); */

@@ -5,6 +5,7 @@ import ReviewsModal from './ReviewsModal';
 import ReviewPostedModal from './ReviewPostedModal';
 import BuyPremiumModal from './BuyPremiumModal';
 import SuccessModal from './SuccessModal';
+import PortfolioModal from './PortfolioModal';
 
 interface Props { }
 
@@ -13,7 +14,8 @@ export enum MODALS {
     REVIEW,
     SUCCESS,
     REVIEW_POSTED,
-    GET_PREMIUM
+    GET_PREMIUM,
+    PORTFOLIO
 }
 
 export function ModalsProvider(props) {
@@ -24,7 +26,6 @@ export function ModalsProvider(props) {
     const open = (_modal: MODALS, goBack = false, data = {}) => {
         setModal({ modal: _modal, data: data });
         setStack(s => [...s, { modal: _modal, goBack, data }]);
-        console.log('something happening?:', _modal)
     }
 
     const back = () => {
@@ -90,6 +91,7 @@ function Modals(props: Props) {
             {(modal?.modal == MODALS.SUCCESS) && <SuccessModal  {...modal.data} />}
             {(modal?.modal == MODALS.GET_PREMIUM) && <BuyPremiumModal  {...modal.data} />}
             {(modal?.modal == MODALS.REVIEW_POSTED) && <ReviewPostedModal  {...modal.data} />}
+            {(modal?.modal == MODALS.PORTFOLIO) && <PortfolioModal  {...modal.data} />}
         </>
     )
 }
