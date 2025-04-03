@@ -46,8 +46,9 @@ export function SetTable({ absolute_items, hide_meta }: { absolute_items?: Array
     );
 }
 function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateAction<ProductLego[]>> }) {
-    const { id, name, product_num, prices, year, num_parts, theme_id, img_url } = props;
+    const { id, name, product_num, latest_price, prices, year, num_parts, theme_id, img_url } = props;
 
+    const currentPrice = latest_price?.value ?? prices?.[0]?.price ?? null;
     return (
         <tr className="odd:bg-[#F5F5F5] hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black">
             <Link href={route('admin.products.show.set', { product: id })}>
@@ -68,7 +69,7 @@ function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateActio
             <Td>{props.theme?.name}</Td>
             <Td>{year}</Td>
             <Td>{num_parts}</Td>
-            <Td >$ {prices?.[0]?.value ?? '—'}</Td>
+            <Td >$ {currentPrice ?? '—'}</Td>
         </tr>
     );
 }

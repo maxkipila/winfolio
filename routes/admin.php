@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SetController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\RecordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,12 +32,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         });
 
-        Route::group(['prefix' => 'awards'], function () {
-            Route::match(['POST', 'GET'], '/', [AwardController::class, 'index'])->name('awards.index');
-            Route::match(['POST', 'GET'], '/create', [AwardController::class, 'create'])->name('awards.create');
-            Route::match(['POST', 'GET'], '/store', [AwardController::class, 'store'])->name('awards.store');
-            Route::match(['POST', 'GET'], '/{award}/edit', [AwardController::class, 'edit'])->name('awards.edit');
-            Route::match(['POST', 'GET'], '/{award}', [AwardController::class, 'update'])->name('awards.update');
+        Route::group(['prefix' => 'awards', 'as' => 'awards.'], function () {
+            Route::match(['POST', 'GET'], '/', [AwardController::class, 'index'])->name('index');
+            Route::match(['POST', 'GET'], '/create', [AwardController::class, 'create'])->name('create');
+            Route::match(['POST', 'GET'], '/store', [AwardController::class, 'store'])->name('store');
+            Route::match(['POST', 'GET'], '/edit/{award}', [AwardController::class, 'edit'])->name('edit');
+            Route::match(['POST', 'GET'], '/{award}', [AwardController::class, 'update'])->name('update');
             Route::delete('/{award}', [AwardController::class, 'destroy'])->name('awards.destroy');
         });
 
@@ -58,6 +59,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/create', [ProductController::class, 'create'])->name('create');
             /* Route::post('/', [ProductController::class, 'store'])->name('store'); */
         });
+
 
 
         /*   Route::post('/import', [ImportController::class, 'import'])->name('import');

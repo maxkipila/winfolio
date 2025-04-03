@@ -23,4 +23,5 @@ interface ProductLego {
     value: string;
     condition: string;
     prices: Prices;
+    latest_price: { value: number };
 }

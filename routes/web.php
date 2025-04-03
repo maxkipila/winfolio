@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecordController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
@@ -61,6 +62,9 @@ Route::middleware('auth:web')->group(function () {
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::post('/users/{user}/update-records', [RecordController::class, 'updateRecords'])
+    ->name('users.update-records');
 
 
 require __DIR__ . '/admin.php';

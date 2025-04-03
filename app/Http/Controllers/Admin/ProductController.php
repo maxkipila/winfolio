@@ -45,11 +45,9 @@ class ProductController extends Controller
     {
         $setsQuery = Product::where('product_type', 'set')
             ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())
-            ->with(['theme', 'prices']);
+            ->with(['theme', 'latest_price']);
 
-        $sets = fn() => _Product::collection(
-            $setsQuery->paginate($request->paginate ?? 10)
-        );
+        $sets = fn() => _Product::collection($setsQuery->paginate($request->paginate ?? 10));
 
         $themes = fn() => _Theme::collection(
             Theme::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())->get()

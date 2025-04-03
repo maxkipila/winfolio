@@ -30,6 +30,10 @@ class Product extends Model
     {
         return $this->hasMany(Price::class);
     }
+    public function latest_price()
+    {
+        return $this->hasOne(Price::class)->latestOfMany();
+    }
 
     public function price()
     {
@@ -38,6 +42,10 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
     }
 
     public function review()
@@ -55,5 +63,11 @@ class Product extends Model
     public function subscription()
     {
         return $this->hasOne(Subscription::class);
+    }
+    public function awards(): BelongsToMany
+    {
+        return $this->belongsToMany(Award::class, 'user_awards')
+            ->withPivot(['value', 'count', 'percentage', 'notified', 'earned_at'])
+            ->withTimestamps();
     }
 }
