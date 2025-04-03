@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Traits\isNullable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class _Price extends JsonResource
 {
+    use isNullable;
     /**
      * Transform the resource into an array.
      *

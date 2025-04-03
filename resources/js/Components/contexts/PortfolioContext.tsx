@@ -35,7 +35,7 @@ export default function PortfolioContextProvider(props: { children: any }) {
 
     const { } = props
     // const { auth } = usePageProps<{ auth: { user: User } }>();
-    let { open } = useContext(ModalsContext)
+    let { open, close } = useContext(ModalsContext)
     let [products, setProducts] = useState([])
     let [hasProducts, setHasProducts] = useState(false)
     let [displayModal, setDisplayModal] = useState(true)
@@ -59,6 +59,7 @@ export default function PortfolioContextProvider(props: { children: any }) {
         console.log(user)
         if (user?.products?.length > 0) {
             setHasProducts(true);
+            close();
         } else {
             if (displayModal) {
                 console.log('nema produkty')
