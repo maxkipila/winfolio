@@ -21,4 +21,5 @@ interface User extends Resource {
     year: number;
     created_at: string;
     updated_at: string;
+    products: Array<Product>
 }

@@ -14,7 +14,7 @@ function Catalog(props: Props) {
     const { } = props
     const form = useForm({});
     const { data } = form;
-    const [sets, button, meta, setItems] = useLazyLoad<SetLego>('sets');
+    const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     return (
         <AuthenticatedLayout>
 
@@ -83,7 +83,7 @@ function Catalog(props: Props) {
                 <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
                     
                     {
-                        sets?.map((s)=>
+                        products?.map((s)=>
                             <ProductCard wide {...s} />
                         )
                     }

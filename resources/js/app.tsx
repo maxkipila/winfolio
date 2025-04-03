@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { ModalsProvider } from './Fragments/Modals';
+import PortfolioContextProvider from './Components/contexts/PortfolioContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -19,7 +20,9 @@ createInertiaApp({
         if (import.meta.env.SSR) {
             hydrateRoot(el,
                 <ModalsProvider>
-                    <App {...props} />
+                    <PortfolioContextProvider>
+                        <App {...props} />
+                    </PortfolioContextProvider>
                 </ModalsProvider>
             );
             return;
@@ -27,7 +30,9 @@ createInertiaApp({
 
         createRoot(el).render(
             <ModalsProvider>
-                <App {...props} />
+                <PortfolioContextProvider>
+                    <App {...props} />
+                </PortfolioContextProvider>
             </ModalsProvider>
         );
     },

@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\Set;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,26 +30,25 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 Route::middleware('auth:web')->group(function () {
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/get-user', [UserController::class,'get_user'])->name('get_user');
+    Route::match(['POST','GET'], '/add_product_to_user/{product}', [UserController::class,'add_product_to_user'])->name('add_product_to_user');
+    Route::match(['POST','GET'], '/remove_product_from_user/{product}', [UserController::class,'remove_product_from_user'])->name('remove_product_from_user');
     Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');
 
     Route::match(['GET', 'POST'], '/chest', function () {
-        $sets = _Set::collection(Set::latest()->paginate($request->paginate ?? 10));
-        return Inertia::render('chest', compact('sets'));
+        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+        return Inertia::render('chest', compact('products'));
     })->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     Route::match(['GET', 'POST'], '/catalog', function () {
-        $sets = _Set::collection(Set::latest()->paginate($request->paginate ?? 10));
-        return Inertia::render('catalog', compact('sets'));
+        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+        return Inertia::render('catalog', compact('products'));
     })->name('catalog');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {

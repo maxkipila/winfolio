@@ -103,7 +103,7 @@ let options = {
 function Chest(props: Props) {
     const { } = props
     let [portfolio, setPortfolio] = useState(true)
-    const [sets, button, meta, setItems] = useLazyLoad<SetLego>('sets');
+    const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     return (
         <AuthenticatedLayout>
             <div className='w-full pt-32px mob:pt-24px px-24px'>
@@ -139,7 +139,7 @@ function Chest(props: Props) {
                 </div>
                 <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
                     {
-                        sets?.map((s)=>
+                        products?.map((s)=>
                             <ProductCard wide {...s} />
                         )
                     }
