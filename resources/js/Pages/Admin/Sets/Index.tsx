@@ -51,7 +51,9 @@ function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateActio
     return (
         <tr className="odd:bg-[#F5F5F5] hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black">
             <Link href={route('admin.products.show.set', { product: id })}>
-                <Td>{id}</Td>
+                <div className='flex flex-col justify-center mt-8px items-start'>
+                    <Td>{id}</Td>
+                </div>
             </Link>
             <Td>
                 <Link className='hover:underline' href={route('admin.products.show.set', { product: id })}>
@@ -59,7 +61,7 @@ function Row(props: ProductLego & { setItems: React.Dispatch<React.SetStateActio
                 </Link>
             </Td>
             <Td>{product_num}</Td>
-            <Link href={route('admin.products.show.set', { product: id })}>
+            <Link className='flex items-center my-auto' href={route('admin.products.show.set', { product: id })}>
                 <Td>{name.length > 30 ? name.slice(0, 30) + '…' : name}</Td>
             </Link>
 

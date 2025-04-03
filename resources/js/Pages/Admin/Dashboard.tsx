@@ -80,6 +80,7 @@ function UserRow(props: User & { sent_payments_sum: number } & { setItems: React
             <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{id}</Link></Td>
             <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{first_name}{last_name}</Link></Td>
             <Td><Link className='hover:underline' href={route('admin.users.show', { user: id })}>{/* {Math.floor((sent_payments_sum ?? 0) * 0.05 * 100) / 100} */} {/* Kč */}</Link></Td>
+
             {/* <Td>
                 <div className='flex gap-8px items-center justify-end'>
                     <Link href={route('users.edit', { user: id })}><PencilSimple /></Link>
@@ -323,8 +324,10 @@ export default function Dashboard(props: Props) {
                                         custom="border-none m-0 w-full table-auto"
                                         Row={UserRow}
                                     >
+
                                         <Th order_by='id'>ID</Th>
-                                        <Th order_by='first_name'>Uživatel</Th>
+                                        <Th order_by='id'>Uživatelé</Th>
+
                                     </Table>
                                 </div>
                             </div>

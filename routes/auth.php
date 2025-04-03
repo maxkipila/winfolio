@@ -43,7 +43,7 @@ Route::middleware('guest:admins')->prefix('admin')->name('admin.')->group(functi
 
     Route::post('exists', [RegisteredUserController::class, 'adminExists'])->name('exists');
 
-    Route::get('login', [AuthenticatedSessionController::class, 'createAdmin'])
+    Route::get('/', [AuthenticatedSessionController::class, 'createAdmin'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'storeAdmin'])->name('login.account');

@@ -12,7 +12,7 @@ function Th(props: Props) {
 
     return (
         <th className={`p-12px text-left last:text-right align-middle whitespace-nowrap ${props.custom}`}>
-            <div className='flex items-center gap-8px'>
+            <div className='flex items-center '>
                 {children}
                 {
                     order_by &&

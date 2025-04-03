@@ -16,8 +16,8 @@ const AdminLayout = ({ title = 'Winfolio', children, rightChild, addButtonText, 
         <div className="flex flex-col min-h-screen font-nunito">
             <Head title={title} />
             <Header customButtonHref={customButtonHref} addButtonText={addButtonText} customButtonClassName={customButtonClassName} rightChild={rightChild} />
-            <div className='flex-grow flex flex-row gap-16px w-full'>
-                <Sidebar /* auth={auth} */ />
+            <div className='flex'>
+                <Sidebar  /* auth={auth} */ />
                 <main className='w-full m-48px'>
                     {children}
                 </main>

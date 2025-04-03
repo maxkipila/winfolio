@@ -63,9 +63,6 @@ class HandleInertiaRequests extends Middleware
         $products = fn(): AnonymousResourceCollection => _Product::collection(
             Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get()
         );
-        $searchProducts = fn(): AnonymousResourceCollection => _Product::collection(
-            Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get()
-        );
 
 
         return [
@@ -86,10 +83,7 @@ class HandleInertiaRequests extends Middleware
                     ->merge($users())
                     ->merge($products())
                     ->merge($themes())
-                /*  ->merge($minifigs())
-                    ->merge($sets()) */
-                /* ->merge($admins()) */
-                /* ->merge($activities()) */
+
             ),
             'searchProducts' => Inertia::lazy($products),
             'flash' => Session::get('flash'),

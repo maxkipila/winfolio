@@ -45,7 +45,7 @@ class ProductController extends Controller
     {
         $setsQuery = Product::where('product_type', 'set')
             ->orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())
-            ->with(['theme', 'prices']); // <— Přidáno eager loading pro "prices"
+            ->with(['theme', 'prices']);
 
         $sets = fn() => _Product::collection(
             $setsQuery->paginate($request->paginate ?? 10)
@@ -101,7 +101,7 @@ class ProductController extends Controller
         }
 
 
-        $product->load('theme');
+        $product->load('theme', 'price');
 
         $otherSets = Product::where('product_type', 'set')
             ->where('theme_id', $product->theme_id)
