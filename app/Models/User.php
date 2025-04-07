@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
@@ -57,6 +59,7 @@ class User extends Authenticatable
         // $this->sendTwoFactorCode($code);
     }
 
+
     public function news()
     {
         return $this->hasMany(News::class);
@@ -81,13 +84,35 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class);
     }
 
-    public function awards()
-    {
-        return $this->belongsToMany(Award::class)->withTimestamps();
-    }
-
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_user', 'user_id', 'product_id')->withTimestamps();
+        return $this->belongsToMany(Product::class)
+            ->withPivot([
+                'purchase_day',
+                'purchase_month',
+                'purchase_year',
+                'purchase_price',
+                'currency',
+                'condition'
+            ])
+            ->withTimestamps();
+    }
+
+    //ziska vsechny recordy
+    public function records(): HasMany
+    {
+        return $this->hasMany(UserRecord::class);
+    }
+    //ziska vsechny recordy podle typu
+    public function getRecord(string $type): ?UserRecord
+    {
+        return $this->records()->where('record_type', $type)->first();
+    }
+
+    public function awards()
+    {
+        return $this->belongsToMany(Award::class, 'user_awards')
+            ->withPivot(['earned_at', 'notified', 'count', 'value', 'percentage'])
+            ->withTimestamps();
     }
 }

@@ -2,13 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Traits\isNullable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class _Award extends JsonResource
+class _UserAward extends JsonResource
 {
-    use isNullable;
     /**
      * Transform the resource into an array.
      *
@@ -23,13 +21,13 @@ class _Award extends JsonResource
             'category' => $this->category,
             'description' => $this->description,
             'icon' => $this->icon,
-            'condition_type' => optional($this->conditions->first())->condition_type,
-            'conditions' => _AwardCondition::collection($this->whenLoaded('conditions')),
-            /* 'user_records' => _UserRecord::collection($this->whenLoaded('records')), */
-            /* 'user_awards' => _UserAward::collection($this->whenLoaded('users')),
- */
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'pivot' => [
+                'value' => $this->pivot->value,
+                'count' => $this->pivot->count,
+                'percentage' => $this->pivot->percentage,
+                'notified' => (bool) $this->pivot->notified,
+                'earned_at' => $this->pivot->earned_at,
+            ],
         ];
     }
 }

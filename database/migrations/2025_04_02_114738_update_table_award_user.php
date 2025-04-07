@@ -6,19 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
-
         Schema::create('award_user', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('award_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->unique(['award_id', 'user_id']);
-            $table->timestamps();
+            $table->primary(['award_id', 'user_id']);
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('award_user');
     }
