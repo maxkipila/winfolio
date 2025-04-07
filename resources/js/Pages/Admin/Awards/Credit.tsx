@@ -1,3 +1,4 @@
+import Img from '@/Components/Image'
 import PrimaryButton from '@/Components/PrimaryButton'
 import SecondaryButton from '@/Components/SecondaryButton'
 import Breadcrumbs from '@/Fragments/forms/Breadcrumbs'
@@ -5,6 +6,8 @@ import { CSubmitButton } from '@/Fragments/forms/Buttons/CSubmitButton'
 import CustomButton from '@/Fragments/forms/Buttons/CustomButton'
 import { SubmitButton } from '@/Fragments/forms/Buttons/SubmitButton'
 import Form from '@/Fragments/forms/Form'
+import Search, { SearchCard } from '@/Fragments/forms/inputs/Search'
+import SearchMultiple from '@/Fragments/forms/inputs/SearchMultiple'
 import Select from '@/Fragments/forms/inputs/Select'
 import Submit from '@/Fragments/forms/inputs/Submit'
 import TextArea from '@/Fragments/forms/inputs/TextArea'
@@ -19,18 +22,40 @@ import React, { useEffect, useState } from 'react'
 
 type NewsCategory = 'Odznak' | 'Lorem'
 
+type Award = {
+    id: string | number
+    name: string
+    description?: string
+    category?: string
+    condition_type?: string
+    product_id?: string
+    category_id?: string
+    required_count?: string
+    required_value?: string
+    required_percentage?: string
+}
+
 type Props = {
     awards?: Award
+    conditions?: Award
+
 }
 type LangType = 'cz' | 'eng'
 
-const Credit = ({ awards }: Props) => {
+const Credit = ({ awards, conditions }: Props) => {
     const [activeTab, setActiveTab] = useState<NewsCategory>(awards?.category as NewsCategory || 'Odznak');
     const form = useForm({
         description: awards?.description || '',
         name: awards?.name || '',
         category: activeTab,
-        condition_type: awards?.condition_type || '',
+        condition_type: awards?.condition_type || conditions?.condition_type || 'specific_product',
+        product_id: awards?.product_id || conditions?.product_id || '',
+        category_id: awards?.category_id || conditions?.category_id || '',
+        required_count: awards?.required_count || conditions?.required_count || '',
+        required_value: awards?.required_value || conditions?.required_value || '',
+        required_percentage: awards?.required_percentage || conditions?.required_percentage || '',
+
+
     })
 
     /*  useEffect(() => {
@@ -54,9 +79,6 @@ const Credit = ({ awards }: Props) => {
             }
         })
     }
-
-
-
 
     return (
         <AdminLayout
@@ -87,7 +109,6 @@ const Credit = ({ awards }: Props) => {
                                 <TextField label={'Popisek'} name={'description'} />
                             </div>
 
-
                             <div className="mt-[16px] border p-4px border-black flex w-[fit-content] text-[14px] font-bold">
                                 {/* Tlačítko pro Novinku */}
                                 <Button
@@ -99,63 +120,162 @@ const Credit = ({ awards }: Props) => {
                                     className={`px-[16px] py-[8px] border-2 border-black ${activeTab === 'Odznak' ? 'bg-black text-white' : 'bg-white text-black'} rounded-l-[4px]`} href={'#'}>
                                     Odznak
                                 </Button>
-                                {/* Tlačítko pro Blogpost */}
-                                {/*  <Button
-                                    preserveState
-                                    onClick={() => setActiveTab('Lorem')}
-                                    className={`px-[16px] py-[8px] border-2 border-black ${activeTab === 'Lorem' ? 'bg-black text-white' : 'bg-white text-black'} -ml-[2px]`} href={'#'}>
-                                    Lorem
-                                </Button> */}
 
                             </div>
 
-
-
                         </div>
-                        <div className='pt-16px'>
-                            <Select
-                                label={'Podmínky'}
-                                name={'condition_type'}
-                                value={form.data.condition_type}
-                                onChange={e => form.setData('condition_type', e.target.value)}
-                                options={[
-                                    { text: 'Konkrétní produkt', value: 'specific_product' },
-                                    { text: 'Konkrétní kategorie', value: 'specific_category' },
-                                    { text: 'Počet produktů v kategorii', value: 'category_items_count' },
-                                    { text: 'Celkový počet produktů', value: 'total_items_count' },
-                                    { text: 'Hodnota portfolia', value: 'portfolio_value' },
-                                    { text: 'Procento portfolia', value: 'portfolio_percentage' }
-                                ]}
-                            />
-                        </div>
-                        <div className='flex justify-end mt-16px'>
-                            {awards ? (
-                                form.isDirty && (
+                        <div className='flex flex-col gap-16px p-[24px] mt-[16px] border border-black'>
+
+                            <div>
+                                <Select
+                                    label={'Typ podmínky'}
+                                    name={'condition_type'}
+                                    value={form.data.condition_type}
+                                    onChange={e => form.setData('condition_type', e.target.value)}
+                                    options={[
+                                        { text: 'Konkrétní produkt', value: 'specific_product' },
+                                        { text: 'Konkrétní kategorie', value: 'specific_category' },
+                                        { text: 'Počet produktů v kategorii', value: 'category_items_count' },
+                                        { text: 'Celkový počet produktů', value: 'total_items_count' },
+                                        { text: 'Hodnota portfolia', value: 'portfolio_value' },
+                                        { text: 'Procento portfolia', value: 'portfolio_percentage' }
+                                    ]}
+                                />
+                            </div>
+
+                            {form.data.condition_type === 'specific_product' && (
+                                <div>
+
+                                    <SearchMultiple<Award>
+                                        name="product_name"
+                                        keyName="search_products"
+                                        placeholder='Konkretní produkt'
+                                        value={form.data.product_id}
+                                        onChange={(value) => form.setData('product_id', value)}
+                                        optionsCallback={(r) => ({
+                                            text: r.name,
+                                            element: (
+                                                <div>{r.name}</div>
+                                            ),
+                                            value: r.id,
+                                            object: r
+                                        })}
+
+                                    />
+                                    <div>
+                                        {conditions?.product_id}
+                                    </div>
+                                </div>
+                            )}
+
+                            {
+                                form.data.condition_type === 'specific_category' && (
+                                    <SearchMultiple<Award>
+                                        name="category_name"
+                                        keyName="search_products"
+                                        placeholder='Nazev kategorie'
+                                        value={form.data.product_id}
+                                        onChange={(value) => form.setData('product_id', value)}
+                                        optionsCallback={(r) => ({
+                                            text: r.name,
+                                            element: (
+                                                <div>{r.name}</div>
+                                            ),
+                                            value: r.id,
+                                            object: r
+                                        })}
+                                    />
+                                )
+                            }
+
+                            {
+                                form.data.condition_type === 'category_items_count' && (
+                                    <div className='flex gap-16px'>
+                                        <SearchMultiple<Award>
+                                            name="category_name"
+                                            keyName="search_products"
+                                            placeholder='Nazev kategorie'
+                                            value={form.data.product_id}
+                                            onChange={(value) => form.setData('product_id', value)}
+                                            optionsCallback={(r) => ({
+                                                text: r.name,
+                                                element: (
+                                                    <div>{r.name}</div>
+                                                ),
+                                                value: r.id,
+                                                object: r
+                                            })}
+                                        />
+                                        <TextField
+                                            label="Počet"
+                                            name="required_count"
+                                            value={form.data.required_count}
+                                            onChange={e => form.setData('required_count', e.target.value)}
+                                        />
+                                    </div>
+                                )
+                            }
+
+                            {
+                                form.data.condition_type === 'total_items_count' && (
+                                    <TextField
+                                        label="Počet"
+                                        name="required_count"
+                                        value={form.data.required_count}
+                                        onChange={e => form.setData('required_count', e.target.value)}
+                                    />
+                                )
+                            }
+
+                            {
+                                form.data.condition_type === 'portfolio_value' && (
+                                    <TextField
+                                        label="Hodnota"
+                                        name="required_value"
+                                        value={form.data.required_value}
+                                        onChange={e => form.setData('required_value', e.target.value)}
+                                    />
+                                )
+                            }
+
+                            {
+                                form.data.condition_type === 'portfolio_percentage' && (
+                                    <TextField
+                                        label="Procento (%)"
+                                        name="required_percentage"
+                                        value={form.data.required_percentage}
+                                        onChange={e => form.setData('required_percentage', e.target.value)}
+                                    />
+                                )
+                            }
+                            <div className='flex justify-end mt-16px'>
+                                {awards ? (
+                                    form.isDirty && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                form.post(route('admin.awards.update', { award: awards.id }), {
+                                                    onSuccess: () => {
+                                                        form.reset();
+                                                    }
+                                                });
+                                            }}
+                                            className='py-12px px-24px hover:scale-105 items-center bg-app-input-green rounded-sm font-bold font-teko text-white border-black border-2 flex gap-12px'
+                                        >
+                                            <Check weight='bold' />Upravit ocenění
+                                        </button>
+                                    )
+                                ) : (
                                     <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            form.post(route('admin.awards.update', { award: awards.id }), {
-                                                onSuccess: () => {
-                                                    form.reset();
-                                                }
-                                            });
-                                        }}
+                                        onClick={addPost}
                                         className='py-12px px-24px hover:scale-105 items-center bg-app-input-green rounded-sm font-bold font-teko text-white border-black border-2 flex gap-12px'
                                     >
-                                        <Check weight='bold' />Upravit ocenění
+                                        <Check weight='bold' />Přidat nové ocenění
                                     </button>
-                                )
-                            ) : (
-                                <button
-                                    onClick={addPost}
-                                    className='py-12px px-24px hover:scale-105 items-center bg-app-input-green rounded-sm font-bold font-teko text-white border-black border-2 flex gap-12px'
-                                >
-                                    <Check weight='bold' />Přidat nové ocenění
-                                </button>
-                            )}
+                                )}
+                            </div>
+
                         </div>
-
-
                     </div>
                 </Form>
             </div >

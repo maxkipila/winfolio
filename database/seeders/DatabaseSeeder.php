@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
 
         User::factory()->create([
             'first_name' => 'Test',
@@ -54,5 +54,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PriceSeeder::class);
         $this->call(ReviewSeeder::class);
         $this->call(NewsSeeder::class);
+
+        Artisan::call('import:lego-images');
     }
 }

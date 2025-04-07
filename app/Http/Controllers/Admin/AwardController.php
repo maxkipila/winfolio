@@ -56,11 +56,23 @@ class AwardController extends Controller
     }
     public function store(Request $request)
     {
+
+        if ($request->has('product_name') && is_array($request->product_name)) {
+            $firstItem = $request->product_name[0] ?? null;
+            if ($firstItem && isset($firstItem['id'])) {
+
+                $request->merge([
+                    'product_id' => $firstItem['id'],
+                ]);
+            }
+        }
+
         $awardData = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-
+            'category' => 'nullable|string|max:255',
         ]);
+
 
         $conditionData = $request->validate([
             'condition_type' => 'required|string',
@@ -71,9 +83,10 @@ class AwardController extends Controller
             'required_percentage' => 'nullable|numeric',
         ]);
 
+
         $award = Award::create($awardData);
 
-        if ($request->filled('condition_type')) {
+        if ($conditionData['condition_type']) {
             $award->conditions()->create($conditionData);
         }
 

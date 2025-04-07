@@ -23,6 +23,7 @@ class _Award extends JsonResource
             'category' => $this->category,
             'description' => $this->description,
             'icon' => $this->icon,
+            'product_id' => $this->product_id,
             'condition_type' => optional($this->conditions->first())->condition_type,
             'conditions' => _AwardCondition::collection($this->whenLoaded('conditions')),
             /* 'user_records' => _UserRecord::collection($this->whenLoaded('records')), */
