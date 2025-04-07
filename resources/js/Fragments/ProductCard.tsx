@@ -9,7 +9,7 @@ interface Props extends Product {
 }
 
 function ProductCard(props: Props) {
-    const { wide = false, id, img_url, name, num_parts, set_num, theme_id, thumbnail, year } = props
+    const { wide = false, id, img_url, name, num_parts, product_num, theme_id, thumbnail, year } = props
 
     return (
         <Link href={route('product.detail', { product: id })} className='border-2 border-black divide-y-2 divide-black'>

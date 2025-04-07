@@ -29,7 +29,7 @@ function Product(props: Props) {
                         </div>
                     </div>
                     <div className='mt-24px'>
-                        <div className='font-nunito font-bold'>{product?.set_num}</div>
+                        <div className='font-nunito font-bold'>{product?.product_num}</div>
                         <div className='font-bold text-4xl'>{product?.name}</div>
                     </div>
                     <div className='mt-12px flex items-center justify-between w-full'>
@@ -49,7 +49,7 @@ function Product(props: Props) {
                         <div className='flex items-center justify-between w-full pb-16px border-b border-[#D0D4DB]'>
                             <div className='font-nunito'>Retail price</div>
                             <div className='flex items-center gap-16px'>
-                                <div className='font-nunito font-semibold text-[#4D4D4D]'>Free</div>
+                                <div className='font-nunito font-semibold text-[#4D4D4D]'>${product?.price?.retail}</div>
                                 <div className='py-6px px-8px bg-[#F5F5F5] text-xs font-semibold font-nunito text-[#4D4D4D]'>Medium accuracy</div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@ function Product(props: Props) {
                         </div>
                         <div className='flex items-center justify-between mb-8px'>
                             <div className='font-nunito flex items-center'>Value</div>
-                            <div className='font-semibold font-nunito text-[#4D4D4D]'>$22.36</div>
+                            <div className='font-semibold font-nunito text-[#4D4D4D]'>${product?.price?.value}</div>
                         </div>
                         <div className='flex items-center justify-between w-full pb-16px border-b border-[#D0D4DB]'>
                             <div className='font-nunito flex items-center gap-12px'>
@@ -79,7 +79,7 @@ function Product(props: Props) {
                         <div className='flex items-center justify-between w-full'>
                             <div className='font-nunito'>Value</div>
                             <div className='flex items-center gap-16px'>
-                                <div className='py-6px px-8px  font-semibold font-nunito text-[#4D4D4D]'>$18.56</div>
+                                <div className='py-6px px-8px  font-semibold font-nunito text-[#4D4D4D]'>${product?.price?.value}</div>
                             </div>
                         </div>
                         <div className='flex items-center justify-between w-full pb-16px'>
@@ -103,7 +103,7 @@ function Product(props: Props) {
                                     <div className='text-[#4D4D4D]'>Today’s value</div>
                                     <Question size={24} />
                                 </div>
-                                <div className='text-[#4D4D4D]'>$22.36</div>
+                                <div className='text-[#4D4D4D]'>${product?.price?.wholesale}</div>
                             </div>
 
                             <div className='w-full flex justify-between items-center mt-8px'>
@@ -211,19 +211,19 @@ function Product(props: Props) {
 
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Set number</div>
-                            <div className='text-[#4D4D4D]'>30713-2</div>
+                            <div className='text-[#4D4D4D]'>{product?.product_num}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Name</div>
-                            <div className='text-[#4D4D4D]'>...</div>
+                            <div className='text-[#4D4D4D]'>{product?.name}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Theme</div>
-                            <div className='text-[#4D4D4D]'>...</div>
+                            <div className='text-[#4D4D4D]'>{product?.theme?.name ?? "---"}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Year</div>
-                            <div className='text-[#4D4D4D]'>2024</div>
+                            <div className='text-[#4D4D4D]'>{product?.year}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Released</div>
@@ -231,20 +231,20 @@ function Product(props: Props) {
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Availability</div>
-                            <div className='text-[#4D4D4D]'>Retail</div>
+                            <div className='text-[#4D4D4D]'>{product?.price?.condition}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Packaging</div>
-                            <div className='text-[#4D4D4D]'>Paper</div>
+                            <div className='text-[#4D4D4D]'>{product?.price?.condition}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Pieces</div>
-                            <div className='text-[#4D4D4D]'>43 (PPP 0,15)</div>
+                            <div className='text-[#4D4D4D]'>{product?.num_parts}</div>
                         </div>
-                        <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+                        {/* <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Minifigs</div>
                             <div className='text-[#4D4D4D]'>1</div>
-                        </div>
+                        </div> */}
                         <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>Availible at retail</div>
                         <Button href={"#"} icon={<Plus size={24} />}>Add to portfolio</Button>
                     </div>

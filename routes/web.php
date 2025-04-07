@@ -32,9 +32,9 @@ Route::get('/', function () {
 
 Route::middleware('auth:web')->group(function () {
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-    Route::get('/get-user', [UserController::class,'get_user'])->name('get_user');
-    Route::match(['POST','GET'], '/add_product_to_user/{product}', [UserController::class,'add_product_to_user'])->name('add_product_to_user');
-    Route::match(['POST','GET'], '/remove_product_from_user/{product}', [UserController::class,'remove_product_from_user'])->name('remove_product_from_user');
+    Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');
+    Route::match(['POST', 'GET'], '/add_product_to_user/{product}', [UserController::class, 'add_product_to_user'])->name('add_product_to_user');
+    Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
     Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');
@@ -51,7 +51,7 @@ Route::middleware('auth:web')->group(function () {
     })->name('catalog');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
-        $product = _Product::init($product);
+        $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme']));
         // dd($set);
         return Inertia::render('product', compact('product'));
     })->name('product.detail');
