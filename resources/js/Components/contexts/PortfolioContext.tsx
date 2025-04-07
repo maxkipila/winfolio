@@ -56,7 +56,7 @@ export default function PortfolioContextProvider(props: { children: any }) {
     }, [])
     
     useEffect(() => {
-        console.log(user)
+        
         if (user?.products?.length > 0) {
             setHasProducts(true);
             close();

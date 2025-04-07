@@ -10,7 +10,7 @@ interface Props extends Product {
 }
 
 function PortfolioProductCard(props: Props) {
-    const { wide = false, id, img_url, name, num_parts, set_num, theme_id, thumbnail, year } = props
+    const { wide = false, id, img_url, name, num_parts, product_num, theme_id, thumbnail, year } = props
     let { setSelected } = useContext(PortfolioContext)
     return (
         <div onClick={() => { setSelected({ ...props }) }} className='border-2 border-black divide-y-2 divide-black'>
