@@ -8,7 +8,7 @@ interface Product {
     theme_id: number;
     thumbnail: string;
     img_url: string;
-    price?: Prices;
+    latest_price?: Prices;
     prices?: Array<Prices>
     theme?: Theme
 }
