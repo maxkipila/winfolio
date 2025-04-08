@@ -10,7 +10,7 @@ interface Props extends Product {
 }
 
 function PortfolioProductCard(props: Props) {
-    const { wide = false, id, img_url, name, num_parts, product_num, theme_id, thumbnail, year } = props
+    const { wide = false, id, img_url, name, num_parts, product_num, theme_id, thumbnail, year, theme } = props
     let { setSelected } = useContext(PortfolioContext)
     return (
         <div onClick={() => { setSelected({ ...props }) }} className='border-2 border-black divide-y-2 divide-black'>
@@ -21,8 +21,8 @@ function PortfolioProductCard(props: Props) {
                         <div className='font-bold'>{name}</div>
                         <div className='w-16px h-16px bg-[#46BD0F] rounded-full'></div>
                     </div>
-                    <div className='mt-4px mb-8px'>Star Wars / Ultimate Collecto…</div>
-                    <div className='pt-8px border-t border-[#D0D4DB]'>2021</div>
+                    <div className='mt-4px mb-8px'>{theme?.name ?? "---"}</div>
+                    <div className='pt-8px border-t border-[#D0D4DB]'>{year}</div>
                 </div>
             </div>
             <div className={`p-16px w-full grid ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>

@@ -20,7 +20,7 @@ class _Theme extends JsonResource
             'parent_id' => $this->parent_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'parent'   => new _Theme($this->whenLoaded('parent')),
+            'parent'   => new _Theme($this->parent),
             'children' => _Theme::collection($this->whenLoaded('children')),
 
         ];

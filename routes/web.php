@@ -43,12 +43,12 @@ Route::middleware('auth:web')->group(function () {
 
     Route::match(['GET', 'POST'], '/chest', function () {
         $user = Auth::user();
-        
-        
+
+
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
         $user_products = _Product::collection($user->products->load('prices'));
 
-        return Inertia::render('chest', compact('products','user_products'));
+        return Inertia::render('chest', compact('products', 'user_products'));
     })->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
@@ -59,8 +59,11 @@ Route::middleware('auth:web')->group(function () {
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
         $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme']));
+
+        $similar_products = _Product::collection(Product::where('theme_id', $product->theme->id ?? NULL)->inRandomOrder()->take(4)->get());
+
         // dd($set);
-        return Inertia::render('product', compact('product'));
+        return Inertia::render('product', compact('product', 'similar_products'));
     })->name('product.detail');
 
     /*   Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index'); */

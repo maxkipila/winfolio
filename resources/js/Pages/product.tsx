@@ -10,10 +10,11 @@ import React, { useState } from 'react'
 
 interface Props {
     product: Product
+    similar_products?: Array<Product>
 }
 
 function Product(props: Props) {
-    const { product } = props
+    const { product, similar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
     return (
         <AuthenticatedLayout>
@@ -202,7 +203,14 @@ function Product(props: Props) {
                     <div className='grid grid-cols-2 mob:grid-cols-1 mt-16px gap-12px'>
                         {/* <ProductCard wide />
                         <ProductCard wide /> */}
-                        <div className='font-bold text-xl'>No other sets in theme</div>
+                        {
+                            similar_products?.length > 0 ?
+                                similar_products?.map((sp) =>
+                                    <ProductCard wide {...sp} />
+                                )
+                                :
+                                <div className='font-bold text-xl'>No other sets in theme</div>
+                        }
                     </div>
                 </div>
                 <div className='w-full'>
@@ -219,6 +227,10 @@ function Product(props: Props) {
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Theme</div>
+                            <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ?? "---"}</div>
+                        </div>
+                        <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+                            <div className='text-[#4D4D4D]'>Subtheme</div>
                             <div className='text-[#4D4D4D]'>{product?.theme?.name ?? "---"}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
