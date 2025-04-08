@@ -43,6 +43,8 @@ const Credit = ({ awards, conditions }: Props) => {
         required_count: awards?.required_count || conditions?.required_count || '',
         required_value: awards?.required_value || conditions?.required_value || '',
         required_percentage: awards?.required_percentage || conditions?.required_percentage || '',
+        category_name: awards?.category_name || conditions?.category_name || '',
+
         awards: {
             conditions: [
                 {
@@ -51,11 +53,10 @@ const Credit = ({ awards, conditions }: Props) => {
                     product_id: awards?.product_id || '',
                     required_count: awards?.required_count || '',
                     required_value: awards?.required_value || '',
+                    category_name: awards?.category_name || '',
                 }
             ]
         }
-
-
     })
 
     /*  useEffect(() => {
@@ -178,21 +179,27 @@ const Credit = ({ awards, conditions }: Props) => {
 
                             {
                                 form.data.condition_type === 'specific_category' && (
-                                    <SearchMultiple<Award>
-                                        name="category_name"
-                                        keyName="search_themes"
-                                        placeholder='Nazev kategorie'
-                                        value={form.data.product_id}
-                                        onChange={(value) => form.setData('category_id', value)}
-                                        optionsCallback={(r) => ({
-                                            text: r.name,
-                                            element: (
-                                                <div>{r.name}</div>
-                                            ),
-                                            value: r.id,
-                                            object: r
-                                        })}
-                                    />
+                                    <div>
+                                        <SearchMultiple<Award>
+                                            name="categories"
+                                            keyName="search_themes"
+                                            placeholder='Nazev kategorie'
+                                            value={form.data.category_id}
+                                            onChange={(value: string) => form.setData('category_id', value)}
+                                            optionsCallback={(r) => ({
+                                                text: r.name,
+                                                element: (
+                                                    <div>{r.name}</div>
+                                                ),
+                                                value: r.id,
+                                                object: r
+                                            })}
+                                        />
+                                        {/*  <div className="mt-4px">
+                                            <label className="font-bold">Název kategorie:</label>
+                                            <span className="ml-2">{form.data.category_name}</span>
+                                        </div> */}
+                                    </div>
                                 )
                             }
 

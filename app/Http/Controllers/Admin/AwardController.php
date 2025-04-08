@@ -49,7 +49,7 @@ class AwardController extends Controller
     {
 
 
-        $award->load('conditions.product');
+        $award->load('conditions.product', 'conditions.category');
         $awards = _Award::init($award);
 
         return Inertia::render('Admin/Awards/Credit', [

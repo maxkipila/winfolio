@@ -24,7 +24,7 @@ class _AwardCondition extends JsonResource
             }),
             'product' => $this->when($this->product_id, new _Product($this->whenLoaded('product'))),
             'category_id' => $this->category_id,
-            'category' => $this->when($this->category_id, new _Category($this->whenLoaded('category'))),
+            'category' => $this->when($this->relationLoaded('category'), new _Category($this->whenLoaded('category'))),
             'required_count' => $this->required_count,
             'required_value' => $this->required_value,
             'required_percentage' => $this->required_percentage,
