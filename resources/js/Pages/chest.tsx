@@ -198,8 +198,8 @@ function Chest(props: Props) {
                         :
                         <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
                             {
-                                products?.map((s) =>
-                                    <ProductCard wide {...s} />
+                                auth?.user?.favourites?.map((s) =>
+                                    <ProductCard wide {...s.favourite} />
                                 )
                             }
                         </div>

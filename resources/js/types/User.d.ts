@@ -22,4 +22,5 @@ interface User extends Resource {
     created_at: string;
     updated_at: string;
     products: Array<Product>
+    favourites: Array<Favourite>
 }

@@ -11,4 +11,6 @@ interface Product {
     latest_price?: Prices;
     prices?: Array<Prices>
     theme?: Theme
+    reviews?: Array<Review>
+    favourited: boolean
 }

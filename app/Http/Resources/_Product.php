@@ -2,9 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
+use App\Models\User;
 use App\Traits\isNullable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class _Product extends JsonResource
 {
@@ -29,6 +32,7 @@ class _Product extends JsonResource
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,
+            'favourited' => Auth::user() instanceof User ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists() : false,
             'prices'      => _Price::collection($this->whenLoaded('prices')),
             'model'       => (new \ReflectionClass($this->resource))->getShortName(),
             'review'      => new _Review($this->whenLoaded('review')),

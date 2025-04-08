@@ -6,6 +6,7 @@ import ReviewCard from '@/Fragments/ReviewCard'
 import { Button } from '@/Fragments/UI/Button'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosphor-icons/react'
+import axios from 'axios'
 import React, { useState } from 'react'
 
 interface Props {
@@ -16,6 +17,8 @@ interface Props {
 function Product(props: Props) {
     const { product, similar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
+    
+    
     return (
         <AuthenticatedLayout>
             <div className='w-full pb-24px px-24px flex gap-20px pt-32px mob:flex-col'>
@@ -40,7 +43,9 @@ function Product(props: Props) {
                         </div>
                         <div className='flex gap-16px'>
                             <Export size={24} />
-                            <Heart size={24} />
+                            <Heart weight={product?.favourited?"fill":"regular"} color={product?.favourited?"#F7AA1A":"black"} className='cursor-pointer' onClick={()=>{
+                                axios.post(route('favourites.toggle', { type: encodeURI(encodeURIComponent("App\\Models\\Product")), favouritable: product.id }))
+                            }} size={24} />
                         </div>
                     </div>
                     <div className='mt-24px font-bold text-xl'>Forecast</div>
@@ -267,7 +272,7 @@ function Product(props: Props) {
                             <div className='text-[#4D4D4D]'>The Make & Take event were be available in UK and selected European stores on March 9th between 10:00 – 12:00 and on March 10th between 12:00 – 14:00.</div>
                         </div>
                     </div>
-                    <ReviewCard />
+                    <ReviewCard product={product} />
                     <PromotionalCard />
                 </div>
             </div>

@@ -41,6 +41,8 @@ Route::middleware('auth:web')->group(function () {
         return Inertia::render('blog');
     })->name('blog-layout');
 
+    Route::post('/favourite/{type}/{favouritable}', [UserController::class, 'toggleFavourite'])->name('favourites.toggle');
+
     Route::match(['GET', 'POST'], '/chest', function () {
         $user = Auth::user();
 
