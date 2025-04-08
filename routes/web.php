@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Set;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -41,8 +42,13 @@ Route::middleware('auth:web')->group(function () {
     })->name('blog-layout');
 
     Route::match(['GET', 'POST'], '/chest', function () {
+        $user = Auth::user();
+        
+        
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
-        return Inertia::render('chest', compact('products'));
+        $user_products = _Product::collection($user->products->load('prices'));
+
+        return Inertia::render('chest', compact('products','user_products'));
     })->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');

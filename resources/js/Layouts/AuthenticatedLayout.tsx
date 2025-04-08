@@ -36,7 +36,7 @@ function AuthenticatedLayout(props: Props) {
     let { open: _OpenModal, modal } = useContext(ModalsContext)
 
     return (
-        <div className='font-teko'>
+        <div className='font-teko '>
             <div className='relative'>
                 <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen z-max transform duration-300  ${open ? "" : "-translate-x-full"}`}>
                     <div className='flex flex-col p-24px'>
