@@ -24,6 +24,8 @@ type NewsCategory = 'Odznak' | 'Lorem'
 
 
 
+
+
 type Props = {
     awards?: Award
     conditions?: Award
@@ -39,12 +41,11 @@ const Credit = ({ awards, conditions }: Props) => {
         category: activeTab,
         condition_type: awards?.condition_type || conditions?.condition_type || 'specific_product',
         product_id: awards?.product_id || conditions?.product_id || '',
-        category_id: awards?.category_id || conditions?.category_id || '',
         required_count: awards?.required_count || conditions?.required_count || '',
         required_value: awards?.required_value || conditions?.required_value || '',
         required_percentage: awards?.required_percentage || conditions?.required_percentage || '',
+        category_id: awards?.category_id || conditions?.category_id || [],
         category_name: awards?.category_name || conditions?.category_name || '',
-
         awards: {
             conditions: [
                 {
@@ -57,7 +58,7 @@ const Credit = ({ awards, conditions }: Props) => {
                 }
             ]
         }
-    })
+    });
 
     /*  useEffect(() => {
          form.setData('category', activeTab)
@@ -147,8 +148,8 @@ const Credit = ({ awards, conditions }: Props) => {
                             {form.data.condition_type === 'specific_product' && (
                                 <div>
                                     <div className='mt-16px pb-16px flex font-teko text-xl'>
-                                        {awards?.conditions?.map((c) => (
-                                            <div key={c.id} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                        {awards?.conditions?.map((c, index) => (
+                                            <div key={c.award_id || index} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
                                                 <div className="flex gap-16px">
                                                     <span>ID: {c.product_id}</span>
                                                     <span>Nazev: {c.product_name}</span>
@@ -177,31 +178,49 @@ const Credit = ({ awards, conditions }: Props) => {
                                 </div>
                             )}
 
-                            {
-                                form.data.condition_type === 'specific_category' && (
-                                    <div>
-                                        <SearchMultiple<Award>
-                                            name="categories"
-                                            keyName="search_themes"
-                                            placeholder='Nazev kategorie'
-                                            value={form.data.category_id}
-                                            onChange={(value: string) => form.setData('category_id', value)}
-                                            optionsCallback={(r) => ({
-                                                text: r.name,
-                                                element: (
-                                                    <div>{r.name}</div>
-                                                ),
-                                                value: r.id,
-                                                object: r
-                                            })}
-                                        />
-                                        {/*  <div className="mt-4px">
-                                            <label className="font-bold">Název kategorie:</label>
-                                            <span className="ml-2">{form.data.category_name}</span>
-                                        </div> */}
+                            {form.data.condition_type === 'specific_category' && (
+                                <div>
+                                    <div className='mt-16px pb-16px flex flex-col font-teko text-xl'>
+                                        {awards?.conditions?.map((c, index) => (
+                                            <div key={c.condition} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                                <div className="flex gap-16px">
+                                                    <span>ID: {c.category_id}</span>
+                                                    <span>Nazev: {c.category_name}</span>
+                                                </div>
+                                                <X
+                                                    className="cursor-pointer"
+                                                    onClick={() => {
+                                                        // Remove condition logic
+                                                        const updatedConditions = awards.conditions.filter((_, i) => i !== index);
+                                                        // You would typically update your state here
+                                                        // This is a placeholder for actual implementation
+                                                        console.log('Condition removed', updatedConditions);
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
-                                )
-                            }
+                                    <SearchMultiple<Award>
+                                        name="category_id"
+                                        keyName="search_themes"
+                                        placeholder="Název kategorie"
+                                        value={form.data.category_id}
+                                        onChange={(value) => {
+                                            // Pokud "value" je pole, použijeme první prvek, jinak použijeme přímo value
+                                            const selectedId = Array.isArray(value) ? value[0] : value;
+                                            form.setData('category_id', selectedId);
+                                        }}
+                                        optionsCallback={(r) => ({
+                                            text: r.name,
+                                            element: <div>{r.name}</div>,
+                                            value: r.id,
+                                            object: r
+                                        })}
+                                    />
+
+
+                                </div>
+                            )}
 
                             {
                                 form.data.condition_type === 'category_items_count' && (
