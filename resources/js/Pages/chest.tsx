@@ -113,11 +113,14 @@ function Chest(props: Props) {
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let { open } = useContext(ModalsContext)
+    let current_value = 0
     let all_prices = user_products?.flatMap((up) => up.prices)
     let price_values = all_prices?.flatMap((ap) => ap.value)
+    let current_prices = user_products?.flatMap((up) => up.latest_price?.value)
+    current_prices?.map((cp) => current_value += parseInt(cp, 10))
     let dates = all_prices?.flatMap((dt) => moment(dt.created_at, 'YYYY-MM-DD').format('D.'))
-    console.log('dummy: ', Object.values(days ?? {}), daysLabel)
-    console.log('actual', price_values, dates)
+
+
 
     const data = {
         labels: dates,
@@ -146,7 +149,7 @@ function Chest(props: Props) {
                     <div className='flex items-center w-full justify-between'>
                         <div className='flex items-center'>
                             <div className='font-bold text-4xl'>$</div>
-                            <div className='font-bold text-6xl'>1 102</div>
+                            <div className='font-bold text-6xl'>{current_value}</div>
                             <div className='text-[#999999] font-bold text-4xl'>.13</div>
                         </div>
                         <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
