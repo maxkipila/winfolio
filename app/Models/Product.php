@@ -73,4 +73,20 @@ class Product extends Model implements HasMedia
             ->withPivot(['value', 'count', 'percentage', 'notified', 'earned_at'])
             ->withTimestamps();
     }
+
+    // Pro sety - získání minifigurek v setu
+    public function minifigs()
+    {
+        return $this->belongsToMany(Product::class, 'set_minifigs', 'parent_id', 'id')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
+
+    // Pro minifigurky - získání setů, kde je minifigurka obsažena
+    public function sets()
+    {
+        return $this->belongsToMany(Product::class, 'set_minifigs', 'id', 'parent_id')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }

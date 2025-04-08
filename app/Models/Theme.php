@@ -9,23 +9,24 @@ class Theme extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    protected $primaryKey = 'id';
-    protected $keyType = 'string';
-    public $incrementing = false;
 
 
     public function parent()
     {
-        return $this->belongsTo(Theme::class, 'parent_id');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function children()
     {
-        return $this->hasMany(Theme::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+    public function isSubTheme(): bool
+    {
+        return $this->parent_id !== null;
     }
 }

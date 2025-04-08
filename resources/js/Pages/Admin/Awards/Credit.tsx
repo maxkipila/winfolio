@@ -17,23 +17,12 @@ import Toggle from '@/Fragments/forms/inputs/Toggle'
 import { Button } from '@/Fragments/UI/Button'
 import AdminLayout from '@/Layouts/AdminLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
-import { Check } from '@phosphor-icons/react'
+import { Check, X } from '@phosphor-icons/react'
 import React, { useEffect, useState } from 'react'
 
 type NewsCategory = 'Odznak' | 'Lorem'
 
-type Award = {
-    id: string | number
-    name: string
-    description?: string
-    category?: string
-    condition_type?: string
-    product_id?: string
-    category_id?: string
-    required_count?: string
-    required_value?: string
-    required_percentage?: string
-}
+
 
 type Props = {
     awards?: Award
@@ -54,8 +43,20 @@ const Credit = ({ awards, conditions }: Props) => {
         required_count: awards?.required_count || conditions?.required_count || '',
         required_value: awards?.required_value || conditions?.required_value || '',
         required_percentage: awards?.required_percentage || conditions?.required_percentage || '',
+        category_name: awards?.category_name || conditions?.category_name || '',
 
-
+        awards: {
+            conditions: [
+                {
+                    award_id: awards?.id || '',
+                    category_id: '',
+                    product_id: awards?.product_id || '',
+                    required_count: awards?.required_count || '',
+                    required_value: awards?.required_value || '',
+                    category_name: awards?.category_name || '',
+                }
+            ]
+        }
     })
 
     /*  useEffect(() => {
@@ -145,7 +146,17 @@ const Credit = ({ awards, conditions }: Props) => {
 
                             {form.data.condition_type === 'specific_product' && (
                                 <div>
-
+                                    <div className='mt-16px pb-16px flex font-teko text-xl'>
+                                        {awards?.conditions?.map((c) => (
+                                            <div key={c.id} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                                <div className="flex gap-16px">
+                                                    <span>ID: {c.product_id}</span>
+                                                    <span>Nazev: {c.product_name}</span>
+                                                </div>
+                                                <X />
+                                            </div>
+                                        ))}
+                                    </div>
                                     <SearchMultiple<Award>
                                         name="product_name"
                                         keyName="search_products"
@@ -162,29 +173,33 @@ const Credit = ({ awards, conditions }: Props) => {
                                         })}
 
                                     />
-                                    <div>
-                                        {conditions?.product_id}
-                                    </div>
+
                                 </div>
                             )}
 
                             {
                                 form.data.condition_type === 'specific_category' && (
-                                    <SearchMultiple<Award>
-                                        name="category_name"
-                                        keyName="search_products"
-                                        placeholder='Nazev kategorie'
-                                        value={form.data.product_id}
-                                        onChange={(value) => form.setData('product_id', value)}
-                                        optionsCallback={(r) => ({
-                                            text: r.name,
-                                            element: (
-                                                <div>{r.name}</div>
-                                            ),
-                                            value: r.id,
-                                            object: r
-                                        })}
-                                    />
+                                    <div>
+                                        <SearchMultiple<Award>
+                                            name="categories"
+                                            keyName="search_themes"
+                                            placeholder='Nazev kategorie'
+                                            value={form.data.category_id}
+                                            onChange={(value: string) => form.setData('category_id', value)}
+                                            optionsCallback={(r) => ({
+                                                text: r.name,
+                                                element: (
+                                                    <div>{r.name}</div>
+                                                ),
+                                                value: r.id,
+                                                object: r
+                                            })}
+                                        />
+                                        {/*  <div className="mt-4px">
+                                            <label className="font-bold">Název kategorie:</label>
+                                            <span className="ml-2">{form.data.category_name}</span>
+                                        </div> */}
+                                    </div>
                                 )
                             }
 
