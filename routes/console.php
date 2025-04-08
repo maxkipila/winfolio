@@ -14,11 +14,12 @@ Artisan::command('inspire', function () {
 Schedule::command('telescope:prune --hours=48')->daily();
 
 Schedule::command('import:lego-data')->dailyAt('23:50')->timezone('Europe/Prague');
+Schedule::command('import:lego-images --skip-existing')->dailyAt('23:53')->timezone('Europe/Prague');
 
 Schedule::call(function () {
     $seeder = new PriceSeeder();
     $seeder->seedPrices();
-})->dailyAt('23:55')->timezone('Europe/Prague');
+})->dailyAt('23:57')->timezone('Europe/Prague');
 
 Schedule::call(function () {
     $seeder = new PriceSeeder();

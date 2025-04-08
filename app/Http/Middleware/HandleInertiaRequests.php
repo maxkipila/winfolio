@@ -85,7 +85,11 @@ class HandleInertiaRequests extends Middleware
                     ->merge($themes())
 
             ),
-            'searchProducts' => Inertia::lazy($products),
+            "search_products" => Inertia::lazy(
+                fn() => collect()
+                    ->merge($products())
+            ),
+
             'flash' => Session::get('flash'),
             /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
             'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),

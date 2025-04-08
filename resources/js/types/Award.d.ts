@@ -7,4 +7,9 @@ interface Award {
     updated_at: string;
     category: string;
     condition_type: ConditionType;
+    product_id: number;
+    category_id: number;
+    required_count: number;
+    required_value: number;
+    required_percentage: number;
 }
