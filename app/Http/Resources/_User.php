@@ -50,7 +50,8 @@ class _User extends JsonResource
             'subscriptions' => _Subscription::collection($this->whenLoaded('subscriptions')),
             'awards' => _Award::collection($this->whenLoaded('awards')),
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
-            'products' => _Product::collection($this->whenLoaded('products'))
+            'products' => _Product::collection($this->whenLoaded('products')),
+            'favourites' => _Favourite::collection($this->favourites),
         ];
     }
 }

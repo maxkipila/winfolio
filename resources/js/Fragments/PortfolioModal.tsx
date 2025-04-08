@@ -49,10 +49,10 @@ function PortfolioModal(props: Props) {
     let { close } = useContext(ModalsContext)
     let { setDisplayModal, hasProducts, selected, setSelected, setProducts, products: _contextProducts } = useContext(PortfolioContext)
     let [createPortfolio, setCreatePortfolio] = useState(hasProducts)
-    const { auth, searchProducts } = usePageProps<{ auth: { user: User }, searchProducts: Array<Product> }>();
+    const { auth, search_products } = usePageProps<{ auth: { user: User }, search_products: Array<Product> }>();
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const form = useForm({
-        searchProducts: ''
+        search_products: ''
     });
     const { data, post } = form;
     function add_to_portfolio() {
@@ -258,9 +258,9 @@ function PortfolioModal(props: Props) {
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
                                                     <Search<Product>
                                                         // className="min-w-[400px]"
-                                                        name="searchProducts"
+                                                        name="search_products"
                                                         placeholder="Hledat položku"
-                                                        keyName="searchProducts"
+                                                        keyName="search_products"
                                                         noSuggestion
                                                         optionsCallback={(r) => ({
                                                             text: r.name,
@@ -279,8 +279,8 @@ function PortfolioModal(props: Props) {
 
                                                     <div className='grid grid-cols-2 gap-16px p-24px'>
                                                         {
-                                                            searchProducts?.length > 0 ?
-                                                                searchProducts?.map((sp) =>
+                                                            search_products?.length > 0 ?
+                                                                search_products?.map((sp) =>
                                                                     <PortfolioProductCard wide {...sp} />
                                                                 )
                                                                 :

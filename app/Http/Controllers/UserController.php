@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\_Favourite;
 use App\Http\Resources\_Minifig;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
 use App\Http\Resources\_User;
+use App\Models\Favourite;
 use App\Models\Minifig;
 use App\Models\Product;
 use App\Models\Set;
@@ -43,6 +45,25 @@ class UserController extends Controller
         
         $user->products()->detach($product->id);
         return back();
+    }
+
+    public function toggleFavourite(Request $request, $type, $favouritable)
+    {
+
+     
+        $favourite = Favourite::firstOrCreate([
+            'favourite_id' => $favouritable,
+            'favourite_type' => urldecode($type),
+            'user_id' => Auth::user()->id
+        ]);
+
+        if (!$favourite->wasRecentlyCreated) {
+            $favourite->delete();
+        }
+
+        return $request->wantsJson()
+            ? response()->json(['favourite' => _Favourite::init($favourite->fresh())])
+            : back();
     }
 
     

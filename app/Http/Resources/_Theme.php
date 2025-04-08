@@ -23,9 +23,7 @@ class _Theme extends JsonResource
             'is_category' => $this->is_category,
             'is_subcategory' => $this->is_subcategory,
             'updated_at' => $this->updated_at,
-            'parent'           => $this->whenLoaded('parent', function () {
-                return new self($this->parent);
-            }),
+            'parent'           => new self($this->parent),
             'children'         => self::collection($this->whenLoaded('children')),
             /* 'parent'   => new _Theme($this->whenLoaded('parent')),
             'children' => _Theme::collection($this->whenLoaded('children')), */
