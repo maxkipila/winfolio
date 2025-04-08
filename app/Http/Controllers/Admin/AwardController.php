@@ -48,8 +48,10 @@ class AwardController extends Controller
     public function edit(Award $award)
     {
 
+
+        $award->load('conditions.product');
         $awards = _Award::init($award);
-        $awards->load('conditions');
+
         return Inertia::render('Admin/Awards/Credit', [
             'awards' => $awards,
         ]);
@@ -57,12 +59,22 @@ class AwardController extends Controller
     public function store(Request $request)
     {
 
+        dd($request->all());
+
         if ($request->has('product_name') && is_array($request->product_name)) {
             $firstItem = $request->product_name[0] ?? null;
             if ($firstItem && isset($firstItem['id'])) {
 
                 $request->merge([
                     'product_id' => $firstItem['id'],
+                ]);
+            }
+        }
+        if ($request->has('category_name') && is_array($request->category_name)) {
+            $firstCategory = $request->category_name[0] ?? null;
+            if ($firstCategory && isset($firstCategory['id'])) {
+                $request->merge([
+                    'category_id' => $firstCategory['id'],
                 ]);
             }
         }
@@ -96,10 +108,27 @@ class AwardController extends Controller
     }
     public function update(Request $request, Award $award)
     {
+        if ($request->has('product_name') && is_array($request->product_name)) {
+            $firstItem = $request->product_name[0] ?? null;
+            if ($firstItem && isset($firstItem['id'])) {
+                $request->merge([
+                    'product_id' => $firstItem['id'],
+                ]);
+            }
+        }
+        if ($request->has('category_name') && is_array($request->category_name)) {
+            $firstCategory = $request->category_name[0] ?? null;
+            if ($firstCategory && isset($firstCategory['id'])) {
+                $request->merge([
+                    'category_id' => $firstCategory['id'],
+                ]);
+            }
+        }
+
+
         $awardData = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-
         ]);
 
         $conditionData = $request->validate([

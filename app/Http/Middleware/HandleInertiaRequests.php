@@ -53,16 +53,8 @@ class HandleInertiaRequests extends Middleware
 
         $is_admin_section = Str::startsWith(Route::currentRouteName(), 'admin.');
         $users = fn(): AnonymousResourceCollection => _User::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
-        /*         $minifigs = fn(): AnonymousResourceCollection => _Minifig::collection(Minifig::search(['id', 'fig_num', 'name'], $request->q ?? '', 6, App::getLocale())->get());
-        $sets = fn(): AnonymousResourceCollection => _Set::collection(Set::search(['id', 'set_num', 'name'], $request->q ?? '', 6, App::getLocale())->get());
- */
         $themes = fn(): AnonymousResourceCollection => _Theme::collection(Theme::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
-        /* $admins = fn(): AnonymousResourceCollection => _Admin::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
-        $activities = fn(): AnonymousResourceCollection => _Activity::collection(Activity::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
-    */
-        $products = fn(): AnonymousResourceCollection => _Product::collection(
-            Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get()
-        );
+        $products = fn(): AnonymousResourceCollection => _Product::collection(Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get());
 
 
         return [
@@ -88,6 +80,10 @@ class HandleInertiaRequests extends Middleware
             "search_products" => Inertia::lazy(
                 fn() => collect()
                     ->merge($products())
+            ),
+            "search_themes" => Inertia::lazy(
+                fn() => collect()
+                    ->merge($themes())
             ),
 
             'flash' => Session::get('flash'),
