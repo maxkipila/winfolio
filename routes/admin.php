@@ -1,16 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AwardController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\MinifigController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\SetController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\RecordController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 //Admin Routes
@@ -39,6 +34,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/edit/{award}', [AwardController::class, 'edit'])->name('edit');
             Route::match(['POST', 'GET'], '/{award}', [AwardController::class, 'update'])->name('update');
             Route::delete('/{award}', [AwardController::class, 'destroy'])->name('awards.destroy');
+            Route::delete(
+                '/awards/{award}/conditions/{condition}/remove/{field}',
+                [AwardController::class, 'removeField']
+            )->name('admin.awards.removeField');
         });
 
         Route::group(['prefix' => 'news', 'as' => 'news.'], function () {

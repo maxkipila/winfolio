@@ -14,5 +14,4 @@ interface Award {
     required_percentage: number;
     conditions: Array<AwardCondition>;
     category_name: string;
-    conditions: Array<AwardCondition>;
 }

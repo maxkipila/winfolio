@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\_Award;
 use App\Http\Resources\_AwardCondition;
 use App\Models\Award;
+use App\Models\AwardCondition;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\AwardCheckerService;
@@ -56,6 +57,7 @@ class AwardController extends Controller
     }
     public function store(Request $request)
     {
+        /*  dd($request->all()); */
 
         if ($request->has('category_id') && is_array($request->input('category_id'))) {
             $catArray = $request->input('category_id');
@@ -97,9 +99,28 @@ class AwardController extends Controller
             ->route('admin.awards.index')
             ->with('success', 'Ocenění bylo úspěšně vytvořeno.');
     }
+    public function removeField(Request $request, Award $award, AwardCondition $condition, $field)
+    {
+        if (!in_array($field, ['category', 'product'])) {
+            abort(400, 'Neplatný parametr');
+        }
+
+        if ($field === 'category') {
+            $condition->update(['category_id' => null]);
+            $message = 'Kategorie byla úspěšně odstraněna.';
+        } else {
+            $condition->update(['product_id' => null]);
+            $message = 'Hodnota produktu byla úspěšně odstraněna.';
+        }
+        return redirect()
+            ->route('admin.awards.edit', $award)
+            ->with('success', $message);
+    }
+
+
     public function update(Request $request, Award $award)
     {
-        // Pokud produktový výběr přichází jako pole (pod klíčem product_name), vybereme první položku
+        // Zpracování pole pro product_name: pokud přichází jako pole, z merge se uloží první položka do product_id
         if ($request->has('product_name') && is_array($request->input('product_name'))) {
             $firstItem = $request->input('product_name')[0] ?? null;
             if ($firstItem && isset($firstItem['id'])) {
@@ -109,7 +130,7 @@ class AwardController extends Controller
             }
         }
 
-        // Pokud kategorie přichází jako pole (pod klíčem category_id), vybereme první položku
+        // Zpracování pole pro category_id: pokud přichází jako pole, vezme se první položka
         if ($request->has('category_id') && is_array($request->input('category_id'))) {
             $catArray = $request->input('category_id');
             $firstCatId = $catArray[0]['id'] ?? null;
@@ -124,22 +145,19 @@ class AwardController extends Controller
             }
         }
 
-
         $awardData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-
         $conditionData = $request->validate([
-            'condition_type' => 'required|string',
-            'product_id' => 'nullable|integer',
-            'category_id' => 'nullable',
-            'required_count' => 'nullable|integer',
-            'required_value' => 'nullable|numeric',
+            'condition_type'     => 'required|string',
+            'product_id'         => 'nullable|integer',
+            'category_id'        => 'nullable',
+            'required_count'     => 'nullable|integer',
+            'required_value'     => 'nullable|numeric',
             'required_percentage' => 'nullable|numeric',
         ]);
-
 
         $award->update($awardData);
 
