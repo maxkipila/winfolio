@@ -19,8 +19,8 @@ function Product(props: Props) {
     const { product, similar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
     const form = useForm({});
-    const {data, post} = form;
-    
+    const { data, post } = form;
+
     return (
         <AuthenticatedLayout>
             <div className='w-full pb-24px px-24px flex gap-20px pt-32px mob:flex-col'>
@@ -45,7 +45,7 @@ function Product(props: Props) {
                         </div>
                         <div className='flex gap-16px'>
                             <Export size={24} />
-                            <Heart weight={product?.favourited?"fill":"regular"} color={product?.favourited?"#F7AA1A":"black"} className='cursor-pointer' onClick={()=>{
+                            <Heart weight={product?.favourited ? "fill" : "regular"} color={product?.favourited ? "#F7AA1A" : "black"} className='cursor-pointer' onClick={() => {
                                 post(route('favourites.toggle', { type: encodeURI(encodeURIComponent("App\\Models\\Product")), favouritable: product.id }))
                             }} size={24} />
                         </div>
@@ -96,7 +96,7 @@ function Product(props: Props) {
                                 <Question size={24} />
                             </div>
                             <div className='flex items-center gap-16px'>
-                                <div className='py-6px px-8px  font-semibold font-nunito text-[#4D4D4D]'>$18.21-$20.66</div>
+                                <div className='py-6px px-8px  font-semibold font-nunito text-[#4D4D4D]'>${product?.latest_price?.value}-${product?.latest_price?.retail}</div>
                             </div>
                         </div>
 
@@ -120,7 +120,7 @@ function Product(props: Props) {
                                     <Question size={24} />
                                 </div>
                                 <div className='flex gap-8px items-center'>
-                                    <div className='text-[#4D4D4D]'>$22.36</div>
+                                    <div className='text-[#4D4D4D]'>${product?.latest_price?.retail}</div>
                                     <div className='py-6px px-8px bg-[#F5F5F5] text-xs font-semibold font-nunito text-[#4D4D4D]'>Medium accuracy</div>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@ function Product(props: Props) {
                                     <div className='text-[#4D4D4D]'>5 year forecast</div>
                                     <Question size={24} />
                                 </div>
-                                <div className='text-[#4D4D4D]'>$22.36</div>
+                                <div className='text-[#4D4D4D]'>${product?.latest_price?.retail}</div>
 
                             </div>
 

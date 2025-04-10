@@ -18,13 +18,13 @@ function ReviewCard(props: Props) {
     let colNumber = 0
     let invNumber = 0
     product?.reviews?.map((re) => {
-        if(re.role == "both"){
+        if (re.role == "both") {
             colNumber += 1
             invNumber += 1
-        }else if(re.role == "investor"){
-            invNumber +=1
-        }else{
-            colNumber +=1
+        } else if (re.role == "investor") {
+            invNumber += 1
+        } else {
+            colNumber += 1
         }
     })
     return (
@@ -79,20 +79,20 @@ function ReviewCard(props: Props) {
                         <div className='text-[#4D4D4D]'>{product?.reviews?.length ?? 0} ratings</div>
                     </div>
                     <div className='flex gap-16px'>
-                        <div className='font-bold font-teko text-5xl'>{Math.floor(reviewValue / ratingValues?.length) ?? 0}</div>
+                        <div className='font-bold font-teko text-5xl'>{reviewValue ? Math.floor(reviewValue / ratingValues?.length) : 0}</div>
                         <div className='w-full'>
                             <div className='flex items-center justify-between w-full gap-24px'>
                                 <div className='text-[#4D4D4D]'>Collectors</div>
                                 <div className='grid w-110px'>
                                     <div className='col-start-1 row-start-1 h-8px w-full rounded-[4px] bg-[#F5F5F5]'></div>
-                                    <div className={`col-start-1 row-start-1 h-8px w-[${(colNumber/product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
+                                    <div className={`col-start-1 row-start-1 h-8px w-[${(colNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between w-full gap-24px'>
                                 <div className='text-[#4D4D4D]'>Investors</div>
                                 <div className='grid w-110px'>
                                     <div className='col-start-1 row-start-1 h-8px w-full rounded-[4px] bg-[#F5F5F5]'></div>
-                                    <div className={`col-start-1 row-start-1 h-8px w-[${(invNumber/product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
+                                    <div className={`col-start-1 row-start-1 h-8px w-[${(invNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
                                 </div>
                             </div>
                         </div>
