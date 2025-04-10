@@ -18,6 +18,7 @@ class DashboardController extends Controller
         return view('admin.dashboard');
     }
  */
+
     public function index(Request $request)
     {
 

@@ -18,10 +18,10 @@ import { Button } from '@/Fragments/UI/Button'
 import AdminLayout from '@/Layouts/AdminLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
 import { Check, X } from '@phosphor-icons/react'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
 type NewsCategory = 'Odznak' | 'Lorem'
-
 
 
 type Props = {
@@ -39,25 +39,24 @@ const Credit = ({ awards, conditions }: Props) => {
         category: activeTab,
         condition_type: awards?.condition_type || conditions?.condition_type || 'specific_product',
         product_id: awards?.product_id || conditions?.product_id || '',
-        category_id: awards?.category_id || conditions?.category_id || '',
-        required_count: awards?.required_count || conditions?.required_count || '',
+        required_count: awards?.conditions?.[0]?.required_count || '',
         required_value: awards?.required_value || conditions?.required_value || '',
-        required_percentage: awards?.required_percentage || conditions?.required_percentage || '',
+        required_percentage: awards?.conditions?.[0]?.required_percentage || awards?.required_percentage || '',
+        category_id: awards?.category_id || conditions?.category_id || [],
         category_name: awards?.category_name || conditions?.category_name || '',
 
-        awards: {
-            conditions: [
-                {
-                    award_id: awards?.id || '',
-                    category_id: '',
-                    product_id: awards?.product_id || '',
-                    required_count: awards?.required_count || '',
-                    required_value: awards?.required_value || '',
-                    category_name: awards?.category_name || '',
-                }
-            ]
-        }
-    })
+        conditions: [
+            {
+                award_id: awards?.id || '',
+                category_id: '',
+                product_id: awards?.product_id || '',
+                required_count: awards?.required_count || '',
+                required_value: awards?.required_value || '',
+                category_name: awards?.category_name || '',
+            }
+        ]
+
+    });
 
     /*  useEffect(() => {
          form.setData('category', activeTab)
@@ -80,6 +79,15 @@ const Credit = ({ awards, conditions }: Props) => {
             }
         })
     }
+    const removePost = (e: React.MouseEvent) => {
+        e.preventDefault()
+        form.delete(route('admin.awards.destroy', { award: awards.id }), {
+            onSuccess: () => {
+                form.reset()
+            }
+        })
+    }
+
 
     return (
         <AdminLayout
@@ -147,13 +155,24 @@ const Credit = ({ awards, conditions }: Props) => {
                             {form.data.condition_type === 'specific_product' && (
                                 <div>
                                     <div className='mt-16px pb-16px flex font-teko text-xl'>
-                                        {awards?.conditions?.map((c) => (
-                                            <div key={c.id} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                        {awards?.conditions?.map((c, index) => (
+                                            <div key={c.award_id || index} className="flex items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
                                                 <div className="flex gap-16px">
                                                     <span>ID: {c.product_id}</span>
                                                     <span>Nazev: {c.product_name}</span>
                                                 </div>
-                                                <X />
+                                                <div className='flex gap-16px'>
+                                                    <button
+                                                        className="cursor-pointer"
+                                                        onClick={() => {
+                                                            form.delete(route('admin.awards.removeField', {
+                                                                award: awards.id,
+                                                                condition: c.award_id,
+                                                                field: 'product'
+                                                            }));
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -177,56 +196,100 @@ const Credit = ({ awards, conditions }: Props) => {
                                 </div>
                             )}
 
-                            {
-                                form.data.condition_type === 'specific_category' && (
-                                    <div>
-                                        <SearchMultiple<Award>
-                                            name="categories"
-                                            keyName="search_themes"
-                                            placeholder='Nazev kategorie'
-                                            value={form.data.category_id}
-                                            onChange={(value: string) => form.setData('category_id', value)}
-                                            optionsCallback={(r) => ({
-                                                text: r.name,
-                                                element: (
-                                                    <div>{r.name}</div>
-                                                ),
-                                                value: r.id,
-                                                object: r
-                                            })}
-                                        />
-                                        {/*  <div className="mt-4px">
-                                            <label className="font-bold">Název kategorie:</label>
-                                            <span className="ml-2">{form.data.category_name}</span>
-                                        </div> */}
+                            {form.data.condition_type === 'specific_category' && (
+                                <div>
+                                    <div className='mt-16px pb-16px flex flex-col font-teko text-xl'>
+                                        {awards?.conditions?.map((c, index) => (
+                                            <div key={c.condition} className="flex w-1/4 items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                                <div className="flex gap-16px">
+                                                    <span>ID: {c.category_id}</span>
+                                                    <span>Nazev: {c.category_name}</span>
+                                                </div>
+                                                <button
+                                                    className="cursor-pointer"
+                                                    value={'x'}
+                                                    onClick={() => {
+                                                        form.delete(route('admin.awards.removeField', {
+                                                            award: awards.id,
+                                                            condition: c.award_id,
+                                                            field: 'category'
+                                                        }));
+                                                    }}
+                                                >X</button>
+                                            </div>
+                                        ))}
                                     </div>
-                                )
-                            }
+                                    <SearchMultiple<Award>
+                                        name="category_id"
+                                        keyName="search_themes"
+                                        placeholder="Název kategorie"
+                                        value={form.data.category_id}
+                                        onChange={(value) => {
+
+                                            const selectedId = Array.isArray(value) ? value[0] : value;
+                                            form.setData('category_id', selectedId);
+                                        }}
+                                        optionsCallback={(r) => ({
+                                            text: r.name,
+                                            element: <div>{r.name}</div>,
+                                            value: r.id,
+                                            object: r
+                                        })}
+                                    />
+
+
+                                </div>
+                            )}
 
                             {
                                 form.data.condition_type === 'category_items_count' && (
-                                    <div className='flex gap-16px'>
-                                        <SearchMultiple<Award>
-                                            name="category_name"
-                                            keyName="search_products"
-                                            placeholder='Nazev kategorie'
-                                            value={form.data.product_id}
-                                            onChange={(value) => form.setData('product_id', value)}
-                                            optionsCallback={(r) => ({
-                                                text: r.name,
-                                                element: (
-                                                    <div>{r.name}</div>
-                                                ),
-                                                value: r.id,
-                                                object: r
-                                            })}
-                                        />
-                                        <TextField
-                                            label="Počet"
-                                            name="required_count"
-                                            value={form.data.required_count}
-                                            onChange={e => form.setData('required_count', e.target.value)}
-                                        />
+                                    <div className='flex flex-col gap-16px'>
+                                        <div className='mt-16px flex pb-16px  flex-col font-teko text-xl'>
+                                            {awards?.conditions?.map((c, index) => (
+                                                <div key={c.condition} className="flex  w-1/4 items-center p-16px justify-between mb-2 p-2 border border-gray-200 rounded">
+                                                    <div className="flex gap-16px">
+                                                        <span>ID: {c.category_id}</span>
+                                                        <span>Nazev: {c.category_name}</span>
+                                                    </div>
+                                                    <button
+                                                        className="cursor-pointer"
+                                                        value={'x'}
+                                                        onClick={() => {
+                                                            form.delete(route('admin.awards.removeField', {
+                                                                award: awards.id,
+                                                                condition: c.award_id,
+                                                                field: 'category'
+                                                            }));
+                                                        }}
+                                                    >X</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className='flex flex-row gap-16px'>
+                                            <SearchMultiple<Award>
+                                                name="category_id"
+                                                keyName="search_themes"
+                                                placeholder="Název kategorie"
+                                                value={form.data.category_id}
+                                                onChange={(value) => {
+
+                                                    const selectedId = Array.isArray(value) ? value[0] : value;
+                                                    form.setData('category_id', selectedId);
+                                                }}
+                                                optionsCallback={(r) => ({
+                                                    text: r.name,
+                                                    element: <div>{r.name}</div>,
+                                                    value: r.id,
+                                                    object: r
+                                                })}
+                                            />
+                                            <TextField
+                                                label="Počet"
+                                                name="required_count"
+                                                value={form.data.required_count}
+                                                onChange={e => form.setData('required_count', e.target.value)}
+                                            />
+                                        </div>
                                     </div>
                                 )
                             }

@@ -37,7 +37,7 @@ class AwardCondition extends Model
     const TYPE_PORTFOLIO_PERCENTAGE = 'portfolio_percentage';
 
     /**
-     * Získá odznak, ke kterému tato podmínka patří.
+     * 
      */
     public function award(): BelongsTo
     {
@@ -45,7 +45,7 @@ class AwardCondition extends Model
     }
 
     /**
-     * Získá produkt spojený s touto podmínkou (pokud existuje).
+     * 
      */
     public function product(): BelongsTo
     {
@@ -53,10 +53,10 @@ class AwardCondition extends Model
     }
 
     /**
-     * Získá kategorii spojenou s touto podmínkou (pokud existuje).
+     * 
      */
-    public function category(): BelongsTo
+    public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Theme::class, 'category_id');
     }
 }

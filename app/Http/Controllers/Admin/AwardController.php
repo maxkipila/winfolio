@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\_Award;
 use App\Http\Resources\_AwardCondition;
 use App\Models\Award;
+use App\Models\AwardCondition;
+use App\Models\Category;
 use App\Models\User;
 use App\Services\AwardCheckerService;
 use Illuminate\Http\Request;
@@ -47,34 +49,27 @@ class AwardController extends Controller
 
     public function edit(Award $award)
     {
-
-
         $award->load('conditions.product', 'conditions.category');
         $awards = _Award::init($award);
-
         return Inertia::render('Admin/Awards/Credit', [
             'awards' => $awards,
         ]);
     }
     public function store(Request $request)
     {
+        /*  dd($request->all()); */
 
-        dd($request->all());
-
-        if ($request->has('product_name') && is_array($request->product_name)) {
-            $firstItem = $request->product_name[0] ?? null;
-            if ($firstItem && isset($firstItem['id'])) {
-
+        if ($request->has('category_id') && is_array($request->input('category_id'))) {
+            $catArray = $request->input('category_id');
+            $firstCatId = $catArray[0]['id'] ?? null;
+            if ($firstCatId) {
                 $request->merge([
-                    'product_id' => $firstItem['id'],
+                    'category_id' => $firstCatId,
                 ]);
-            }
-        }
-        if ($request->has('category_name') && is_array($request->category_name)) {
-            $firstCategory = $request->category_name[0] ?? null;
-            if ($firstCategory && isset($firstCategory['id'])) {
+            } else {
+
                 $request->merge([
-                    'category_id' => $firstCategory['id'],
+                    'category_id' => null,
                 ]);
             }
         }
@@ -85,7 +80,6 @@ class AwardController extends Controller
             'category' => 'nullable|string|max:255',
         ]);
 
-
         $conditionData = $request->validate([
             'condition_type' => 'required|string',
             'product_id' => 'nullable|integer',
@@ -95,10 +89,9 @@ class AwardController extends Controller
             'required_percentage' => 'nullable|numeric',
         ]);
 
-
         $award = Award::create($awardData);
 
-        if ($conditionData['condition_type']) {
+        if (!empty($conditionData['condition_type'])) {
             $award->conditions()->create($conditionData);
         }
 
@@ -106,37 +99,63 @@ class AwardController extends Controller
             ->route('admin.awards.index')
             ->with('success', 'Ocenění bylo úspěšně vytvořeno.');
     }
+    public function removeField(Request $request, Award $award, AwardCondition $condition, $field)
+    {
+        if (!in_array($field, ['category', 'product'])) {
+            abort(400, 'Neplatný parametr');
+        }
+
+        if ($field === 'category') {
+            $condition->update(['category_id' => null]);
+            $message = 'Kategorie byla úspěšně odstraněna.';
+        } else {
+            $condition->update(['product_id' => null]);
+            $message = 'Hodnota produktu byla úspěšně odstraněna.';
+        }
+        return redirect()
+            ->route('admin.awards.edit', $award)
+            ->with('success', $message);
+    }
+
+
     public function update(Request $request, Award $award)
     {
-        if ($request->has('product_name') && is_array($request->product_name)) {
-            $firstItem = $request->product_name[0] ?? null;
+        // Zpracování pole pro product_name: pokud přichází jako pole, z merge se uloží první položka do product_id
+        if ($request->has('product_name') && is_array($request->input('product_name'))) {
+            $firstItem = $request->input('product_name')[0] ?? null;
             if ($firstItem && isset($firstItem['id'])) {
                 $request->merge([
                     'product_id' => $firstItem['id'],
                 ]);
             }
         }
-        if ($request->has('category_name') && is_array($request->category_name)) {
-            $firstCategory = $request->category_name[0] ?? null;
-            if ($firstCategory && isset($firstCategory['id'])) {
+
+        // Zpracování pole pro category_id: pokud přichází jako pole, vezme se první položka
+        if ($request->has('category_id') && is_array($request->input('category_id'))) {
+            $catArray = $request->input('category_id');
+            $firstCatId = $catArray[0]['id'] ?? null;
+            if ($firstCatId) {
                 $request->merge([
-                    'category_id' => $firstCategory['id'],
+                    'category_id' => $firstCatId,
+                ]);
+            } else {
+                $request->merge([
+                    'category_id' => null,
                 ]);
             }
         }
 
-
         $awardData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
         $conditionData = $request->validate([
-            'condition_type' => 'required|string',
-            'product_id' => 'nullable|integer',
-            'category_id' => 'nullable|integer',
-            'required_count' => 'nullable|integer',
-            'required_value' => 'nullable|numeric',
+            'condition_type'     => 'required|string',
+            'product_id'         => 'nullable|integer',
+            'category_id'        => 'nullable',
+            'required_count'     => 'nullable|integer',
+            'required_value'     => 'nullable|numeric',
             'required_percentage' => 'nullable|numeric',
         ]);
 
@@ -155,6 +174,7 @@ class AwardController extends Controller
             ->route('admin.awards.index')
             ->with('success', 'Ocenění bylo úspěšně aktualizováno.');
     }
+
 
     public function destroy(Award $award)
     {
