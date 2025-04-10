@@ -5,6 +5,7 @@ import PromotionalCard from '@/Fragments/PromotionalCard'
 import ReviewCard from '@/Fragments/ReviewCard'
 import { Button } from '@/Fragments/UI/Button'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { useForm } from '@inertiajs/react'
 import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosphor-icons/react'
 import axios from 'axios'
 import React, { useState } from 'react'
@@ -17,7 +18,8 @@ interface Props {
 function Product(props: Props) {
     const { product, similar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
-    
+    const form = useForm({});
+    const {data, post} = form;
     
     return (
         <AuthenticatedLayout>
@@ -44,7 +46,7 @@ function Product(props: Props) {
                         <div className='flex gap-16px'>
                             <Export size={24} />
                             <Heart weight={product?.favourited?"fill":"regular"} color={product?.favourited?"#F7AA1A":"black"} className='cursor-pointer' onClick={()=>{
-                                axios.post(route('favourites.toggle', { type: encodeURI(encodeURIComponent("App\\Models\\Product")), favouritable: product.id }))
+                                post(route('favourites.toggle', { type: encodeURI(encodeURIComponent("App\\Models\\Product")), favouritable: product.id }))
                             }} size={24} />
                         </div>
                     </div>

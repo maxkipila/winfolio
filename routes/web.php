@@ -6,8 +6,10 @@ use App\Http\Controllers\RecordController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
+use App\Http\Resources\_Theme;
 use App\Models\Product;
 use App\Models\Set;
+use App\Models\Theme;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,10 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     Route::match(['GET', 'POST'], '/catalog', function () {
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
-        return Inertia::render('catalog', compact('products'));
+
+        $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 10));
+        // dd($themes);
+        return Inertia::render('catalog', compact('products', 'themes'));
     })->name('catalog');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
