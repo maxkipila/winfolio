@@ -14,20 +14,28 @@ class _UserAward extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
             'category' => $this->category,
             'description' => $this->description,
             'icon' => $this->icon,
-            'pivot' => [
+            'earned' => $this->earned ?? false,
+        ];
+
+        if (isset($this->pivot)) {
+            $data['pivot'] = [
                 'value' => $this->pivot->value,
                 'count' => $this->pivot->count,
                 'percentage' => $this->pivot->percentage,
                 'notified' => (bool) $this->pivot->notified,
                 'earned_at' => $this->pivot->earned_at,
-            ],
-        ];
+            ];
+        } elseif (isset($this->earned_at)) {
+            $data['earned_at'] = $this->earned_at;
+        }
+
+        return $data;
     }
 }

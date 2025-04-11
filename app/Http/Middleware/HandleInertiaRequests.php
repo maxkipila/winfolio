@@ -85,7 +85,12 @@ class HandleInertiaRequests extends Middleware
                 fn() => collect()
                     ->merge($themes())
             ),
-
+            'notifications' => fn() => $request->user()
+                ? $request->user()->unreadNotifications
+                : [],
+            'awardNotifications' => fn() => $request->user()
+                ? $request->user()->awards()->wherePivot('notified', false)->get()
+                : [],
             'flash' => Session::get('flash'),
             /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
             'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),

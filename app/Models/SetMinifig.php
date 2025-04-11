@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SetMinifig extends Pivot
 {
-
-
     public $incrementing = false;
 
     protected $fillable = [
-        'parent_id', // Set ID
-        'id'        // Minifig ID
+        'parent_id',
+        'minifig_id'
     ];
 
     public function set()
@@ -22,6 +20,6 @@ class SetMinifig extends Pivot
 
     public function minifig()
     {
-        return $this->belongsTo(Product::class, 'id');
+        return $this->belongsTo(Product::class, 'minifig_id');
     }
 }

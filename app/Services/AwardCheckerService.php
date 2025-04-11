@@ -90,6 +90,13 @@ class AwardCheckerService
                             'value' => $value,
                             'percentage' => $percentage
                         ]);
+                        // Přidejte tyto řádky pro odeslání notifikace
+                        $user->notify(new \App\Notifications\NewAwardNotification($award));
+
+                        // Označíme odznak jako notifikovaný
+                        $user->awards()->updateExistingPivot($award->id, [
+                            'notified' => true
+                        ]);
 
                         Log::info("Odznak {$award->name} úspěšně přidělen uživateli {$user->id}");
                         $newAwards[] = $award;

@@ -61,12 +61,7 @@ class RecordTrackerService
 
 
 
-    /**
-     * Aktualizuje rekord pro nejvyšší počet položek.
-     *
-     * @param User $user Uživatel
-     * @return bool True, pokud byl rekord aktualizován
-     */
+
     private function updateMostItems(User $user): bool
     {
         // Aktuální počet produktů v portfoliu
@@ -87,12 +82,7 @@ class RecordTrackerService
         return false;
     }
 
-    /**
-     * Aktualizuje rekord pro nejlepší nákup (nejvyšší zhodnocení).
-     *
-     * @param User $user Uživatel
-     * @return bool True, pokud byl rekord aktualizován
-     */
+
     private function updateBestPurchase(User $user): bool
     {
         // Získáme všechny produkty uživatele s informacemi o nákupu

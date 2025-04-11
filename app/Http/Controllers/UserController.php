@@ -87,7 +87,9 @@ class UserController extends Controller
 
         $portfolioValue = $this->dashboardPortfolioValue();
 
-        $records = $user->records()->with('product')->get()->keyBy('record_type');
+        // Načtení rekordů uživatele
+        /*   $records = $user->records()->with('product')->get()->keyBy('record_type');
+
 
         $formattedRecords = [
             'highest_portfolio' => $records->get('highest_portfolio_value') ? $records->get('highest_portfolio_value')->value : 0,
@@ -100,10 +102,10 @@ class UserController extends Controller
                 'value' => $records->get('worst_purchase')->value,
                 'product' => new _Product($records->get('worst_purchase')->product)
             ] : null,
-        ];
+        ]; */
 
         // Načtení odznaků uživatele
-        $userAwards = $user->userAwards()->with('award')->get();
+        /*    $userAwards = $user->userAwards()->with('award')->get();
         $userAwardsData = collect($userAwards)->map(function ($userAward) {
             return [
                 'id' => $userAward->award->id,
@@ -114,14 +116,14 @@ class UserController extends Controller
                 'earned_at' => $userAward->earned_at,
             ];
         });
-
+ */
         return Inertia::render('Dashboard', [
             'products' => $products,
             'trendingProducts' => $trendingData,
             'topMovers' => $topMoversData,
             'portfolioValue' => $portfolioValue,
-            'records' => $formattedRecords,
-            'awards' => $userAwardsData,
+            /*   'records' => $formattedRecords,
+            'awards' => $userAwardsData, */
         ]);
     }
 

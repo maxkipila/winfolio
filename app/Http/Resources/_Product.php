@@ -40,6 +40,9 @@ class _Product extends JsonResource
             'users'       => _User::collection($this->whenLoaded('users')),
             'reviews'     => _Review::collection($this->whenLoaded('reviews')),
             'news'        => _News::collection($this->whenLoaded('news')),
+            'minifigs' => _Product::collection($this->whenLoaded('minifigs')),
+
+
         ];
     }
 }

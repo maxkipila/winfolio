@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Award;
 use App\Notifications\AwardEarned;
+use App\Notifications\NewAwardNotification;
 use Illuminate\Support\Collection;
 
 class AwardNotificationService
@@ -21,7 +22,7 @@ class AwardNotificationService
         $count = 0;
 
         foreach ($newAwards as $award) {
-            $user->notify(new AwardEarned($award));
+            $user->notify(new NewAwardNotification($award));
 
             $user->awards()->updateExistingPivot($award->id, [
                 'notified' => true

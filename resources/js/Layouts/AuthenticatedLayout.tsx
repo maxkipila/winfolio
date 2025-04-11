@@ -56,7 +56,7 @@ function AuthenticatedLayout(props: Props) {
                     <Link href={route('chest')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('chest') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
                         <ShippingContainer size={24} />
                     </Link>
-                    <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('awards') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Link href={route('awards')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('awards') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
                         <Star size={24} />
                     </Link>
                 </div>
@@ -85,7 +85,7 @@ function AuthenticatedLayout(props: Props) {
                             <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
                             <MenuItem text="Catalogue" link={route('catalog')} active={route()?.current()?.includes('catalog')} />
                             <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
-                            <MenuItem text="Awards" link='#' />
+                            <MenuItem text="Awards" link={route('awards')} active={route()?.current()?.includes('awards')} />
                         </div>
                         <div className='flex gap-16px items-center'>
                             <MagnifyingGlass size={24} />

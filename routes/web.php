@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\AwardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\UserController;
@@ -37,7 +38,7 @@ Route::get('/', function () {
 
 Route::middleware('auth:web')->group(function () {
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-    Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data');
+    /*  Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data'); */
     Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');
     Route::match(['POST', 'GET'], '/add_product_to_user/{product}', [UserController::class, 'add_product_to_user'])->name('add_product_to_user');
     Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
@@ -66,6 +67,8 @@ Route::middleware('auth:web')->group(function () {
         return Inertia::render('catalog', compact('products', 'themes'));
     })->name('catalog');
 
+    Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
+
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
         $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme']));
 
@@ -74,6 +77,8 @@ Route::middleware('auth:web')->group(function () {
         // dd($set);
         return Inertia::render('product', compact('product', 'similar_products'));
     })->name('product.detail');
+
+
 
     /*   Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index'); */
 
