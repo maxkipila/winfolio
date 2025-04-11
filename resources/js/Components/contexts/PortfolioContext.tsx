@@ -47,6 +47,9 @@ export default function PortfolioContextProvider(props: { children: any }) {
 
         let response = await axios.get(route('get_user')).then((r) =>{
             // console.log(r.data)
+            if(r?.data?.user?.products > 0){
+                close();
+            }
             setUser(r.data)
         })
     }

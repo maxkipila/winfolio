@@ -1,4 +1,5 @@
 import Img from '@/Components/Image'
+import usePageProps from '@/hooks/usePageProps'
 import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, List, LockKey, UserCircle, X, XLogo } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
 
@@ -9,6 +10,7 @@ interface Props {
 function ProfileLayout(props: Props) {
     const { children } = props
     let [open, setOpen] = useState(false)
+    const { auth } = usePageProps<{ auth: { user: User } }>();
     return (
         <div className='nMob:flex mob:relative'>
             <div className={`flex-shrink-0 p-24px mob:py-12px nMob:border-r nMob:border-[#E6E6E6] min-h-screen-no-header mob:fixed mob:top-[60px] mob:z-50 mob:bg-white mob:overflow-y-scroll mob:h-screen-no-header mob:w-full mob:transform mob:duration-300 ${open ? "" : "mob:-translate-x-full"}`}>
@@ -18,8 +20,8 @@ function ProfileLayout(props: Props) {
                 <div className='flex items-center gap-16px w-[345px]'>
                     <Img className='w-[84px] h-[84px]' src="/assets/img/user.png" />
                     <div>
-                        <div className='font-bold text-xl'>Matěj Baránek</div>
-                        <div className='font-bold'>@legomaniac</div>
+                        <div className='font-bold text-xl'>{auth?.user?.first_name} {auth?.user?.last_name}</div>
+                        <div className='font-bold'>@{auth?.user?.nickname}</div>
                     </div>
                 </div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-24px rounded-sm'>
