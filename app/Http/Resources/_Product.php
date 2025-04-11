@@ -42,7 +42,6 @@ class _Product extends JsonResource
             'news'        => _News::collection($this->whenLoaded('news')),
             'minifigs' => _Product::collection($this->whenLoaded('minifigs')),
 
-
         ];
     }
 }
