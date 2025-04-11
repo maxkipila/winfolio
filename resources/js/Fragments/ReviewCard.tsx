@@ -100,7 +100,7 @@ function ReviewCard(props: Props) {
                 </div>
             </div>
             <div className='max-w-[180px] mob:max-w-full mt-16px'>
-                <Button onClick={(e) => { e.preventDefault(); open(MODALS.REVIEW, false) }} href={"#"} icon={<PaperPlaneTilt size={24} />}>Submit Reviews</Button>
+                <Button onClick={(e) => { e.preventDefault(); open(MODALS.REVIEW, false, { product: product }) }} href={"#"} icon={<PaperPlaneTilt size={24} />}>Submit Reviews</Button>
             </div>
         </div>
     )
