@@ -16,10 +16,6 @@ class Award extends Model
     protected $casts = [
         'condition_type' => AwardConditionType::class,
     ];
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class)->withTimestamps();
-    }
 
     public function conditions(): HasMany
     {
@@ -32,5 +28,18 @@ class Award extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_awards')
+            ->withPivot(['earned_at', 'notified', 'count', 'value', 'percentage'])
+            ->withTimestamps();
+    }
+
+    // Pokud používáte userAwards(), přidejte také tuto metodu
+    public function userAwards()
+    {
+        return $this->hasMany(UserAward::class);
     }
 }

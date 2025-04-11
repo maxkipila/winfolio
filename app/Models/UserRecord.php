@@ -15,14 +15,7 @@ class UserRecord extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'user_id',
-        'record_type',
-        'value',
-        'count',
-        'percentage',
-        'product_id',
-    ];
+    protected $guarded = [];
 
     /**
      * Konstanty pro typy rekordů

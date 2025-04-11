@@ -36,8 +36,8 @@ class UserController extends Controller
     } */
     public function dashboard(Request $request)
     {
+        $user = auth()->user();
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
-
 
         $trendingProducts = Cache::remember('trending_products', Carbon::now()->addHours(12), function () {
             $trends = Trend::with(['product.latest_price', 'product.theme'])
@@ -46,7 +46,6 @@ class UserController extends Controller
                 ->orderBy('favorites_count', 'desc')
                 ->limit(8)
                 ->get();
-
 
             if ($trends->isEmpty()) {
                 return $this->trendService->calculateTrendingProducts();
@@ -88,11 +87,41 @@ class UserController extends Controller
 
         $portfolioValue = $this->dashboardPortfolioValue();
 
+        $records = $user->records()->with('product')->get()->keyBy('record_type');
+
+        $formattedRecords = [
+            'highest_portfolio' => $records->get('highest_portfolio_value') ? $records->get('highest_portfolio_value')->value : 0,
+            'most_items' => $records->get('most_items') ? $records->get('most_items')->value : 0,
+            'best_purchase' => $records->get('best_purchase') ? [
+                'value' => $records->get('best_purchase')->value,
+                'product' => new _Product($records->get('best_purchase')->product)
+            ] : null,
+            'worst_purchase' => $records->get('worst_purchase') ? [
+                'value' => $records->get('worst_purchase')->value,
+                'product' => new _Product($records->get('worst_purchase')->product)
+            ] : null,
+        ];
+
+        // Načtení odznaků uživatele
+        $userAwards = $user->userAwards()->with('award')->get();
+        $userAwardsData = collect($userAwards)->map(function ($userAward) {
+            return [
+                'id' => $userAward->award->id,
+                'name' => $userAward->award->name,
+                'description' => $userAward->award->description,
+                'category' => $userAward->award->category,
+                'icon' => $userAward->award->icon,
+                'earned_at' => $userAward->earned_at,
+            ];
+        });
+
         return Inertia::render('Dashboard', [
             'products' => $products,
             'trendingProducts' => $trendingData,
             'topMovers' => $topMoversData,
             'portfolioValue' => $portfolioValue,
+            'records' => $formattedRecords,
+            'awards' => $userAwardsData,
         ]);
     }
 

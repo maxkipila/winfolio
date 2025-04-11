@@ -7,23 +7,9 @@ use Illuminate\Console\Command;
 
 class UpdateUserRecords extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:update-user-records';
+    protected $description = 'Aktualizace rekordů uživatelů';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $users = User::all();
@@ -32,22 +18,117 @@ class UpdateUserRecords extends Command
             $this->info("Updated records for user {$user->id}: " . json_encode($updated));
         }
     }
-    public function updateUserRecords(User $user): array
+
+    protected function updateUserRecords(User $user): array
     {
         $updated = [];
-
-        // Aktualizace rekordu pro nejvyšší hodnotu portfolia
         $updated['highest_portfolio_value'] = $this->updateHighestPortfolioValue($user);
-
-        // Aktualizace rekordu pro největší počet položek
         $updated['most_items'] = $this->updateMostItems($user);
-
-        // Aktualizace rekordu pro nejlepší nákup (nejvyšší zhodnocení)
         $updated['best_purchase'] = $this->updateBestPurchase($user);
-
-        // Aktualizace rekordu pro nejhorší nákup (nejnižší zhodnocení)
         $updated['worst_purchase'] = $this->updateWorstPurchase($user);
-
         return $updated;
+    }
+
+    protected function updateHighestPortfolioValue(User $user): bool
+    {
+        $currentValue = $user->products->sum(function ($product) {
+            return $product->price ? $product->price->value : 0;
+        });
+
+        $record = $user->records()->where('record_type', 'highest_portfolio_value')->first();
+
+        if (!$record || $currentValue > $record->value) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'highest_portfolio_value'],
+                ['value' => $currentValue]
+            );
+            return true;
+        }
+        return false;
+    }
+
+    protected function updateMostItems(User $user): bool
+    {
+        $currentCount = $user->products()->count();
+        $record = $user->records()->where('record_type', 'most_items')->first();
+
+        if (!$record || $currentCount > $record->value) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'most_items'],
+                ['value' => $currentCount]
+            );
+            return true;
+        }
+        return false;
+    }
+
+    protected function updateBestPurchase(User $user): bool
+    {
+        $products = $user->products()->with('price')->get();
+        $bestGrowth = 0;
+        $bestProductId = null;
+
+        foreach ($products as $product) {
+            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+                continue;
+            }
+
+            $purchasePrice = $product->pivot->purchase_price;
+            $currentValue = $product->price->value;
+            $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
+
+            if ($growth > $bestGrowth) {
+                $bestGrowth = $growth;
+                $bestProductId = $product->id;
+            }
+        }
+
+        if ($bestProductId) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'best_purchase'],
+                [
+                    'value' => $bestGrowth,
+                    'product_id' => $bestProductId
+                ]
+            );
+            return true;
+        }
+        return false;
+    }
+
+    protected function updateWorstPurchase(User $user): bool
+    {
+        $products = $user->products()->with('price')->get();
+        $worstGrowth = 0;
+        $worstProductId = null;
+        $foundNegativeGrowth = false;
+
+        foreach ($products as $product) {
+            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+                continue;
+            }
+
+            $purchasePrice = $product->pivot->purchase_price;
+            $currentValue = $product->price->value;
+            $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
+
+            if (!$foundNegativeGrowth || $growth < $worstGrowth) {
+                $worstGrowth = $growth;
+                $worstProductId = $product->id;
+                $foundNegativeGrowth = true;
+            }
+        }
+
+        if ($worstProductId) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'worst_purchase'],
+                [
+                    'value' => $worstGrowth,
+                    'product_id' => $worstProductId
+                ]
+            );
+            return true;
+        }
+        return false;
     }
 }
