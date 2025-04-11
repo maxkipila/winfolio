@@ -26,12 +26,12 @@ function Product(props: Props) {
             <div className='w-full pb-24px px-24px flex gap-20px pt-32px mob:flex-col'>
                 <div className='w-2/3 flex-shrink-0 mob:w-full'>
                     <div className='flex gap-24px mob:flex-col'>
-                        <div className='border-2 border-black w-full'>
+                        <div className='border-2 border-black w-full max-w-[590px]'>
                             <Img className='w-full object-cover' src={product?.img_url} />
                         </div>
                         <div className='flex flex-col gap-24px mob:flex-row mob:overflow-x-auto'>
-                            <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} />
-                            <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} />
+                            {/* <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} />
+                            <Img className='max-w-[200px] border-2 border-black' src={product?.img_url} /> */}
                         </div>
                     </div>
                     <div className='mt-24px'>

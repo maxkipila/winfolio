@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecordController;
@@ -44,7 +45,7 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');
-
+    Route::post('/post-review', [ReviewController::class, 'submit_review'])->name('submit_review');
     Route::post('/favourite/{type}/{favouritable}', [UserController::class, 'toggleFavourite'])->name('favourites.toggle');
 
     Route::match(['GET', 'POST'], '/chest', function () {

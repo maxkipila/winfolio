@@ -6,50 +6,108 @@ import { useForm } from '@inertiajs/react';
 import TextField from './forms/inputs/TextField';
 import TextArea from './forms/inputs/TextArea';
 import { Button } from './UI/Button';
+import moment from 'moment';
+import ReviewCard from './ReviewCard';
+import { MODALS } from './Modals';
+import usePageProps from '@/hooks/usePageProps';
 
-function ReviewLine() {
+interface ReviewLineProps extends Review {
 
+}
+
+function ReviewLine(props: ReviewLineProps) {
+    const { comment, id, rating, role, user, created_at } = props
     return (
         <div className='border-t border-[#E6E6E6] py-24px'>
             <div className='flex justify-between items-center'>
-                <div className='font-bold text-lg'>Michael Coleman</div>
-                <div className='text-[#4D4D4D] font-nunito'>20 days ago</div>
+                <div className='font-bold text-lg'>{user?.first_name} {user?.last_name}</div>
+                <div className='text-[#4D4D4D] font-nunito'>{moment(created_at).format('DD.MM.YYYY')}</div>
             </div>
             <div className='flex gap-4px mt-16px'>
                 <div className='grid'>
-                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    {
+                        rating > 0 &&
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
-                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    {
+                        rating > 1 &&
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
-                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    {
+                        rating > 2 &&
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
-                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    {
+                        rating > 3 &&
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
+                    {
+                        rating > 4 &&
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                    }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
             </div>
-            <div className='font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+            <div className='font-nunito text-[#4D4D4D]'>{comment}</div>
         </div>
     )
 }
 
 
-interface Props { }
+interface Props {
+    product: Product
+}
 
 function ReviewsModal(props: Props) {
-    const { } = props
-    let { close } = useContext(ModalsContext)
+    const { product } = props
+    let { close, open } = useContext(ModalsContext)
     let [collected, setCollected] = useState(true)
-    const form = useForm({});
-    const { data } = form;
+    const { auth } = usePageProps<{ auth: { user: User } }>();
+    const form = useForm({
+        rating: 0,
+        role: "collector",
+        product_id: product?.id,
+        user_id: auth?.user?.id
+    });
+    const { data, setData, post } = form;
+    let ratingValues = product.reviews?.flatMap((r) => r.rating)
+    let reviewValue = 0
+    ratingValues?.map((v) => reviewValue += v)
+    let colNumber = 0
+    let invNumber = 0
+    product?.reviews?.map((re) => {
+        if (re.role == "both") {
+            colNumber += 1
+            invNumber += 1
+        } else if (re.role == "investor") {
+            invNumber += 1
+        } else {
+            colNumber += 1
+        }
+    })
+    let five = product?.reviews?.filter((r) => r.rating == 5)
+    let four = product?.reviews?.filter((r) => r.rating == 4)
+    let three = product?.reviews?.filter((r) => r.rating == 3)
+    let two = product?.reviews?.filter((r) => r.rating == 2)
+    let one = product?.reviews?.filter((r) => r.rating == 1)
+
+    function submit() {
+        post(route('submit_review'), {
+            onSuccess: () => { open(MODALS.SUCCESS, false) }
+        })
+    }
     return (
         <div onClick={() => { close() }} className="bg-black bg-opacity-80 fixed top-0 left-0 w-full h-screen items-center justify-center mob:block mob:max-h-full flex z-max p-24px mob:pb-0">
             <div onClick={(e) => { e.stopPropagation(); }} className='bg-white border-2 border-black min-w-2/3 mob:w-full mob:max-h-90vh overflow-y-auto'>
@@ -57,25 +115,47 @@ function ReviewsModal(props: Props) {
                     <div className='w-full p-24px'>
                         <div className='font-bold text-3xl'>Averange Rating</div>
                         <div className='flex items-center gap-8px'>
-                            <div className='text-[#4D4D4D] font-nunito'>4.7</div>
+                            <div className='text-[#4D4D4D] font-nunito'>{reviewValue ? Math.floor(reviewValue / ratingValues?.length) : 0}</div>
                             <div className='flex gap-4px'>
                                 <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+
+                                    {
+                                        Math.floor(reviewValue / ratingValues?.length) > 0 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+
+                                    {
+                                        Math.floor(reviewValue / ratingValues?.length) > 1 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
+                                    <Star className='col-start-1 row-start-1' weight='bold' />
+
+                                </div>
+                                <div className='grid'>
+
+                                    {
+                                        Math.floor(reviewValue / ratingValues?.length) > 2 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+
+                                    {
+                                        Math.floor(reviewValue / ratingValues?.length) > 3 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
-                                </div>
-                                <div className='grid'>
+
+                                    {
+                                        Math.floor(reviewValue / ratingValues?.length) > 4 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                             </div>
@@ -85,41 +165,41 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>5</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div className='w-[90%] h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1'></div>
+                                <div style={{ width: `${(five?.length / product?.reviews?.length) * 100}%` }} className={`h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>90%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((five?.length / product?.reviews?.length) * 100)}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>4</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div className='w-[60%] h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1'></div>
+                                <div style={{ width: `${(four?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>60%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((four?.length / product?.reviews?.length) * 100)}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>3</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div className='w-[40%] h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1'></div>
+                                <div style={{ width: `${(three?.length / product?.reviews?.length) * 100}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>40%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((three?.length / product?.reviews?.length) * 100)}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>2</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div className='w-[30%] h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1'></div>
+                                <div style={{ width: `${(two?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>30%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor(two?.length / product?.reviews?.length) * 100}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>1</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div className='w-[0%] h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1'></div>
+                                <div style={{ width: `${(one?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>0%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((one?.length / product?.reviews?.length) * 100)}%</div>
                         </div>
 
                     </div>
@@ -128,32 +208,48 @@ function ReviewsModal(props: Props) {
                         <div className='flex items-center gap-8px'>
                             <div className='text-[#4D4D4D] font-nunito whitespace-nowrap'>Add Your Rating</div>
                             <div className='flex gap-4px'>
-                                <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                <div onClick={() => { setData('rating', 1) }} className='grid cursor-pointer'>
+                                    {
+                                        data['rating'] > 0 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
-                                <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                <div onClick={() => { setData('rating', 2) }} className='grid cursor-pointer'>
+                                    {
+                                        data['rating'] > 1 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
-                                <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                <div onClick={() => { setData('rating', 3) }} className='grid cursor-pointer'>
+                                    {
+                                        data['rating'] > 2 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
-                                <div className='grid'>
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                <div onClick={() => { setData('rating', 4) }} className='grid cursor-pointer'>
+                                    {
+                                        data['rating'] > 3 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
-                                <div className='grid'>
+                                <div onClick={() => { setData('rating', 5) }} className='grid cursor-pointer'>
+                                    {
+                                        data['rating'] > 4 &&
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                             </div>
                         </div>
                         <div className='w-full flex mt-12px'>
-                            <div className={`border-b-2 pb-12px font-bold text-lg w-full ${collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
+                            <div onClick={() => { setCollected(true); setData('role', 'collector') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
                                 Collected
                             </div>
-                            <div className={`border-b-2 pb-12px font-bold text-lg w-full ${!collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
+                            <div onClick={() => { setCollected(false); setData('role', 'investor') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${!collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
                                 Invested in
                             </div>
                         </div>
@@ -161,15 +257,17 @@ function ReviewsModal(props: Props) {
                             <TextArea label={'Write Your Review…'} placeholder='Write Your Review…' name="text" />
                         </Form>
                         <div className='max-w-[175px] mt-40px'>
-                            <Button href="#" icon={<PaperPlaneTilt weight='bold' size={24} />}>Submit Reviews</Button>
+                            <Button onClick={(e) => { e.preventDefault(); submit() }} href="#" icon={<PaperPlaneTilt weight='bold' size={24} />}>Submit Reviews</Button>
                         </div>
                     </div>
                 </div>
                 <div className='p-24px border-t-2 border-black'>
                     <div className='font-bold text-3xl'>Customer Feedbacks</div>
-                    <ReviewLine />
-                    <ReviewLine />
-                    <ReviewLine />
+                    {
+                        product?.reviews?.map((r) =>
+                            <ReviewLine {...r} />
+                        )
+                    }
                 </div>
             </div>
         </div>

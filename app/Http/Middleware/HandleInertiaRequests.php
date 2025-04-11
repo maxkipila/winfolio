@@ -56,7 +56,6 @@ class HandleInertiaRequests extends Middleware
         $themes = fn(): AnonymousResourceCollection => _Theme::collection(Theme::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
         $products = fn(): AnonymousResourceCollection => _Product::collection(Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get());
 
-
         return [
             ...parent::share($request),
             'auth' => [
