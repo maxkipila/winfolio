@@ -37,28 +37,29 @@ class RecordTrackerService
      * @param User $user Uživatel
      * @return bool True, pokud byl rekord aktualizován
      */
-    protected function updateHighestPortfolioValue(User $user): bool
+    private function updateHighestPortfolioValue(User $user): bool
     {
-        $currentValue = $user->products()->sum('current_value');
-        $record = $user->getRecord(UserRecord::TYPE_HIGHEST_PORTFOLIO_VALUE);
+        // Vypočítání aktuální hodnoty portfolia
+        $currentValue = $user->products->sum(function ($product) {
+            return $product->price ? $product->price->value : 0;
+        });
 
-        if (!$record) {
-            // Vytvoř nový rekord, pokud neexistuje
-            $user->records()->create([
-                'record_type' => UserRecord::TYPE_HIGHEST_PORTFOLIO_VALUE,
-                'value' => $currentValue,
-            ]);
-            return true;
-        } elseif ($currentValue > $record->value) {
-            // Aktualizuj existující rekord, pokud je nová hodnota vyšší
-            $record->update([
-                'value' => $currentValue,
-            ]);
+        // Získání existujícího rekordu, pokud existuje
+        $record = $user->records()->where('record_type', 'highest_portfolio_value')->first();
+
+        // Pokud nemáme žádný záznam nebo je nová hodnota vyšší, vytvoříme/aktualizujeme záznam
+        if (!$record || $currentValue > $record->value) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'highest_portfolio_value'],
+                ['value' => $currentValue]
+            );
             return true;
         }
 
         return false;
     }
+
+
 
     /**
      * Aktualizuje rekord pro nejvyšší počet položek.
@@ -66,23 +67,20 @@ class RecordTrackerService
      * @param User $user Uživatel
      * @return bool True, pokud byl rekord aktualizován
      */
-    protected function updateMostItems(User $user): bool
+    private function updateMostItems(User $user): bool
     {
+        // Aktuální počet produktů v portfoliu
         $currentCount = $user->products()->count();
-        $record = $user->getRecord(UserRecord::TYPE_MOST_ITEMS);
 
-        if (!$record) {
-            // Vytvoř nový rekord, pokud neexistuje
-            $user->records()->create([
-                'record_type' => UserRecord::TYPE_MOST_ITEMS,
-                'count' => $currentCount,
-            ]);
-            return true;
-        } elseif ($currentCount > $record->count) {
-            // Aktualizuj existující rekord, pokud je nová hodnota vyšší
-            $record->update([
-                'count' => $currentCount,
-            ]);
+        // Získání existujícího rekordu, pokud existuje
+        $record = $user->records()->where('record_type', 'most_items')->first();
+
+        // Pokud nemáme žádný záznam nebo je nový počet vyšší, vytvoříme/aktualizujeme záznam
+        if (!$record || $currentCount > $record->value) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'most_items'],
+                ['value' => $currentCount]
+            );
             return true;
         }
 
@@ -95,37 +93,40 @@ class RecordTrackerService
      * @param User $user Uživatel
      * @return bool True, pokud byl rekord aktualizován
      */
-    protected function updateBestPurchase(User $user): bool
+    private function updateBestPurchase(User $user): bool
     {
-        $bestProduct = $user->products()
-            ->selectRaw('*, ((current_value - purchase_price) / purchase_price * 100) as profit_percentage')
-            ->whereRaw('purchase_price > 0')  // Vyhni se dělení nulou
-            ->orderByDesc('profit_percentage')
-            ->first();
+        // Získáme všechny produkty uživatele s informacemi o nákupu
+        $products = $user->products()->with('price')->get();
 
-        if (!$bestProduct) {
-            return false;
+        $bestGrowth = 0;
+        $bestProductId = null;
+
+        foreach ($products as $product) {
+            // Pokud nemáme informace o nákupní ceně nebo aktuální hodnotě, přeskočíme
+            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+                continue;
+            }
+
+            // Výpočet procentuálního růstu: (aktuální hodnota - nákupní cena) / nákupní cena * 100
+            $purchasePrice = $product->pivot->purchase_price;
+            $currentValue = $product->price->value;
+            $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
+
+            if ($growth > $bestGrowth) {
+                $bestGrowth = $growth;
+                $bestProductId = $product->id;
+            }
         }
 
-        $profitPercentage = (($bestProduct->current_value - $bestProduct->purchase_price) / $bestProduct->purchase_price) * 100;
-        $record = $user->getRecord(UserRecord::TYPE_BEST_PURCHASE);
-
-        if (!$record) {
-            // Vytvoř nový rekord, pokud neexistuje
-            $user->records()->create([
-                'record_type' => UserRecord::TYPE_BEST_PURCHASE,
-                'product_id' => $bestProduct->id,
-                'value' => $bestProduct->current_value,
-                'percentage' => $profitPercentage,
-            ]);
-            return true;
-        } elseif (!$record->percentage || $profitPercentage > $record->percentage) {
-            // Aktualizuj existující rekord, pokud je nová hodnota vyšší
-            $record->update([
-                'product_id' => $bestProduct->id,
-                'value' => $bestProduct->current_value,
-                'percentage' => $profitPercentage,
-            ]);
+        // Pokud jsme našli produkt s nejvyšším zhodnocením
+        if ($bestProductId) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'best_purchase'],
+                [
+                    'value' => $bestGrowth,
+                    'product_id' => $bestProductId
+                ]
+            );
             return true;
         }
 
@@ -138,37 +139,43 @@ class RecordTrackerService
      * @param User $user Uživatel
      * @return bool True, pokud byl rekord aktualizován
      */
-    protected function updateWorstPurchase(User $user): bool
+    private function updateWorstPurchase(User $user): bool
     {
-        $worstProduct = $user->products()
-            ->selectRaw('*, ((current_value - purchase_price) / purchase_price * 100) as profit_percentage')
-            ->whereRaw('purchase_price > 0')  // Vyhni se dělení nulou
-            ->orderBy('profit_percentage')
-            ->first();
+        // Získáme všechny produkty uživatele s informacemi o nákupu
+        $products = $user->products()->with('price')->get();
 
-        if (!$worstProduct) {
-            return false;
+        $worstGrowth = 0;
+        $worstProductId = null;
+        $foundNegativeGrowth = false;
+
+        foreach ($products as $product) {
+            // Pokud nemáme informace o nákupní ceně nebo aktuální hodnotě, přeskočíme
+            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+                continue;
+            }
+
+            // Výpočet procentuálního růstu: (aktuální hodnota - nákupní cena) / nákupní cena * 100
+            $purchasePrice = $product->pivot->purchase_price;
+            $currentValue = $product->price->value;
+            $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
+
+            // Inicializace na první produkt nebo nalezení produktu s horším zhodnocením
+            if (!$foundNegativeGrowth || $growth < $worstGrowth) {
+                $worstGrowth = $growth;
+                $worstProductId = $product->id;
+                $foundNegativeGrowth = true;
+            }
         }
 
-        $profitPercentage = (($worstProduct->current_value - $worstProduct->purchase_price) / $worstProduct->purchase_price) * 100;
-        $record = $user->getRecord(UserRecord::TYPE_WORST_PURCHASE);
-
-        if (!$record) {
-            // Vytvoř nový rekord, pokud neexistuje
-            $user->records()->create([
-                'record_type' => UserRecord::TYPE_WORST_PURCHASE,
-                'product_id' => $worstProduct->id,
-                'value' => $worstProduct->current_value,
-                'percentage' => $profitPercentage,
-            ]);
-            return true;
-        } elseif (!$record->percentage || $profitPercentage < $record->percentage) {
-            // Aktualizuj existující rekord, pokud je nová hodnota nižší
-            $record->update([
-                'product_id' => $worstProduct->id,
-                'value' => $worstProduct->current_value,
-                'percentage' => $profitPercentage,
-            ]);
+        // Pokud jsme našli produkt s nejnižším zhodnocením
+        if ($worstProductId) {
+            $user->records()->updateOrCreate(
+                ['record_type' => 'worst_purchase'],
+                [
+                    'value' => $worstGrowth,
+                    'product_id' => $worstProductId
+                ]
+            );
             return true;
         }
 

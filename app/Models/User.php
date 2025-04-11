@@ -102,6 +102,16 @@ class User extends Authenticatable
             ])
             ->withTimestamps();
     }
+    public function getPortfolioValue()
+    {
+        return $this->products->sum(function ($product) {
+            return $product->price ? $product->price->value : 0;
+        });
+    }
+    public function userAwards()
+    {
+        return $this->hasMany(UserAward::class);
+    }
 
     //ziska vsechny recordy
     public function records(): HasMany
