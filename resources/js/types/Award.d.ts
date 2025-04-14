@@ -2,6 +2,7 @@ interface Award {
     id: number;
     name: string;
     description: string;
+    earned?: boolean;
     icon?: string;
     created_at: string;
     updated_at: string;

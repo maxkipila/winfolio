@@ -60,7 +60,7 @@ Route::middleware('auth:web')->group(function () {
     })->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
-    Route::match(['GET', 'POST'], '/catalog', function () {
+    Route::match(['GET', 'POST'], '/catalog', function (Request $request) {
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
 
         $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 10));
@@ -71,7 +71,7 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
-        $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme']));
+        $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs']));
 
         $similar_products = _Product::collection(Product::where('theme_id', $product->theme->id ?? NULL)->inRandomOrder()->take(4)->get());
 

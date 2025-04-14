@@ -58,7 +58,7 @@ function Catalog(props: Props) {
                     </div>
                     <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
                         {
-                            selected.children?.map((c) =>
+                            selected?.children?.map((c) =>
                                 <div className='px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center'>{c.name}</div>
                             )
                         }
