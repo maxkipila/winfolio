@@ -14,11 +14,11 @@ class TrendService
 
     public function calculateTrendingProducts(int $limit = 8, int $days = 7): array
     {
-        // Získáme datum před X dny
+        // datum před X dny
         $startDate = Carbon::now()->subDays($days);
         $today = Carbon::today();
 
-        // Optimalizovaný dotaz - získáme pouze ID produktů a počet oblíbených
+        // ID produktů a počet oblíbených
         $trendingProductIds = DB::table('product_user')
             ->select('product_id', DB::raw('COUNT(*) as favorites_count'))
             ->where('created_at', '>=', $startDate)
@@ -27,15 +27,13 @@ class TrendService
             ->limit($limit)
             ->get();
 
-        // Uložíme výsledky do databáze a cache
         $trends = [];
 
         foreach ($trendingProductIds as $item) {
-            // Vypočítáme růst za poslední týden a rok pomocí SQL dotazu
+            // Růst za poslední týden a rok 
             $weeklyGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 7);
             $annualGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 365);
 
-            // Uložíme trend
             $trend = Trend::updateOrCreate(
                 [
                     'product_id' => $item->product_id,
@@ -49,16 +47,13 @@ class TrendService
                 ]
             );
 
-            // Načteme produkt až po uložení trendu
             $trend->load('product.latest_price', 'product.theme');
             $trends[] = $trend;
 
-            // Uvolníme paměť
             unset($trend);
             gc_collect_cycles();
         }
 
-        // Uložíme do cache pro rychlé načítání
         Cache::put('trending_products', $trends, Carbon::now()->addDay());
 
         return $trends;
@@ -76,7 +71,7 @@ class TrendService
         $weekAgo = Carbon::today()->subDays(7);
         $yearAgo = Carbon::today()->subDays(365);
 
-        // Optimalizovaný SQL dotaz, který používá JOIN s dílčími dotazy pro získání správných hodnot
+        // Optimalizovaný SQL 
         $topMovers = DB::select("
             WITH latest_price_dates AS (
                 SELECT 
@@ -125,14 +120,11 @@ class TrendService
             LIMIT ?
         ", [$weekAgo, $yearAgo, $limit]);
 
-        // Zbytek kódu zůstává stejný
         $results = [];
         foreach ($topMovers as $mover) {
-            // Zaokrouhlíme hodnoty growth
             $weeklyGrowth = round($mover->weekly_growth, 1);
             $annualGrowth = $mover->year_old_value ? round($mover->annual_growth, 1) : null;
 
-            // Uložíme trend
             $trend = Trend::updateOrCreate(
                 [
                     'product_id' => $mover->product_id,
@@ -144,8 +136,6 @@ class TrendService
                     'annual_growth' => $annualGrowth,
                 ]
             );
-
-            // Načteme produkt až po uložení trendu, abychom šetřili paměť
             $trend->load('product.latest_price', 'product.theme');
             $results[] = $trend;
         }
@@ -156,13 +146,6 @@ class TrendService
         return $results;
     }
 
-    /**
-     * Vypočítá růst ceny produktu za dané období
-     *
-     * @param int $productId ID produktu
-     * @param int $days Počet dnů zpětně
-     * @return float|null
-     */
     private function calculateGrowthForProductOptimized(int $productId, int $days): ?float
     {
         $result = DB::select("
@@ -199,13 +182,6 @@ class TrendService
         return round($result[0]->growth_percentage, 1);
     }
 
-    /**
-     * Vypočítá procentuální změnu mezi starou a novou hodnotou
-     *
-     * @param float $oldValue Stará hodnota
-     * @param float $newValue Nová hodnota
-     * @return float
-     */
     private function calculateGrowthPercentage(float $oldValue, float $newValue): float
     {
         if ($oldValue == 0) return 0;

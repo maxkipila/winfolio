@@ -32,7 +32,10 @@ class _Product extends JsonResource
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,
-            'favourited' => Auth::user() instanceof User ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists() : false,
+            'favourited' => Auth::check() && get_class(Auth::user()) === \App\Models\User::class
+                ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists()
+                : false,
+            /*             'favourited' => Auth::user() instanceof User ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists() : false, */
             'prices'      => _Price::collection($this->whenLoaded('prices')),
             'model'       => (new \ReflectionClass($this->resource))->getShortName(),
             'review'      => new _Review($this->whenLoaded('review')),

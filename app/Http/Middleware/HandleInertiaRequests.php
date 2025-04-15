@@ -87,7 +87,7 @@ class HandleInertiaRequests extends Middleware
             'notifications' => fn() => $request->user()
                 ? $request->user()->unreadNotifications
                 : [],
-            'awardNotifications' => fn() => $request->user()
+            'awardNotifications' => fn() => $request->user() && !Gate::allows('admin')
                 ? $request->user()->awards()->wherePivot('notified', false)->get()
                 : [],
             'flash' => Session::get('flash'),
