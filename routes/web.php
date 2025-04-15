@@ -61,7 +61,21 @@ Route::middleware('auth:web')->group(function () {
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     Route::match(['GET', 'POST'], '/catalog', function (Request $request) {
-        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+        // dd($request->parent_theme, $request->theme_children);
+        $query = $request->search;
+        $column = 'name';
+        $products = _Product::collection(Product::when($request->type, fn($k) => $k->where('product_type', $request->type))->when($request->parent_theme || $request->theme_children, fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])]))->where($column, 'LIKE', '%' . $query . '%')
+            ->orderByRaw("
+            CASE WHEN $column LIKE '" . e($query) . "' THEN 1
+                WHEN $column LIKE '" . e($query) . "%' THEN 2
+                WHEN $column LIKE '%" . e($query) . "%' THEN 3
+                WHEN $column LIKE '%" . e($query) . "' THEN 4
+                ELSE 5
+            END")->latest()->paginate($request->paginate ?? 10));
+
+        // $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+
+
 
         $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 10));
         // dd($themes);
