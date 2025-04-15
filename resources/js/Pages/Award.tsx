@@ -1,10 +1,98 @@
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Check, Medal, X } from '@phosphor-icons/react'
 import React from 'react'
 
-type Props = {}
+interface AwardCardProps extends Award {
 
-const Award = (props: Props) => {
+}
+
+function AwardCard(props: AwardCardProps) {
+    const { category, category_id, earned, category_name, condition_type, conditions, created_at, description, id, name, product_id, required_count, required_percentage, required_value, updated_at, icon } = props
     return (
-        <div>Award</div>
+        <div className={`${earned?"border-[#F7AA1A]":"border-black"} border-2 bg-[#F5F5F5] w-full min-h-[250px] flex flex-col items-center justify-center px-24px`}>
+            <div className='w-40px h-40px bg-white rounded-full flex items-center justify-center mb-8px'>
+                {
+                    earned?
+                    <Check size={24} />
+                    :
+                    <X size={24} />
+                }
+            </div>
+            <div className='text-lg font-bold font-teko text-center'>{name}</div>
+            <div className='font-medium font-teko text-center'>{description}</div>
+        </div>
+    )
+}
+
+interface Props {
+    records: {
+        best_purchase: {
+            value: number,
+            product: Product
+        },
+        highest_portfolio: number,
+        most_items: number,
+        worst_purchase: {
+            value: number,
+            product: Product
+        }
+    },
+    awards: Array<Award>
+}
+
+function Award(props: Props) {
+    const { awards, records } = props
+
+    return (
+        <AuthenticatedLayout>
+            <div className='w-2/3 mx-auto mob:w-full px-24px'>
+                <div className='font-bold font-teko text-xl pt-48px'>Moje rekordy</div>
+                <div className='w-full flex gap-12px overflow-x-auto'>
+                    <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>
+                        <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
+                            <Medal size={24} />
+                        </div>
+                        <div className='font-bold font-nunito text-center'>Nejlepší koupě</div>
+                        <div>{records?.best_purchase?.product?.name}</div>
+                        <div>{records?.best_purchase?.value}</div>
+                    </div>
+
+                    <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>
+                        <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
+                            <Medal size={24} />
+                        </div>
+                        <div className='font-bold font-nunito text-center'>Hodnota portfolia</div>
+                        <div>{Math.floor(records?.highest_portfolio)}</div>
+                    </div>
+
+                    <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>
+                        <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
+                            <Medal size={24} />
+                        </div>
+                        <div className='font-bold font-nunito text-center'>Množství položek</div>
+                        <div>{Math.floor(records?.most_items)}</div>
+                    </div>
+
+                    <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>
+                        <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
+                            <Medal size={24} />
+                        </div>
+                        <div className='font-bold font-nunito text-center'>Největší přehmat</div>
+                        <div>{records?.worst_purchase?.product?.name}</div>
+                        <div>{records?.worst_purchase?.value}</div>
+                    </div>
+
+                </div>
+                <div className='font-bold font-teko text-xl mt-48px'>Odznaky</div>
+                <div className='mt-12px grid grid-cols-3 gap-12px pb-48px mob:grid-cols-2'>
+                    {
+                        awards?.map((a) =>
+                            <AwardCard {...a} />
+                        )
+                    }
+                </div>
+            </div>
+        </AuthenticatedLayout>
     )
 }
 

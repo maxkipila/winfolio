@@ -17,44 +17,48 @@ function SmallBlogCard() {
     )
 }
 
-function CardsDesktop() {
+interface CardsProps {
+    portfolioValue: number
+}
+function CardsDesktop(props: CardsProps) {
+    const { portfolioValue } = props
     return (
         <div className='flex border-b border-[#DEDFE5] px-24px mob:hidden'>
             <div className='w-full py-48px'>
                 <div>Hodnota portfolia</div>
                 <div className='flex items-center'>
                     <div className='font-bold text-7xl'>$</div>
-                    <div className='font-bold text-9xl'>1 102</div>
-                    <div className='text-[#999999] font-bold text-7xl'>.13</div>
+                    <div className='font-bold text-9xl'>{portfolioValue}</div>
+                    {/* <div className='text-[#999999] font-bold text-7xl'>.13</div> */}
                 </div>
-                <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
+                {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
                     <ArrowUpRight color="white" />
                     <div className='text-white'>+4,1 %</div>
-                </div>
+                </div> */}
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
                 <div>Hodnota portfolia</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>1 102</div>
-                    <div className='text-[#999999] font-bold text-4xl'>.13</div>
+                    <div className='font-bold text-6xl'>{portfolioValue}</div>
+                    {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
-                <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
+                {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
                     <ArrowUpRight color="white" />
                     <div className='text-white'>+4,1 %</div>
-                </div>
+                </div> */}
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
                 <div>Hodnota portfolia</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>1 102</div>
-                    <div className='text-[#999999] font-bold text-4xl'>.13</div>
+                    <div className='font-bold text-6xl'>{portfolioValue}</div>
+                    {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
-                <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
+                {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
                     <ArrowUpRight color="white" />
                     <div className='text-white'>+4,1 %</div>
-                </div>
+                </div> */}
             </div>
             <div className='pl-48px py-48px'>
                 <div className='bg-[#E9C784] flex flex-col justify-center items-center w-full p-52px'>
@@ -66,9 +70,9 @@ function CardsDesktop() {
     )
 }
 
-function CardsMobile() {
+function CardsMobile(props: CardsProps) {
     let [index, setIndex] = useState(0)
-
+    const { portfolioValue } = props
     return (
         <div className='nMob:hidden w-full px-24px py-16px'>
             <div className='w-full'>
@@ -83,30 +87,34 @@ function CardsMobile() {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>1 102</div>
+                        <div className='font-bold text-6xl'>{portfolioValue}</div>
                         <div className='text-[#999999] font-bold text-4xl'>.13</div>
                     </div>
-                    <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
+                    {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
                         <ArrowUpRight color="white" />
                         <div className='text-white'>+4,1 %</div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
     )
 }
 
-export default function Dashboard() {
+interface DashBoardProps {
+    portfolioValue: number
+}
+export default function Dashboard(props: DashBoardProps) {
 
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
+    const { portfolioValue } = props
     // const [minifigs, button: _button, meta, setItems] = useLazyLoad<SetLego>('sets');
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
             <div className=''>
 
-                <CardsDesktop />
-                <CardsMobile />
+                <CardsDesktop {...props} />
+                <CardsMobile {...props} />
                 <div className='px-24px divide-x divide-[#DEDFE5] mob:divide-x-0 flex mob:flex-col'>
                     <div className='py-24px pr-24px mob:pr-0 w-full'>
                         <div className='flex gap-8px items-center'>

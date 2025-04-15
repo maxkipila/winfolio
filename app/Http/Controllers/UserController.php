@@ -143,6 +143,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
+        // $user->products()->sync([$product->id => ['purchase_day' => $request->purchase_day]]);
         $user->products()->sync([$product->id]);
         return back();
     }

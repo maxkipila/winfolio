@@ -2,11 +2,12 @@ import Form from '@/Fragments/forms/Form';
 import TextField from '@/Fragments/forms/inputs/TextField';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
+import { useDebouncedCallback } from '@/hooks/useDebounceCallback';
 import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { MagnifyingGlass, SlidersHorizontal, SpinnerGap, TrendUp, X } from '@phosphor-icons/react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface ThemeCardProps extends Theme {
     selected: Theme
@@ -30,11 +31,28 @@ interface Props { }
 
 function Catalog(props: Props) {
     const { } = props
-    const form = useForm({});
+    const form = useForm({
+        search: ''
+    });
     const { data } = form;
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const [themes] = useLazyLoad<Theme>('themes');
     let [selected, setSelected] = useState<Theme>(null)
+    let [themeChildren, setThemeChildren] = useState<Array<number>>([])
+    let [type, setType] = useState(null)
+    const search = useDebouncedCallback(() => {
+        router.post(route('catalog', { parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type }))
+    }, 700);
+
+    useEffect(() => {
+        search()
+    }, [selected, themeChildren, data['search'], type])
+
+    useEffect(() => {
+        setThemeChildren([])
+    }, [selected])
+
+
 
     return (
         <AuthenticatedLayout>
@@ -52,14 +70,18 @@ function Catalog(props: Props) {
                 </div>
                 <div className='mt-24px border-t-2 border-[#E6E6E6] pt-24px flex justify-between items-center mob:flex-col mob:gap-12px mob:items-start mob:px-24px'>
                     <div className='flex items-center gap-12px'>
-                        <div className='p-12px font-nunito font-bold border-2 border-black text-white bg-black'>Vše</div>
-                        <div className='p-12px font-nunito font-bold border-2 border-black'>Avatar</div>
-                        <div className='p-12px font-nunito font-bold border-2 border-black'>Baby</div>
+                        <div onClick={() => { setType(null) }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == null ? "text-white bg-black" : ""}`}>Vše</div>
+                        <div onClick={() => { setType('set') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "set" ? "text-white bg-black" : ""}`}>Sety</div>
+                        <div onClick={() => { setType('minifig') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "minifig" ? "text-white bg-black" : ""}`}>Minifigs</div>
                     </div>
                     <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
                         {
-                            selected.children?.map((c) =>
-                                <div className='px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center'>{c.name}</div>
+                            selected?.children?.map((c) => {
+                                let included = themeChildren?.includes(c?.id)
+                                return (
+                                    <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#F7AA1A]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
+                                )
+                            }
                             )
                         }
                         <SlidersHorizontal size={24} />
@@ -75,7 +97,7 @@ function Catalog(props: Props) {
                 </div>
                 <div className='flex items-center justify-center w-full mt-24px'>
                     <div>
-                        <Button href="#">Zobrazit další</Button>
+                        <Button {...button}>Zobrazit další</Button>
                     </div>
                 </div>
             </div>
