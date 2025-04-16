@@ -6,6 +6,7 @@ use App\Http\Resources\_Award;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_UserAward;
 use App\Models\Award;
+use App\Models\UserAward;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -57,5 +58,24 @@ class AwardController extends Controller
             'earnedAwardsCount' => count($userAwardIds),
             'totalAwardsCount' => $allAwards->count()
         ]);
+    }
+    public function claimBadge(Request $request, Award $award)
+    {
+
+        $userAward = UserAward::where('user_id', auth()->id())
+            ->where('award_id', $award->id)
+            ->first();
+
+
+        if (!$userAward || !$userAward->earned_at) {
+            return redirect()->back()->with('error', 'Tento odznak ještě nemůžeš nárokovat.');
+        }
+
+        $userAward->user_description = 'Gratulujeme! Získal jsi odznak ' . $award->name . '!';
+
+        $userAward->claimed_at = now();
+        $userAward->save();
+
+        return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');
     }
 }

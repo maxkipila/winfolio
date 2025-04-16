@@ -42,4 +42,12 @@ class Award extends Model
     {
         return $this->hasMany(UserAward::class);
     }
+    public function claim(User $user)
+    {
+        $this->user_id = $user->id;
+        $this->claimed_at = now();
+        $this->save();
+
+        return $this;
+    }
 }

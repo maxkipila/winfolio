@@ -14,6 +14,11 @@ class UserAward extends Model
     protected $casts = [
         'earned_at' => 'datetime',
         'notified' => 'boolean',
+        'claimed_at' => 'datetime',
+    ];
+    protected $dates = [
+        'earned_at',
+        'claimed_at'
     ];
 
     /**
@@ -30,5 +35,21 @@ class UserAward extends Model
     public function award()
     {
         return $this->belongsTo(Award::class);
+    }
+    public function isClaimed(): bool
+    {
+        return !is_null($this->claimed_at);
+    }
+    public function claim(User $user)
+    {
+
+        if ($this->claimed_at !== null) {
+            throw new \Exception('Badge has already been claimed');
+        }
+        $this->user_id = $user->id;
+        $this->claimed_at = now();
+        $this->save();
+
+        return $this;
     }
 }
