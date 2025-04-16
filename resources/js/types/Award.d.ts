@@ -15,4 +15,8 @@ interface Award {
     required_percentage: number;
     conditions: Array<AwardCondition>;
     category_name: string;
+    pivot?: {
+        claimed_at: string,
+        is_claimed: boolean
+    }
 }

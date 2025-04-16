@@ -6,6 +6,7 @@ import ReviewPostedModal from './ReviewPostedModal';
 import BuyPremiumModal from './BuyPremiumModal';
 import SuccessModal from './SuccessModal';
 import PortfolioModal from './PortfolioModal';
+import UnclaimedModal from './UnclaimedModal';
 
 interface Props { }
 
@@ -15,7 +16,8 @@ export enum MODALS {
     SUCCESS,
     REVIEW_POSTED,
     GET_PREMIUM,
-    PORTFOLIO
+    PORTFOLIO,
+    UNCLAIMED_AWARDS
 }
 
 export function ModalsProvider(props) {
@@ -92,6 +94,7 @@ function Modals(props: Props) {
             {(modal?.modal == MODALS.GET_PREMIUM) && <BuyPremiumModal  {...modal.data} />}
             {(modal?.modal == MODALS.REVIEW_POSTED) && <ReviewPostedModal  {...modal.data} />}
             {(modal?.modal == MODALS.PORTFOLIO) && <PortfolioModal  {...modal.data} />}
+            {(modal?.modal == MODALS.UNCLAIMED_AWARDS) && <UnclaimedModal  {...modal.data} />}
         </>
     )
 }

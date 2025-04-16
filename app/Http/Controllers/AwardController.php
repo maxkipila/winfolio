@@ -66,7 +66,6 @@ class AwardController extends Controller
             ->where('award_id', $award->id)
             ->first();
 
-
         if (!$userAward || !$userAward->earned_at) {
             return redirect()->back()->with('error', 'Tento odznak ještě nemůžeš nárokovat.');
         }

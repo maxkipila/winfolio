@@ -1,6 +1,8 @@
+import { ModalsContext } from '@/Components/contexts/ModalsContext'
+import { MODALS } from '@/Fragments/Modals'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Check, Medal, X } from '@phosphor-icons/react'
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 
 interface AwardCardProps extends Award {
 
@@ -9,13 +11,13 @@ interface AwardCardProps extends Award {
 function AwardCard(props: AwardCardProps) {
     const { category, category_id, earned, category_name, condition_type, conditions, created_at, description, id, name, product_id, required_count, required_percentage, required_value, updated_at, icon } = props
     return (
-        <div className={`${earned?"border-[#F7AA1A]":"border-black"} border-2 bg-[#F5F5F5] w-full min-h-[250px] flex flex-col items-center justify-center px-24px`}>
+        <div className={`${earned ? "border-[#F7AA1A]" : "border-black"} border-2 bg-[#F5F5F5] w-full min-h-[250px] flex flex-col items-center justify-center px-24px`}>
             <div className='w-40px h-40px bg-white rounded-full flex items-center justify-center mb-8px'>
                 {
-                    earned?
-                    <Check size={24} />
-                    :
-                    <X size={24} />
+                    earned ?
+                        <Check size={24} />
+                        :
+                        <X size={24} />
                 }
             </div>
             <div className='text-lg font-bold font-teko text-center'>{name}</div>
@@ -42,6 +44,14 @@ interface Props {
 
 function Award(props: Props) {
     const { awards, records } = props
+    let { open } = useContext(ModalsContext)
+    useEffect(() => {
+        let unclaimed = awards?.filter((a) => a?.pivot?.is_claimed == false)
+        if (unclaimed?.length > 0) {
+            open(MODALS.UNCLAIMED_AWARDS, false, { awards: unclaimed })
+        }
+    }, [])
+
 
     return (
         <AuthenticatedLayout>
