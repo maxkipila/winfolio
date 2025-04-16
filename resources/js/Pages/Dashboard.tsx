@@ -3,7 +3,7 @@ import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
 import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
 import { useState } from 'react';
 
@@ -105,9 +105,12 @@ interface DashBoardProps {
 }
 export default function Dashboard(props: DashBoardProps) {
 
-    const [products, button, meta, setItems] = useLazyLoad<Product>('products');
+    // const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const { portfolioValue } = props
+    let [topMovers, button] = useLazyLoad<{ product: Product }>('topMovers');
+    let [trendingProducts, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trendingProducts');
     // const [minifigs, button: _button, meta, setItems] = useLazyLoad<SetLego>('sets');
+    console.log('trendingProducts:', trendingProducts)
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
@@ -123,11 +126,16 @@ export default function Dashboard(props: DashBoardProps) {
                         </div>
                         <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
                             {
-                                products?.map((s) =>
-                                    <ProductCard {...s} />
+                                trendingProducts?.map((s) =>
+                                    <ProductCard {...s.product} />
                                 )
                             }
 
+                        </div>
+                        <div className='flex items-center justify-center w-full mt-24px'>
+                            <div>
+                                <Button {...trendButton}>Zobrazit další</Button>
+                            </div>
                         </div>
                     </div>
                     <div className='py-24px pl-24px mob:pl-0 w-full'>
@@ -137,19 +145,20 @@ export default function Dashboard(props: DashBoardProps) {
                         </div>
                         <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
                             {
-                                products?.map((s) =>
-                                    <ProductCard {...s} />
+                                topMovers?.map((s) =>
+                                    <ProductCard {...s.product} />
                                 )
                             }
+                        </div>
+                        <div className='flex items-center justify-center w-full mt-24px'>
+                            <div>
+                                <Button {...button}>Zobrazit další</Button>
+                            </div>
                         </div>
                     </div>
 
                 </div>
-                <div className='flex items-center justify-center w-full'>
-                    <div>
-                        <Button href="#">Zobrazit další</Button>
-                    </div>
-                </div>
+
                 <div className='p-24px border-t border-[#DEDFE5] mt-24px'>
                     <div className='font-bold text-xl'>Novinky a analýzy</div>
                     <div className='flex w-full gap-48px mt-12px mob:flex-col'>

@@ -6,6 +6,7 @@ use App\Http\Resources\_Favourite;
 use App\Http\Resources\_Minifig;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
+use App\Http\Resources\_Trend;
 use App\Http\Resources\_User;
 use App\Models\Favourite;
 use App\Models\Minifig;
@@ -39,51 +40,73 @@ class UserController extends Controller
         $user = auth()->user();
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
 
-        $trendingProducts = Cache::remember('trending_products', Carbon::now()->addHours(12), function () {
-            $trends = Trend::with(['product.latest_price', 'product.theme'])
-                ->where('type', 'trending')
-                ->where('calculated_at', Carbon::today())
-                ->orderBy('favorites_count', 'desc')
-                ->limit(8)
-                ->get();
+        $trends = Trend::with(['product.latest_price', 'product.theme'])
+            ->where('type', 'trending')
+            ->where('calculated_at', Carbon::today())
+            ->orderBy('favorites_count', 'desc')
+            ->limit(8)
+            ->get();
 
-            if ($trends->isEmpty()) {
-                return $this->trendService->calculateTrendingProducts();
-            }
+        if ($trends->isEmpty()) {
+            $this->trendService->calculateTrendingProducts();
+        }
 
-            return $trends;
-        });
+        $movers = Trend::with(['product.latest_price', 'product.theme'])
+            ->where('type', 'top_mover')
+            ->where('calculated_at', Carbon::today())
+            ->orderByRaw('ABS(weekly_growth) DESC')
+            ->limit(8)
+            ->get();
 
-        $topMovers = Cache::remember('top_movers', Carbon::now()->addHours(12), function () {
-            $movers = Trend::with(['product.latest_price', 'product.theme'])
-                ->where('type', 'top_mover')
-                ->where('calculated_at', Carbon::today())
-                ->orderByRaw('ABS(weekly_growth) DESC')
-                ->limit(8)
-                ->get();
+        if ($movers->isEmpty()) {
+            $this->trendService->calculateTopMovers();
+        }
 
-            if ($movers->isEmpty()) {
-                return $this->trendService->calculateTopMovers();
-            }
+        // $trendingProducts = Cache::remember('trending_products', Carbon::now()->addHours(12), function () {
+        //     $trends = Trend::with(['product.latest_price', 'product.theme'])
+        //         ->where('type', 'trending')
+        //         ->where('calculated_at', Carbon::today())
+        //         ->orderBy('favorites_count', 'desc')
+        //         ->limit(8)
+        //         ->get();
 
-            return $movers;
-        });
+        //     if ($trends->isEmpty()) {
+        //         return $this->trendService->calculateTrendingProducts();
+        //     }
 
-        $trendingData = collect($trendingProducts)->map(function ($trend) {
-            return [
-                'product' => new _Product($trend->product),
-                'weekly_growth' => $trend->weekly_growth,
-                'annual_growth' => $trend->annual_growth,
-            ];
-        });
+        //     return $trends;
+        // });
 
-        $topMoversData = collect($topMovers)->map(function ($trend) {
-            return [
-                'product' => new _Product($trend->product),
-                'weekly_growth' => $trend->weekly_growth,
-                'annual_growth' => $trend->annual_growth,
-            ];
-        });
+        // $topMovers = Cache::remember('top_movers', Carbon::now()->addHours(12), function () {
+        //     $movers = Trend::with(['product.latest_price', 'product.theme'])
+        //         ->where('type', 'top_mover')
+        //         ->where('calculated_at', Carbon::today())
+        //         ->orderByRaw('ABS(weekly_growth) DESC')
+        //         ->limit(8)
+        //         ->get();
+
+        //     if ($movers->isEmpty()) {
+        //         return $this->trendService->calculateTopMovers();
+        //     }
+
+        //     return $movers;
+        // });
+
+        // $trendingData = collect($trendingProducts)->map(function ($trend) {
+        //     return [
+        //         'product' => new _Product($trend->product),
+        //         'weekly_growth' => $trend->weekly_growth,
+        //         'annual_growth' => $trend->annual_growth,
+        //     ];
+        // });
+
+        // $topMoversData = collect($topMovers)->map(function ($trend) {
+        //     return [
+        //         'product' => new _Product($trend->product),
+        //         'weekly_growth' => $trend->weekly_growth,
+        //         'annual_growth' => $trend->annual_growth,
+        //     ];
+        // });
 
         $portfolioValue = $this->dashboardPortfolioValue();
 
@@ -117,10 +140,22 @@ class UserController extends Controller
             ];
         });
  */
+
+        $trending_products = _Trend::collection(Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'trending')
+            ->orderBy('favorites_count', 'desc')
+            ->paginate($request->paginate ?? 10));
+
+        $top_movers = _Trend::collection(Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'top_mover')
+            ->orderByRaw('ABS(weekly_growth) DESC')
+            ->paginate($request->paginate ?? 10));
+
+
         return Inertia::render('Dashboard', [
             'products' => $products,
-            'trendingProducts' => $trendingData,
-            'topMovers' => $topMoversData,
+            'trendingProducts' => $trending_products,
+            'topMovers' => $top_movers,
             'portfolioValue' => $portfolioValue,
             /*   'records' => $formattedRecords,
             'awards' => $userAwardsData, */
