@@ -31,6 +31,9 @@ class _UserAward extends JsonResource
                 'percentage' => $this->pivot->percentage,
                 'notified' => (bool) $this->pivot->notified,
                 'earned_at' => $this->pivot->earned_at,
+                'claimed_at' => $this->pivot->claimed_at,
+                'is_claimed' => !is_null($this->pivot->claimed_at),
+                'user_description' => $this->pivot->user_description,
             ];
         } elseif (isset($this->earned_at)) {
             $data['earned_at'] = $this->earned_at;

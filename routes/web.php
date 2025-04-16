@@ -83,6 +83,7 @@ Route::middleware('auth:web')->group(function () {
     })->name('catalog');
 
     Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
+    Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
         $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs']));
