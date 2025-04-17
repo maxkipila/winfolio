@@ -62,18 +62,13 @@ class AwardController extends Controller
     public function claimBadge(Request $request, Award $award)
     {
 
-        $userAward = UserAward::where('user_id', auth()->id())
+        UserAward::where('user_id', auth()->id())
             ->where('award_id', $award->id)
-            ->first();
-
-        if (!$userAward || !$userAward->earned_at) {
-            return redirect()->back()->with('error', 'Tento odznak ještě nemůžeš nárokovat.');
-        }
-
-        $userAward->user_description = 'Gratulujeme! Získal jsi odznak ' . $award->name . '!';
-
-        $userAward->claimed_at = now();
-        $userAward->save();
+            ->update([
+                'user_description' => 'Gratulujeme! Získal jsi odznak ' . $award->name . '!',
+                'claimed_at' => now(),
+                'updated_at' => now(),
+            ]);
 
         return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');
     }

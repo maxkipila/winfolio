@@ -76,6 +76,7 @@ class Product extends Model implements HasMedia
     }
 
     // Pro sety - získání minifigurek v setu
+    // V modelu Product
     public function minifigs()
     {
         return $this->belongsToMany(Product::class, 'set_minifigs', 'parent_id', 'minifig_id')
@@ -83,10 +84,9 @@ class Product extends Model implements HasMedia
             ->withTimestamps();
     }
 
-    // Pro minifigurky - získání setů, kde je minifigurka obsažena
     public function sets()
     {
-        return $this->belongsToMany(Product::class, 'set_minifigs', 'id', 'parent_id')
+        return $this->belongsToMany(Product::class, 'set_minifigs', 'minifig_id', 'parent_id')
             ->withPivot('quantity')
             ->withTimestamps();
     }

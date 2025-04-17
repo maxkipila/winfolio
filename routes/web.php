@@ -86,7 +86,7 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 
     Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
-        $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs']));
+        $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs', 'sets.theme']));
 
         $similar_products = _Product::collection(Product::where('theme_id', $product->theme->id ?? NULL)->inRandomOrder()->take(4)->get());
 
