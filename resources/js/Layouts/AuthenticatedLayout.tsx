@@ -2,7 +2,7 @@ import { ModalsContext } from '@/Components/contexts/ModalsContext'
 import Img from '@/Components/Image'
 import Modals, { MODALS } from '@/Fragments/Modals'
 import { Link, router } from '@inertiajs/react'
-import { BellSimple, Door, House, List, MagnifyingGlass, ShippingContainer, Sparkle, Star, User, X } from '@phosphor-icons/react'
+import { BellSimple, Door, House, List, MagnifyingGlass, Plus, ShippingContainer, Sparkle, Star, User, X } from '@phosphor-icons/react'
 import React, { ReactNode, useContext, useState } from 'react'
 
 
@@ -97,7 +97,10 @@ function AuthenticatedLayout(props: Props) {
                         </div>
                     </div>
                 </div>
-                <div className='mt-[72px] mob:pb-50px'>
+                <div className='mt-[72px] mob:pb-50px relative'>
+                    <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false) }} className='cursor-pointer fixed bottom-40px right-40px w-40px h-40px border border-black bg-[#F7AA1A] rounded-full flex items-center justify-center'>
+                        <Plus size={24} />
+                    </div>
                     {children}
 
                 </div>

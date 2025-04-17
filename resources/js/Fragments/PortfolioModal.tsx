@@ -52,28 +52,36 @@ function PortfolioModal(props: Props) {
     const { auth, search_products } = usePageProps<{ auth: { user: User }, search_products: Array<Product> }>();
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const form = useForm({
-        search_products: ''
+        search_products: '',
+        day: '',
+        month: '',
+        year: '',
+        price: 0,
+        status: '',
+        currency: ''
     });
-    const { data, post } = form;
+    const { data, post, reset, processing, progress } = form;
+
     function add_to_portfolio() {
         post(route('add_product_to_user', { product: selected?.id }), {
-            onSuccess: () => { setProducts((d) => [...d, { ...selected }]); setSelected(undefined); }
+            onSuccess: () => { setProducts((d) => [...d, { product: selected, purchase_date: `${data['day']}. ${data['month']}. ${data['year']}`, price: data['price'], status: data['status'], currency: data['currency'] }]); setSelected(undefined); reset(); }
         })
     }
     function remove_from_portfolio(my_product: Product) {
         post(route('remove_product_from_user', { product: my_product.id }), {
-            onSuccess: () => { setProducts(_contextProducts.filter((cp) => cp.id != my_product.id)); }
+            onSuccess: () => { setProducts(_contextProducts.filter((cp) => cp?.product?.id != my_product.id)); }
         })
     }
+    console.log('processing: ', processing)
     return (
         <div onClick={() => { close() }} className="bg-black bg-opacity-80 fixed top-0 left-0 w-full h-screen items-center justify-center mob:block mob:max-h-full flex z-max mob:pb-0">
             <div onClick={(e) => { e.stopPropagation(); }} className='bg-white border-2 border-black w-full h-full overflow-y-auto'>
-                <div className='flex items-end justify-end'>
+                {/* <div className='flex items-end justify-end'>
                     <div onClick={() => { close() }} className='w-40px h-40px bg-black flex items-center justify-center'>
                         <X color='white' size={24} />
                     </div>
-                </div>
-                <div className='py-48px'>
+                </div> */}
+                <div className=''>
                     {
                         (!createPortfolio && !hasProducts) ?
                             <>
@@ -101,7 +109,10 @@ function PortfolioModal(props: Props) {
                                     selected ?
 
                                         <div className='max-w-1/3 mx-auto grid'>
-                                            <div className='font-bold font-teko text-xl mb-24px'>Nová položka</div>
+                                            <div className='flex justify-between mt-48px'>
+                                                <div className='font-bold font-teko text-xl mb-24px'>Nová položka</div>
+                                                <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>Cancel</div>
+                                            </div>
                                             <ProductCard wide {...selected} />
                                             <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>Datum nákupu</div>
                                             <div className='flex gap-8px'>
@@ -247,13 +258,18 @@ function PortfolioModal(props: Props) {
                                             <ImageInput multiple imagePreview name="images" />
                                             <div className='flex justify-end items-center gap-24px'>
                                                 <div className='cursor-pointer font-bold font-teko' onClick={() => { add_to_portfolio() }}>Uložit a vytvořit další</div>
-                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); setDisplayModal(false); }}>Dokončit</Button>
+                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio(); setDisplayModal(false); close(); }}>Dokončit</Button>
                                             </div>
                                         </div>
 
                                         :
-                                        <div className='flex items-center'>
-                                            <div className='w-full'>
+                                        <div className='flex divide-x-2 divide-[#DEDFE5]'>
+                                            <div className='w-full mt-48px'>
+                                                <div className='flex gap-8px items-center mx-auto w-full justify-center mb-48px'>
+                                                    <div className='h-2px w-38px bg-[#666666]'></div>
+                                                    <div className='h-2px w-38px bg-[#999999]'></div>
+                                                    <div className='h-2px w-38px bg-[#999999]'></div>
+                                                </div>
                                                 <div className='max-w-1/3 mx-auto'>
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
                                                     <Search<Product>
@@ -273,10 +289,9 @@ function PortfolioModal(props: Props) {
                                                 </div>
                                                 <div className='flex justify-center items-center gap-12px mt-28px'>
                                                     <ArrowUpRight size={24} weight='bold' />
-                                                    <div className='font-bold font-teko text-xl'>Momentálně trendují</div>
+                                                    <div className='font-bold font-teko text-xl'>{data['search_products']?.length > 0 ? `Výsledky vyhledávání ${search_products?.length ?? 0}` : "Momentálně trendují"}</div>
                                                 </div>
                                                 {
-
                                                     <div className='grid grid-cols-2 gap-16px p-24px'>
                                                         {
                                                             search_products?.length > 0 ?
@@ -291,19 +306,33 @@ function PortfolioModal(props: Props) {
                                                         }
                                                     </div>
                                                 }
-                                                <div className='flex justify-center mt-24px'>
+                                                <div className='flex justify-center mt-24px mb-48px'>
                                                     <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); setDisplayModal(false); close(); }}>Dokončit</Button>
                                                 </div>
                                             </div>
                                             {
                                                 _contextProducts?.length > 0 &&
-                                                <div className='px-32px flex-shrink-0'>
-                                                    <div className='font-bold text-lg font-teko mb-24px text-center'>Seznam položek</div>
+                                                <div className='px-32px flex-shrink-0 sticky top-0'>
+                                                    <div className='font-bold text-lg font-teko mb-24px text-center mt-48px'>Seznam položek</div>
                                                     {
                                                         _contextProducts?.map((cp) =>
-                                                            <div className='grid'>
-                                                                <ProductCard wide {...cp} />
-                                                                <div onClick={() => { remove_from_portfolio(cp) }} className='font-nunito underline text-end cursor-pointer font-bold mt-12px'>Odstranit položku</div>
+                                                            <div className='grid mb-16px'>
+                                                                <PortfolioProductCard wide {...cp.product} />
+                                                                <div className='flex border-l-2 border-r-2 border-b-2 border-black p-16px justify-between'>
+                                                                    <div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Datum nákupu</div>
+                                                                        <div className='font-bold font-nunito'>{cp?.purchase_date}</div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Nákupní cena</div>
+                                                                        <div className='font-bold font-nunito'>{cp?.currency} {cp?.price}</div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Stav</div>
+                                                                        <div className='font-bold font-nunito'>{cp?.status}</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div onClick={() => { remove_from_portfolio(cp.product) }} className='font-nunito underline text-end cursor-pointer font-bold mt-12px'>Odstranit položku</div>
                                                             </div>
                                                         )
                                                     }

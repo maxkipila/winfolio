@@ -125,10 +125,10 @@ function Login(props: Props) {
                             <>
                                 <TextField name="first_name" placeholder={'Jméno'} />
                                 <TextField name="last_name" placeholder={'Příjmení'} />
-                                <TextField name="username" placeholder={'@username'} />
+                                <TextField name="nickname" placeholder={'@username'} />
                                 <div className='mt-24px'>Telefonní číslo</div>
                                 <div className='flex gap-8px'>
-                                    <Select name="prefix" options={[
+                                    <Select name="prefix" placeholder='Prefix' options={[
                                         { text: '+420', value: '+420' }
                                     ]} />
                                     <TextField name="phone" placeholder={'Telefon'} />

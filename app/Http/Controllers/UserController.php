@@ -177,9 +177,18 @@ class UserController extends Controller
     public function add_product_to_user(Request $request, Product $product)
     {
         $user = Auth::user();
-
-        // $user->products()->sync([$product->id => ['purchase_day' => $request->purchase_day]]);
-        $user->products()->sync([$product->id]);
+        $request->validate([
+            'day' => 'required',
+            'month' => 'required',
+            'year' => 'required',
+            'price' => 'required',
+            'currency' => 'required',
+            'status' => 'required',
+            
+        ]);
+        
+        $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
+        // $user->products()->sync([$product->id]);
         return back();
     }
 

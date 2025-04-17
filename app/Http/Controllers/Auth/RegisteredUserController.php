@@ -54,9 +54,21 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'email' => 'required|exists:users',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'nickname' => 'required',
+            'phone' => 'required',
+            'prefix' => 'required',
+            'day' => 'required',
+            'month' => 'required',
+            'year' => 'required',
+            'street' => 'required',
+            'city' => 'required',
+            'country' => 'required',
+            'postal_code' => 'required|min:5|max:5|numeric',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-        
+
         $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password),
