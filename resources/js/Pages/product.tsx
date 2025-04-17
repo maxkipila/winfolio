@@ -234,11 +234,11 @@ function Product(props: Props) {
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Theme</div>
-                            <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ?? "---"}</div>
+                            <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.parent?.name : (product?.theme?.name ?? "---")}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Subtheme</div>
-                            <div className='text-[#4D4D4D]'>{product?.theme?.name ?? "---"}</div>
+                            <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.name : "---"}</div>
                         </div>
                         <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
                             <div className='text-[#4D4D4D]'>Year</div>
