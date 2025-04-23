@@ -1,4 +1,5 @@
 import Img from '@/Components/Image'
+import { t } from '@/Components/Translator'
 import usePageProps from '@/hooks/usePageProps'
 import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, List, LockKey, UserCircle, X, XLogo } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
@@ -29,7 +30,7 @@ function ProfileLayout(props: Props) {
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <UserCircle size={24} />
                         </div>
-                        <div className='font-bold'>Upravit profil</div>
+                        <div className='font-bold'>{t('Upravit profil')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>
@@ -37,13 +38,13 @@ function ProfileLayout(props: Props) {
                     <div className='w-full bg-black font-bold text-center text-white text-lg'>CZ</div>
                     <div className='w-full bg-white font-bold text-center text-black text-lg'>ENG</div>
                 </div>
-                <div className='mt-40px text-xl font-bold'>Nové</div>
+                <div className='mt-40px text-xl font-bold'>{t('Nové')}</div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <LockKey size={24} />
                         </div>
-                        <div className='font-bold'>Zabezpečení</div>
+                        <div className='font-bold'>{t('Zabezpečení')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>
@@ -52,7 +53,7 @@ function ProfileLayout(props: Props) {
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <Basket size={24} />
                         </div>
-                        <div className='font-bold'>Obnovit nákupy</div>
+                        <div className='font-bold'>{t('Obnovit nákupy')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>
@@ -61,13 +62,13 @@ function ProfileLayout(props: Props) {
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <BellSimple size={24} />
                         </div>
-                        <div className='font-bold'>Notifikace</div>
+                        <div className='font-bold'>{t('Notifikace')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>
 
 
-                <div className='mt-40px text-xl font-bold'>Sociální sítě</div>
+                <div className='mt-40px text-xl font-bold'>{t('Sociální sítě')}</div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
@@ -97,13 +98,13 @@ function ProfileLayout(props: Props) {
                 </div>
 
 
-                <div className='mt-40px text-xl font-bold'>Podpora</div>
+                <div className='mt-40px text-xl font-bold'>{t('Podpora')}</div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <Lifebuoy size={24} />
                         </div>
-                        <div className='font-bold'>Získat pomoc </div>
+                        <div className='font-bold'>{t('Získat pomoc')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>
@@ -112,7 +113,7 @@ function ProfileLayout(props: Props) {
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <Files size={24} />
                         </div>
-                        <div className='font-bold'>VOP a GDPR</div>
+                        <div className='font-bold'>{t('VOP a GDPR')}</div>
                     </div>
                     <ArrowRight size={24} />
                 </div>

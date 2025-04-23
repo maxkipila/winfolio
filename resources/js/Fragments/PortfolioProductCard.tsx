@@ -1,5 +1,6 @@
 import { PortfolioContext } from '@/Components/contexts/PortfolioContext'
 import Img from '@/Components/Image'
+import { t } from '@/Components/Translator'
 import { Link } from '@inertiajs/react'
 import { ArrowUpRight } from '@phosphor-icons/react'
 import React, { useContext } from 'react'
@@ -27,22 +28,22 @@ function PortfolioProductCard(props: Props) {
             </div>
             <div className={`p-16px w-full grid ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>
                 <div>
-                    <div className='text-[#4D4D4D]'>Retail</div>
+                    <div className='text-[#4D4D4D]'>{t('Retail')}</div>
                     <div className='mt-6px font-bold'>$ {latest_price?.retail}</div>
                 </div>
                 <div>
-                    <div className='text-[#4D4D4D]'>Value</div>
+                    <div className='text-[#4D4D4D]'>{t('Value')}</div>
                     <div className='mt-6px font-bold'>$ {latest_price?.value}</div>
                 </div>
                 <div>
-                    <div className='text-[#4D4D4D]'>Growth</div>
+                    <div className='text-[#4D4D4D]'>{t('Growth')}</div>
                     <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center mt-6px'>
                         <ArrowUpRight color="white" />
                         <div className='text-white'>+4,1 %</div>
                     </div>
                 </div>
                 <div>
-                    <div className='text-[#4D4D4D]'>Annual</div>
+                    <div className='text-[#4D4D4D]'>{t('Annual')}</div>
                     <div className='mt-6px font-bold'>6,1 %</div>
                 </div>
             </div>

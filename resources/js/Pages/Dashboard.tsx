@@ -114,7 +114,7 @@ export default function Dashboard(props: DashBoardProps) {
     console.log('trendingProducts:', trendingProducts)
     return (
         <AuthenticatedLayout>
-            <Head title="Dashboard" />
+            <Head title="Dashboard | Winfolio" />
             <div className=''>
 
                 <CardsDesktop {...props} />

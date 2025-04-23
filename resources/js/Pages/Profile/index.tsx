@@ -1,3 +1,4 @@
+import { t } from '@/Components/Translator';
 import Form from '@/Fragments/forms/Form';
 import PasswordField from '@/Fragments/forms/inputs/PasswordField';
 import Select from '@/Fragments/forms/inputs/Select';
@@ -35,17 +36,17 @@ function Index(props: Props) {
         <AuthenticatedLayout>
             <ProfileLayout>
                 <div className='pt-24px flex flex-col'>
-                    <div className='text-center font-bold text-xl'>Upravit profil</div>
+                    <div className='text-center font-bold text-xl'>{t('Upravit profil')}</div>
                     <Form className='w-1/2 mob:w-full mob:px-24px mx-auto mt-32px flex flex-col gap-8px' form={form}>
-                        <TextField name="first_name" placeholder={'Jméno'} />
-                        <TextField name="last_name" placeholder={'Příjmení'} />
-                        <TextField name="username" placeholder={'@username'} />
-                        <div className='mt-24px'>Telefonní číslo</div>
+                        <TextField name="first_name" placeholder={t('Jméno')} />
+                        <TextField name="last_name" placeholder={t('Příjmení')} />
+                        <TextField name="username" placeholder={t('@username')} />
+                        <div className='mt-24px'>{t('Telefonní číslo')}</div>
                         <div className='flex gap-8px'>
                             <Select name="prefix" options={[
                                 { text: '+420', value: '+420' }
                             ]} />
-                            <TextField name="phone" placeholder={'Telefon'} />
+                            <TextField name="phone" placeholder={t('Telefon')} />
                         </div>
                         <div className='flex gap-8px'>
                             <Select name="day" placeholder='DD' options={[
@@ -169,20 +170,20 @@ function Index(props: Props) {
                             ]} />
 
                         </div>
-                        <TextField name="street" placeholder={'Ulice a č. popisné'} />
+                        <TextField name="street" placeholder={t('Ulice a č. popisné')} />
                         <div className='flex gap-8px'>
-                            <TextField name="postal_code" placeholder={'PSČ'} />
-                            <TextField name="city" placeholder={'Město'} />
+                            <TextField name="postal_code" placeholder={t('PSČ')} />
+                            <TextField name="city" placeholder={t('Město')} />
                         </div>
-                        <Select name="country" placeholder='Stát' options={[
+                        <Select name="country" placeholder={t('Stát')} options={[
                             { text: 'CZE', value: 'CZE' }
                         ]} />
                         <div className='mt-24px flex gap-8px'>
                             <Lock size={24} />
-                            <div>Zabezpečení</div>
+                            <div>{t('Zabezpečení')}</div>
                         </div>
-                        <PasswordField name="password" placeholder='Heslo' />
-                        <PasswordField name="password_confirm" placeholder='Heslo (znova)' />
+                        <PasswordField name="password" placeholder={t('Heslo')} />
+                        <PasswordField name="password_confirm" placeholder={t('Heslo (znova)')} />
                     </Form>
                 </div>
             </ProfileLayout>

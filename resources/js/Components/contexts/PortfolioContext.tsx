@@ -55,7 +55,9 @@ export default function PortfolioContextProvider(props: { children: any }) {
     }
 
     useEffect(() => {
-        getUser()
+        if(user == undefined){
+            getUser()
+        }
     }, [])
 
     useEffect(() => {

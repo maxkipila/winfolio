@@ -5,7 +5,7 @@ import PromotionalCard from '@/Fragments/PromotionalCard'
 import ReviewCard from '@/Fragments/ReviewCard'
 import { Button } from '@/Fragments/UI/Button'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { useForm } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosphor-icons/react'
 import axios from 'axios'
 import React, { useState } from 'react'
@@ -23,6 +23,7 @@ function Product(props: Props) {
 
     return (
         <AuthenticatedLayout>
+            <Head title={`${product?.name} | Winfolio`} />
             <div className='w-full pb-24px px-24px flex gap-20px pt-32px mob:flex-col'>
                 <div className='w-2/3 flex-shrink-0 mob:w-full'>
                     <div className='flex gap-24px mob:flex-col'>

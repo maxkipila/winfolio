@@ -1,5 +1,6 @@
 import Img from '@/Components/Image'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Head } from '@inertiajs/react'
 import React from 'react'
 
 interface Props { }
@@ -9,6 +10,7 @@ function Blog(props: Props) {
 
     return (
         <AuthenticatedLayout>
+            <Head title="Blog | Winfolio" />
             <div className='w-full'>
                 <div className='grid w-full h-40vh'>
                     <Img className='object-cover w-full h-40vh col-start-1 row-start-1' src="/assets/img/blog-guy.png" />

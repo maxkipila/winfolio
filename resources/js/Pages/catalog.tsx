@@ -1,3 +1,4 @@
+import { t } from '@/Components/Translator';
 import Form from '@/Fragments/forms/Form';
 import TextField from '@/Fragments/forms/inputs/TextField';
 import ProductCard from '@/Fragments/ProductCard';
@@ -5,7 +6,7 @@ import { Button } from '@/Fragments/UI/Button';
 import { useDebouncedCallback } from '@/hooks/useDebounceCallback';
 import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { MagnifyingGlass, SlidersHorizontal, SpinnerGap, TrendUp, X } from '@phosphor-icons/react';
 import React, { useEffect, useState } from 'react'
 
@@ -56,10 +57,10 @@ function Catalog(props: Props) {
 
     return (
         <AuthenticatedLayout>
-
+            <Head title="Catalog | Winfolio" />
             <div className='max-w-[920px] mx-auto pb-24px'>
                 <Form className='pt-32px mob:px-24px' form={form}>
-                    <TextField placeholder={"Vyhledat položku"} name="search" icon={<MagnifyingGlass size={24} />} />
+                    <TextField placeholder={t("Vyhledat položku")} name="search" icon={<MagnifyingGlass size={24} />} />
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
                     {
@@ -70,9 +71,9 @@ function Catalog(props: Props) {
                 </div>
                 <div className='mt-24px border-t-2 border-[#E6E6E6] pt-24px flex justify-between items-center mob:flex-col mob:gap-12px mob:items-start mob:px-24px'>
                     <div className='flex items-center gap-12px'>
-                        <div onClick={() => { setType(null) }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == null ? "text-white bg-black" : ""}`}>Vše</div>
-                        <div onClick={() => { setType('set') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "set" ? "text-white bg-black" : ""}`}>Sety</div>
-                        <div onClick={() => { setType('minifig') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "minifig" ? "text-white bg-black" : ""}`}>Minifigs</div>
+                        <div onClick={() => { setType(null) }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == null ? "text-white bg-black" : ""}`}>{t('Vše')}</div>
+                        <div onClick={() => { setType('set') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "set" ? "text-white bg-black" : ""}`}>{t('Sety')}</div>
+                        <div onClick={() => { setType('minifig') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "minifig" ? "text-white bg-black" : ""}`}>{t('Minifigs')}</div>
                     </div>
                     <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
                         {
@@ -97,7 +98,7 @@ function Catalog(props: Props) {
                 </div>
                 <div className='flex items-center justify-center w-full mt-24px'>
                     <div>
-                        <Button {...button}>Zobrazit další</Button>
+                        <Button {...button}>{t('Zobrazit další')}</Button>
                     </div>
                 </div>
             </div>

@@ -74,7 +74,7 @@ function Login(props: Props) {
     };
     return (
         <div className='flex items-center p-40px h-screen font-teko'>
-            <Head title="Login" />
+            <Head title="Login | Winfolio" />
             <div className='w-full h-full flex flex-col'>
                 <div className='flex items-center justify-center'>
                     <Link href={route('welcome')}><Img src="/assets/img/logo.png" /></Link>
