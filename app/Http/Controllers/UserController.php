@@ -16,6 +16,7 @@ use App\Models\Trend;
 use App\Services\TrendService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -39,6 +40,11 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+
+        // $locale = App::currentLocale();
+        // dd($locale);
+        // App::setLocale('cs');
+        
 
         $trends = Trend::with(['product.latest_price', 'product.theme'])
             ->where('type', 'trending')

@@ -14,6 +14,7 @@ import useLazyLoad from '@/hooks/useLazyLoad';
 import PortfolioProductCard from './PortfolioProductCard';
 import Select from './forms/inputs/Select';
 import ImageInput from './forms/inputs/ImageInput';
+import { t } from '@/Components/Translator';
 
 function SearchCard({ name, type, image, href }) {
     return (
@@ -98,7 +99,7 @@ function PortfolioModal(props: Props) {
                                     <TextCard />
                                 </div>
                                 <div className='flex items-center justify-center gap-12px max-w-[200px] mx-auto mt-40px'>
-                                    <div className='cursor-pointer' onClick={() => { setDisplayModal(false); close(); }}>Přeskočit</div>
+                                    <div className='cursor-pointer' onClick={() => { close(); }}>Přeskočit</div>
                                     <Button href="#" icon={<HandPointing size={24} weight='bold' />} onClick={(e) => { e.preventDefault(); setCreatePortfolio(true); }}>Vytvořit portfolio</Button>
                                 </div>
                             </>
@@ -241,7 +242,7 @@ function PortfolioModal(props: Props) {
                                             </div>
                                             <div className='flex gap-8px mt-8px'>
                                                 <TextField name="price" placeholder={"Nákupní cena"} label={"Nákupní cena"} />
-                                                <Select name="currency" placeholder='Měna' options={[
+                                                <Select name="currency" placeholder={t('currency')} options={[
                                                     { text: 'CZK', value: 'CZK' },
                                                     { text: 'EUR', value: 'EUR' },
                                                     { text: 'USD', value: 'USD' },
@@ -258,7 +259,7 @@ function PortfolioModal(props: Props) {
                                             <ImageInput multiple imagePreview name="images" />
                                             <div className='flex justify-end items-center gap-24px'>
                                                 <div className='cursor-pointer font-bold font-teko' onClick={() => { add_to_portfolio() }}>Uložit a vytvořit další</div>
-                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio(); setDisplayModal(false); close(); }}>Dokončit</Button>
+                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio(); close(); }}>Dokončit</Button>
                                             </div>
                                         </div>
 
@@ -307,7 +308,7 @@ function PortfolioModal(props: Props) {
                                                     </div>
                                                 }
                                                 <div className='flex justify-center mt-24px mb-48px'>
-                                                    <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); setDisplayModal(false); close(); }}>Dokončit</Button>
+                                                    <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>Dokončit</Button>
                                                 </div>
                                             </div>
                                             {

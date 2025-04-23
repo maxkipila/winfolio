@@ -1,5 +1,6 @@
 import { ModalsContext } from '@/Components/contexts/ModalsContext'
 import Img from '@/Components/Image'
+import { t } from '@/Components/Translator'
 import Modals, { MODALS } from '@/Fragments/Modals'
 import { Link, router } from '@inertiajs/react'
 import { BellSimple, Door, House, List, MagnifyingGlass, Plus, ShippingContainer, Sparkle, Star, User, X } from '@phosphor-icons/react'
@@ -40,10 +41,10 @@ function AuthenticatedLayout(props: Props) {
             <div className='relative'>
                 <div className={`nMob:hidden fixed top-[60px] left-0 w-full bg-white h-screen z-max transform duration-300  ${open ? "" : "-translate-x-full"}`}>
                     <div className='flex flex-col p-24px'>
-                        <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
-                        <MenuItem text="Catalogue" link={route('catalog')} active={route()?.current()?.includes('catalog')} />
-                        <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
-                        <MenuItem text="Awards" link='#' />
+                        <MenuItem text={t("Dashboard")} link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
+                        <MenuItem text={t("Catalogue")} link={route('catalog')} active={route()?.current()?.includes('catalog')} />
+                        <MenuItem text={t("Chest")} link={route('chest')} active={route()?.current()?.includes('chest')} />
+                        <MenuItem text={t("Awards")} link='#' />
                     </div>
                 </div>
                 <div className='nMob:hidden fixed bottom-0 left-0 flex w-full bg-white'>
@@ -82,10 +83,10 @@ function AuthenticatedLayout(props: Props) {
 
                     <div className='flex gap-48px mob:hidden'>
                         <div className='flex gap-24px'>
-                            <MenuItem text="Dashboard" link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
-                            <MenuItem text="Catalogue" link={route('catalog')} active={route()?.current()?.includes('catalog')} />
-                            <MenuItem text="Chest" link={route('chest')} active={route()?.current()?.includes('chest')} />
-                            <MenuItem text="Awards" link={route('awards')} active={route()?.current()?.includes('awards')} />
+                            <MenuItem text={t("Dashboard")} link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
+                            <MenuItem text={t("Catalogue")} link={route('catalog')} active={route()?.current()?.includes('catalog')} />
+                            <MenuItem text={t("Chest")} link={route('chest')} active={route()?.current()?.includes('chest')} />
+                            <MenuItem text={t("Awards")} link={route('awards')} active={route()?.current()?.includes('awards')} />
                         </div>
                         <div className='flex gap-16px items-center'>
                             <MagnifyingGlass size={24} />
