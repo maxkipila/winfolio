@@ -6,7 +6,7 @@ import TextField from '@/Fragments/forms/inputs/TextField';
 import usePageProps from '@/hooks/usePageProps';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import ProfileLayout from '@/Layouts/ProfileLayout'
-import { useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Lock } from '@phosphor-icons/react';
 import React from 'react'
 
@@ -35,6 +35,7 @@ function Index(props: Props) {
     return (
         <AuthenticatedLayout>
             <ProfileLayout>
+                <Head title="Profile | Winfolio" />
                 <div className='pt-24px flex flex-col'>
                     <div className='text-center font-bold text-xl'>{t('Upravit profil')}</div>
                     <Form className='w-1/2 mob:w-full mob:px-24px mx-auto mt-32px flex flex-col gap-8px' form={form}>

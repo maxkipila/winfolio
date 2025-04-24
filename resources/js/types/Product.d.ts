@@ -13,4 +13,6 @@ interface Product {
     theme?: Theme
     reviews?: Array<Review>
     favourited: boolean
+    sets?: Array<Product>
+    minifigs?: Array<Product>
 }

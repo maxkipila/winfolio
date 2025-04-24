@@ -88,6 +88,7 @@ function ReviewsModal(props: Props) {
     ratingValues?.map((v) => reviewValue += v)
     let colNumber = 0
     let invNumber = 0
+    let userReviewed = product?.reviews?.filter((r) => r?.user?.id == auth?.user?.id).length > 0
     product?.reviews?.map((re) => {
         if (re.role == "both") {
             colNumber += 1
@@ -205,74 +206,86 @@ function ReviewsModal(props: Props) {
 
                     </div>
                     <div className='w-full p-24px'>
-                        <div className='font-bold text-3xl whitespace-nowrap'>Submit Your Review</div>
-                        <div className='flex items-center gap-8px'>
-                            <div className='text-[#4D4D4D] font-nunito whitespace-nowrap'>Add Your Rating</div>
-                            <div className='flex gap-4px'>
-                                <div onClick={() => { setData('rating', 1) }} className='grid cursor-pointer'>
-                                    {
-                                        data['rating'] > 0 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+
+                        {
+                            userReviewed ?
+                                <div className='flex items-center justify-center'>
+                                    <div className='font-bold text-2xl'>{t('Tento produkt jste už recenzovali')}</div>
                                 </div>
-                                <div onClick={() => { setData('rating', 2) }} className='grid cursor-pointer'>
-                                    {
-                                        data['rating'] > 1 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
-                                </div>
-                                <div onClick={() => { setData('rating', 3) }} className='grid cursor-pointer'>
-                                    {
-                                        data['rating'] > 2 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
-                                </div>
-                                <div onClick={() => { setData('rating', 4) }} className='grid cursor-pointer'>
-                                    {
-                                        data['rating'] > 3 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
-                                </div>
-                                <div onClick={() => { setData('rating', 5) }} className='grid cursor-pointer'>
-                                    {
-                                        data['rating'] > 4 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
-                                    }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full flex mt-12px'>
-                            <div onClick={() => { setCollected(true); setData('role', 'collector') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
-                                Collected
-                            </div>
-                            <div onClick={() => { setCollected(false); setData('role', 'investor') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${!collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
-                                Invested in
-                            </div>
-                        </div>
-                        <Form form={form} className='mt-12px'>
-                            <TextArea label={'Write Your Review…'} placeholder='Write Your Review…' name="text" />
-                        </Form>
-                        <div className='max-w-[175px] mt-40px'>
-                            <Button onClick={(e) => { e.preventDefault(); submit() }} href="#" icon={<PaperPlaneTilt weight='bold' size={24} />}>Submit Reviews</Button>
-                        </div>
+                                :
+                                <>
+                                    <div className='font-bold text-3xl whitespace-nowrap'>Submit Your Review</div>
+                                    <div className='flex items-center gap-8px'>
+                                        <div className='text-[#4D4D4D] font-nunito whitespace-nowrap'>Add Your Rating</div>
+                                        <div className='flex gap-4px'>
+                                            <div onClick={() => { setData('rating', 1) }} className='grid cursor-pointer'>
+                                                {
+                                                    data['rating'] > 0 &&
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                }
+                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                            </div>
+                                            <div onClick={() => { setData('rating', 2) }} className='grid cursor-pointer'>
+                                                {
+                                                    data['rating'] > 1 &&
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                }
+                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                            </div>
+                                            <div onClick={() => { setData('rating', 3) }} className='grid cursor-pointer'>
+                                                {
+                                                    data['rating'] > 2 &&
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                }
+                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                            </div>
+                                            <div onClick={() => { setData('rating', 4) }} className='grid cursor-pointer'>
+                                                {
+                                                    data['rating'] > 3 &&
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                }
+                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                            </div>
+                                            <div onClick={() => { setData('rating', 5) }} className='grid cursor-pointer'>
+                                                {
+                                                    data['rating'] > 4 &&
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                }
+                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='w-full flex mt-12px'>
+                                        <div onClick={() => { setCollected(true); setData('role', 'collector') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
+                                            Collected
+                                        </div>
+                                        <div onClick={() => { setCollected(false); setData('role', 'investor') }} className={`cursor-pointer border-b-2 pb-12px font-bold text-lg w-full ${!collected ? "border-black" : "border-[#E6E6E6] text-[#E6E6E6]"}`}>
+                                            Invested in
+                                        </div>
+                                    </div>
+                                    <Form form={form} className='mt-12px'>
+                                        <TextArea label={'Write Your Review…'} placeholder='Write Your Review…' name="text" />
+                                    </Form>
+                                    <div className='max-w-[175px] mt-40px'>
+                                        <Button onClick={(e) => { e.preventDefault(); submit() }} href="#" icon={<PaperPlaneTilt weight='bold' size={24} />}>Submit Reviews</Button>
+                                    </div>
+                                </>
+                        }
+
+
                     </div>
                 </div>
                 <div className='p-24px border-t-2 border-black'>
                     <div className='font-bold text-3xl'>Customer Feedbacks</div>
                     {
                         product?.reviews?.length > 0 ?
-                        product?.reviews?.map((r) =>
-                            <ReviewLine {...r} />
-                        )
-                        :
-                        <div className='mx-auto w-full font-bold text-2xl text-center'>
-                            {t('Tento produkt nebyl zatím recenzován.')}
-                        </div>
+                            product?.reviews?.map((r) =>
+                                <ReviewLine {...r} />
+                            )
+                            :
+                            <div className='mx-auto w-full font-bold text-2xl text-center'>
+                                {t('Tento produkt nebyl zatím recenzován.')}
+                            </div>
                     }
                 </div>
             </div>
