@@ -17,6 +17,7 @@ Schedule::command('app:check-awards')->dailyAt('23:30')->timezone('Europe/Prague
 Schedule::command('app:update-user-records')->dailyAt('23:40')->timezone('Europe/Prague'); //aktualizace uzivatelskych recordu
 Schedule::command('import:lego-data')->dailyAt('23:50')->timezone('Europe/Prague'); //import dat
 Schedule::command('import:lego-images --skip-existing')->dailyAt('23:53')->timezone('Europe/Prague'); //import obrazku
+Schedule::command('prices:aggregate --all')->dailyAt('03:00')->timezone('Europe/Prague');
 
 Schedule::call(function () {
     $seeder = new PriceSeeder();
@@ -29,6 +30,5 @@ Schedule::call(function () {
     $seeder->weeklyPriceUpdate();
 })->weekly()->timezone('Europe/Prague');
 
-
 //predpocitavani trndu
-/* Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague'); */
+Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague');

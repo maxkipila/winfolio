@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Console\Commands\SeedUserProductHistory;
 use App\Models\Admin;
 use App\Models\Minifig;
 use App\Models\Price;
@@ -55,6 +56,9 @@ class DatabaseSeeder extends Seeder
         $this->call(ReviewSeeder::class);
         $this->call(NewsSeeder::class);
 
-        Artisan::call('import:lego-images');
+        Artisan::call('prices:aggregate');
+        $this->call(SeedUserProductHistory::class);
+
+        /* Artisan::call('import:lego-images'); */
     }
 }
