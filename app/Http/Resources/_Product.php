@@ -32,6 +32,9 @@ class _Product extends JsonResource
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,
+            'annual_growth' => $this->annual_growth,
+            'monthly_growth' => $this->monthly_growth,
+            'weekly_growth' => $this->weekly_growth,
             'favourited' => Auth::check() && get_class(Auth::user()) === User::class
                 ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists()
                 : false,

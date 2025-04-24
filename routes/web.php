@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AwardController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 Route::middleware('guest:web')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -50,15 +52,7 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/post-review', [ReviewController::class, 'submit_review'])->name('submit_review');
     Route::post('/favourite/{type}/{favouritable}', [UserController::class, 'toggleFavourite'])->name('favourites.toggle');
 
-    Route::match(['GET', 'POST'], '/chest', function () {
-        $user = Auth::user();
-
-
-        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
-        $user_products = _Product::collection($user->products->load('prices'));
-
-        return Inertia::render('chest', compact('products', 'user_products'));
-    })->name('chest');
+    Route::match(['GET', 'POST'], '/chest', [UserController::class, 'chest'])->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
     Route::match(['GET', 'POST'], '/catalog', function (Request $request) {
@@ -86,14 +80,16 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
     Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 
-    Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
+    Route::match(['GET', 'POST'], '/product/{product}', [ProductController::class, 'show'])->name('product.detail');
+
+    /*   Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
         $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs', 'sets.theme']));
 
         $similar_products = _Product::collection(Product::where('theme_id', $product->theme->id ?? NULL)->inRandomOrder()->take(4)->get());
 
         // dd($set);
         return Inertia::render('product', compact('product', 'similar_products'));
-    })->name('product.detail');
+    })->name('product.detail'); */
 
 
 
@@ -108,6 +104,9 @@ Route::middleware('auth:web')->group(function () {
 
 Route::post('/users/{user}/update-records', [RecordController::class, 'updateRecords'])
     ->name('users.update-records');
+
+Route::get('/products/{product}/price-history', [ProductController::class, 'getPriceHistory']);
+Route::get('/products/{product}/price-statistics', [ProductController::class, 'getPriceStatistics']);
 
 
 require __DIR__ . '/admin.php';

@@ -33,6 +33,14 @@ class Price extends Model
     {
         return $query->where('condition', $condition);
     }
+    public function scopeAggregated($query)
+    {
+        return $query->where('type', 'aggregated');
+    }
+    public function scopeIndividual($query)
+    {
+        return $query->where('type', '!=', 'aggregated');
+    }
 
     /**
      * Scope to find prices by currency
