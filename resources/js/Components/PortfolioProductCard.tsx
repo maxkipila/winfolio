@@ -1,25 +1,25 @@
 import Img from '@/Components/Image'
-import { t } from '@/Components/Translator'
 import { Link } from '@inertiajs/react'
 import { ArrowUpRight } from '@phosphor-icons/react'
 import React from 'react'
+import { t } from './Translator'
 
 interface Props extends Product {
     wide?: boolean,
 
 }
 
-function ProductCard(props: Props) {
+function PortfolioProductCard(props: Props) {
     const { wide = false, id, img_url, name, num_parts, product_num, theme_id, thumbnail, year, theme, latest_price } = props
 
     return (
-        <Link href={route('product.detail', { product: id })} className='border-2 border-black divide-y-2 divide-black'>
+        <div className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
                 <Img className='w-80px h-80px object-contain' src={img_url} />
-                <div className='w-full'>
-                    <div className='flex justify-between items-center w-full'>
+                <div>
+                    <div className='flex justify-between items-center'>
                         <div className='font-bold'>{name}</div>
-                        <div className='w-16px h-16px bg-[#46BD0F] rounded-full flex-shrink-0'></div>
+                        <div className='w-16px h-16px bg-[#46BD0F] rounded-full'></div>
                     </div>
                     <div className='mt-4px mb-8px'>{theme?.name ?? "---"}</div>
                     <div className='pt-8px border-t border-[#D0D4DB]'>{year}</div>
@@ -46,8 +46,8 @@ function ProductCard(props: Props) {
                     <div className='mt-6px font-bold'>6,1 %</div>
                 </div>
             </div>
-        </Link>
+        </div>
     )
 }
 
-export default ProductCard
+export default PortfolioProductCard

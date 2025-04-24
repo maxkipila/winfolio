@@ -4,6 +4,7 @@ import React, { useContext } from 'react'
 import { Button } from './UI/Button'
 import { router } from '@inertiajs/react'
 import { MODALS } from './Modals'
+import { t } from '@/Components/Translator'
 
 
 interface ClaimBadgeCardProps extends Award {
@@ -25,7 +26,7 @@ function ClaimBadgeCard(props: ClaimBadgeCardProps) {
             <div className='w-80px h-80px bg-black bg-opacity-35 rounded-full'></div>
             <div className='mt-16px font-bold text-xl'>{name}</div>
             <div className='font-nunito my-16px'>{description}</div>
-            <Button icon={<ShieldCheck size={24} />} onClick={(e) => { e.preventDefault(); claim(); }} href="#">Claim Badge</Button>
+            <Button icon={<ShieldCheck size={24} />} onClick={(e) => { e.preventDefault(); claim(); }} href="#">{t('Claim Badge')}</Button>
         </div>
     )
 }

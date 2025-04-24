@@ -16,6 +16,7 @@ use App\Models\Trend;
 use App\Services\TrendService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -39,6 +40,11 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+
+        // $locale = App::currentLocale();
+        // dd($locale);
+        // App::setLocale('cs');
+        
 
         $trends = Trend::with(['product.latest_price', 'product.theme'])
             ->where('type', 'trending')
@@ -263,9 +269,18 @@ class UserController extends Controller
     public function add_product_to_user(Request $request, Product $product)
     {
         $user = Auth::user();
-
-        // $user->products()->sync([$product->id => ['purchase_day' => $request->purchase_day]]);
-        $user->products()->sync([$product->id]);
+        $request->validate([
+            'day' => 'required',
+            'month' => 'required',
+            'year' => 'required',
+            'price' => 'required',
+            'currency' => 'required',
+            'status' => 'required',
+            
+        ]);
+        
+        $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
+        // $user->products()->sync([$product->id]);
         return back();
     }
 

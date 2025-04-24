@@ -3,6 +3,19 @@ import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import path from "path";
+import {exec} from 'node:child_process';
+
+
+function translationsHotReload() {
+    return {
+        name: 'translations-hot-reload',
+        handleHotUpdate({ file, server }) {
+            if (file.includes('/lang/') && file.endsWith('.php')) {
+                exec('php artisan translations:generate')
+            }
+        },
+    }
+}
 
 export default defineConfig(({ command, mode }) => {
 
@@ -51,7 +64,8 @@ export default defineConfig(({ command, mode }) => {
                         }
 
                 ]
-            })
+            }),
+            translationsHotReload()
         ],
         ssr: {
             noExternal: ['@inertiajs/server'],

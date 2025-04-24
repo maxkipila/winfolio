@@ -1,4 +1,5 @@
 import Img from '@/Components/Image'
+import { t } from '@/Components/Translator';
 import ChangingCarousel from '@/Fragments/ChangingCarousel';
 import Form from '@/Fragments/forms/Form'
 import Checkbox from '@/Fragments/forms/inputs/Checkbox';
@@ -49,7 +50,7 @@ function Login(props: Props) {
     }, [data["email"]])
 
     const login = (e) => {
-        post(route('login.account'), { preserveState: false });
+        post(route('login.account'));
     };
 
     const register = (e) => {
@@ -73,7 +74,7 @@ function Login(props: Props) {
     };
     return (
         <div className='flex items-center p-40px h-screen font-teko'>
-            <Head title="Login" />
+            <Head title="Login | Winfolio" />
             <div className='w-full h-full flex flex-col'>
                 <div className='flex items-center justify-center'>
                     <Link href={route('welcome')}><Img src="/assets/img/logo.png" /></Link>
@@ -82,20 +83,20 @@ function Login(props: Props) {
                     <Form className='w-full gap-12px flex-col flex' form={form}>
                         {
                             !emailConfirmed &&
-                            <div className='text-xl font-bold mb-16px text-center'>{inDB == null ? "Začněte zadáním e-mailu" : (preRegistered ? "Potvrďte e-mail zadáním kódu" : inDB == true ? "Přihlásit se" : "Začněte zadáním e-mailu")}</div>
+                            <div className='text-xl font-bold mb-16px text-center'>{inDB == null ? t("Začněte zadáním e-mailu") : (preRegistered ? t("Potvrďte e-mail zadáním kódu") : inDB == true ? t("Přihlásit se") : t("Začněte zadáním e-mailu"))}</div>
                         }
                         {
                             !preRegistered &&
-                            <TextField placeholder={'Váš e-mail'} className='w-full' name="email" />
+                            <TextField placeholder={t('Váš e-mail')} className='w-full' name="email" />
                         }
                         {
                             (inDB === true && !preRegistered) &&
                             <>
-                                <PasswordField label={'Heslo'} className='w-full' type='password' name="password" placeholder='Heslo' />
+                                <PasswordField label={t('Heslo')} className='w-full' type='password' name="password" placeholder={t('Heslo')} />
                                 <div className='flex gap-8px items-center justify-between w-full mb-32px'>
-                                    <Checkbox name="agree" label={"Zapamatuj si mě"} />
+                                    <Checkbox name="agree" label={t("Zapamatuj si mě")} />
                                 </div>
-                                <Button href="#" onClick={(e) => { e.preventDefault(); login(e) }}>Přihlásit se</Button>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); login(e) }}>{t('Přihlásit se')}</Button>
                             </>
                         }
                         {
@@ -109,7 +110,7 @@ function Login(props: Props) {
                                 </div> */}
                                 {/* <Toggle label={"Odebírat newsletter"} name="newsletter" /> */}
 
-                                <Button href="#" onClick={(e) => { e.preventDefault(); register(e) }}>Registrovat se</Button>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); register(e) }}>{t('Registrovat se')}</Button>
 
                             </>
                         }
@@ -117,21 +118,21 @@ function Login(props: Props) {
                             (preRegistered && !emailConfirmed) &&
                             <>
                                 <CodeField name="code" length={6} />
-                                <Button href="#" onClick={(e) => { e.preventDefault(); confirmEmail(e) }}>Potvrdit</Button>
+                                <Button href="#" onClick={(e) => { e.preventDefault(); confirmEmail(e) }}>{t('Potvrdit')}</Button>
                             </>
                         }
                         {
                             emailConfirmed &&
                             <>
-                                <TextField name="first_name" placeholder={'Jméno'} />
-                                <TextField name="last_name" placeholder={'Příjmení'} />
-                                <TextField name="username" placeholder={'@username'} />
-                                <div className='mt-24px'>Telefonní číslo</div>
+                                <TextField name="first_name" placeholder={t('Jméno')} />
+                                <TextField name="last_name" placeholder={t('Příjmení')} />
+                                <TextField name="nickname" placeholder={t('@username')} />
+                                <div className='mt-24px'>{t('Telefonní číslo')}</div>
                                 <div className='flex gap-8px'>
-                                    <Select name="prefix" options={[
+                                    <Select name="prefix" placeholder={t('Prefix')} options={[
                                         { text: '+420', value: '+420' }
                                     ]} />
-                                    <TextField name="phone" placeholder={'Telefon'} />
+                                    <TextField name="phone" placeholder={t('Telefon')} />
                                 </div>
                                 <div className='flex gap-8px'>
                                     <Select name="day" placeholder='DD' options={[
@@ -255,21 +256,21 @@ function Login(props: Props) {
                                     ]} />
 
                                 </div>
-                                <TextField name="street" placeholder={'Ulice a č. popisné'} />
+                                <TextField name="street" placeholder={t('Ulice a č. popisné')} />
                                 <div className='flex gap-8px'>
-                                    <TextField name="postal_code" placeholder={'PSČ'} />
-                                    <TextField name="city" placeholder={'Město'} />
+                                    <TextField name="postal_code" placeholder={t('PSČ')} />
+                                    <TextField name="city" placeholder={t('Město')} />
                                 </div>
-                                <Select name="country" placeholder='Stát' options={[
+                                <Select name="country" placeholder={t('Stát')} options={[
                                     { text: 'CZE', value: 'CZE' }
                                 ]} />
                                 <div className='mt-24px flex gap-8px'>
                                     <Lock size={24} />
-                                    <div>Zabezpečení</div>
+                                    <div>{t('Zabezpečení')}</div>
                                 </div>
-                                <PasswordField name="password" placeholder='Heslo' />
-                                <PasswordField name="password_confirmation" placeholder='Heslo (znova)' />
-                                <Button href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>Dokončit</Button>
+                                <PasswordField name="password" placeholder={t('Heslo')} />
+                                <PasswordField name="password_confirmation" placeholder={t('Heslo (znova)')} />
+                                <Button href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
                             </>
                         }
                     </Form>

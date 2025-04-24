@@ -40,6 +40,7 @@ Route::get('/', function () {
 
 
 Route::middleware('auth:web')->group(function () {
+    
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     /*  Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data'); */
     Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');

@@ -1,4 +1,5 @@
 import Img from '@/Components/Image'
+import { t } from '@/Components/Translator';
 import React, { useEffect, useRef, useState } from 'react'
 
 
@@ -8,9 +9,9 @@ interface Props { }
 function ChangingCarousel(props: Props) {
     const { } = props
     let slides = [
-        { src: '/assets/img/brick-placeholder.png', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: '/assets/img/heads-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: '/assets/img/orange-bricks-placeholder.jpg', headline: 'Vzácný Harry Potter', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/brick-placeholder.png', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/heads-placeholder.jpg', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/orange-bricks-placeholder.jpg', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
 
     ]
 

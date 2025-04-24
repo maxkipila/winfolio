@@ -19,7 +19,7 @@
         @inertiaHead
         @picturaHead
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased text-base">
         @inertia
     </body>
 </html>

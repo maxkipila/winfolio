@@ -1,14 +1,18 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { ModalsProvider } from './Fragments/Modals';
 import PortfolioContextProvider from './Components/contexts/PortfolioContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
+export let locale = 'en'
+router.on('navigate', (e)=>{
+    
+    locale = (e?.detail?.page?.props?.locale as string) ?? 'en'
+})
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>

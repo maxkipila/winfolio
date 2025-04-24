@@ -10,6 +10,7 @@ import moment from 'moment';
 import ReviewCard from './ReviewCard';
 import { MODALS } from './Modals';
 import usePageProps from '@/hooks/usePageProps';
+import { t } from '@/Components/Translator';
 
 interface ReviewLineProps extends Review {
 
@@ -165,41 +166,41 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>5</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${(five?.length / product?.reviews?.length) * 100}%` }} className={`h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${five?.length > 0 ? (five?.length / product?.reviews?.length) * 100 : 0}%` }} className={`h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((five?.length / product?.reviews?.length) * 100)}%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{five?.length > 0 ? Math.floor((five?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>4</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${(four?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${four?.length > 0 ? (four?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((four?.length / product?.reviews?.length) * 100)}%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{four?.length > 0 ? Math.floor((four?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>3</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${(three?.length / product?.reviews?.length) * 100}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${three?.length > 0 ? (three?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((three?.length / product?.reviews?.length) * 100)}%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{three?.length > 0 ? Math.floor((three?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>2</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${(two?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${two?.length > 0 ? (two?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor(two?.length / product?.reviews?.length) * 100}%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{two?.length > 0 ? Math.floor(two?.length / product?.reviews?.length) * 100 : 0}%</div>
                         </div>
                         <div className='flex items-center gap-16px mt-16px'>
                             <div className='font-nunito text-[#4D4D4D]'>1</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${(one?.length / product?.reviews?.length) * 100 }%`}} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${one?.length > 0 ? (one?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
                             </div>
-                            <div className='font-nunito text-[#4D4D4D]'>{Math.floor((one?.length / product?.reviews?.length) * 100)}%</div>
+                            <div className='font-nunito text-[#4D4D4D]'>{one?.length > 0 ? Math.floor((one?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
 
                     </div>
@@ -264,9 +265,14 @@ function ReviewsModal(props: Props) {
                 <div className='p-24px border-t-2 border-black'>
                     <div className='font-bold text-3xl'>Customer Feedbacks</div>
                     {
+                        product?.reviews?.length > 0 ?
                         product?.reviews?.map((r) =>
                             <ReviewLine {...r} />
                         )
+                        :
+                        <div className='mx-auto w-full font-bold text-2xl text-center'>
+                            {t('Tento produkt nebyl zatím recenzován.')}
+                        </div>
                     }
                 </div>
             </div>

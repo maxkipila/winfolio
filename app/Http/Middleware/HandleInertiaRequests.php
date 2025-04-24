@@ -91,6 +91,7 @@ class HandleInertiaRequests extends Middleware
                 ? $request->user()->awards()->wherePivot('notified', false)->get()
                 : [],
             'flash' => Session::get('flash'),
+            'locale' => App::getLocale()
             /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
             'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),
             'searchAllMinifigs' => Inertia::lazy($this->searchByModel(Minifig::class, 'name', _Minifig::class, $request->q ?? "")), */

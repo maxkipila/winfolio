@@ -1,4 +1,5 @@
 import { ModalsContext } from '@/Components/contexts/ModalsContext'
+import { t } from '@/Components/Translator'
 import usePageProps from '@/hooks/usePageProps'
 import { Link } from '@inertiajs/react'
 import { BellSimple, Medal } from '@phosphor-icons/react'
@@ -30,7 +31,7 @@ function NotifCard(props: NotificationCardProps) {
             </div>
 
             <div>
-                <div className='font-nunito font-bold'>Obdrželi jste nový record</div>
+                <div className='font-nunito font-bold'>{t('Obdrželi jste nový record')}</div>
                 <div className='font-nunito text-[#4D4D4D]'>{moment(created_at).format('DD. MM. YYYY')}</div>
             </div>
 
@@ -53,7 +54,7 @@ function NotificationsModal(props: Props) {
                     <div className='bg-[#ED2E1B] w-8px h-8px rounded-full absolute top-4px right-4px'></div>
                 </div>
                 <div onClick={(e) => { e.stopPropagation() }} className="bg-white p-24px max-w-sm mob:w-full border-2 border-black">
-                    <div className='font-bold text-xl'>Nové</div>
+                    <div className='font-bold text-xl'>{t('Nové')}</div>
                     <div className='flex flex-col gap-16px'>
                         {
                             notifications?.filter((no) => no.read_at == null).map((n) =>
@@ -61,7 +62,7 @@ function NotificationsModal(props: Props) {
                             )
                         }
                     </div>
-                    <div className='font-bold text-xl mt-40px'>Starší</div>
+                    <div className='font-bold text-xl mt-40px'>{t('Starší')}</div>
                     <div className='flex flex-col gap-16px'>
                         {
                             notifications?.filter((no) => no.read_at != null).map((n) =>
