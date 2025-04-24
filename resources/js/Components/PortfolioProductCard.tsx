@@ -10,7 +10,7 @@ interface Props extends Product {
 }
 
 function PortfolioProductCard(props: Props) {
-    const { wide = false, id, img_url, name, annual_growth, monthly_growth, weekly_growth num_parts, product_num, theme_id, thumbnail, year, theme, latest_price } = props
+    const { wide = false, id, img_url, name, annual_growth, monthly_growth, weekly_growth, num_parts, product_num, theme_id, thumbnail, year, theme, latest_price } = props
 
     return (
         <div className='border-2 border-black divide-y-2 divide-black'>
