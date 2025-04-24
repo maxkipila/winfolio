@@ -15,4 +15,7 @@ interface Product {
     favourited: boolean
     sets?: Array<Product>
     minifigs?: Array<Product>
+    annual_growth: number,
+    monthly_growth: number,
+    weekly_growth: number,
 }

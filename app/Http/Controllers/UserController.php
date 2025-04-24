@@ -39,12 +39,12 @@ class UserController extends Controller
     public function dashboard(Request $request)
     {
         $user = auth()->user();
-        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
+        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 4));
 
         // $locale = App::currentLocale();
         // dd($locale);
         // App::setLocale('cs');
-        
+
 
         $trends = Trend::with(['product.latest_price', 'product.theme'])
             ->where('type', 'trending')
@@ -197,7 +197,7 @@ class UserController extends Controller
                         ->orderByRaw('ABS(weekly_growth) DESC');
                 }
 
-                return $movers->paginate($request->paginate ?? 10);
+                return $movers->paginate($request->paginate ?? 4);
             })
         );
         /* $top_movers = _Trend::collection(Trend::with(['product.latest_price', 'product.theme', 'product'])
@@ -222,6 +222,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $range = $request->input('range', 'week');
+        // dd($request, $range);
         $fromDate = match ($range) {
             'week' => now()->subDays(7),
             'month' => now()->subMonth(),
@@ -238,7 +239,15 @@ class UserController extends Controller
             $product->weekly_growth = $this->trendService->getProductGrowth($product->id, 7);
             $product->monthly_growth = $this->trendService->getProductGrowth($product->id, 30);
         }
-        $history = $trendService->getPortfolioHistory($productIds, 'month', 12);
+        if ($request->range == 'week') {
+            $history = $trendService->getPortfolioHistory($productIds, 'day', 7);
+        } else if ($request->range == 'month') {
+            $history = $trendService->getPortfolioHistory($productIds, 'week', 4);
+        } else {
+            $history = $trendService->getPortfolioHistory($productIds, 'month', 12);
+        }
+
+
         $this->trendService->calculateTrendingProducts();
 
         $user_products = _Product::collection($user->products);
@@ -276,9 +285,9 @@ class UserController extends Controller
             'price' => 'required',
             'currency' => 'required',
             'status' => 'required',
-            
+
         ]);
-        
+
         $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
         // $user->products()->sync([$product->id]);
         return back();

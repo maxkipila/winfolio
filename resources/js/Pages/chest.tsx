@@ -1,6 +1,6 @@
 import ProductCard from '@/Fragments/ProductCard'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { ArrowUpRight, LegoSmiley } from '@phosphor-icons/react'
+import { ArrowDownRight, ArrowUpRight, LegoSmiley } from '@phosphor-icons/react'
 import React, { useContext, useState } from 'react'
 import {
     Chart as ChartJS,
@@ -22,7 +22,7 @@ import { Button } from '@/Fragments/UI/Button';
 import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import { MODALS } from '@/Fragments/Modals';
 import { t } from '@/Components/Translator';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -36,6 +36,14 @@ ChartJS.register(
 );
 interface Props {
     user_products: Array<Product>
+    range: string,
+    portfolioHistory: Array<{ date: string, value: number }>,
+    portfolioStats: {
+        current_value: number,
+        growth_percentage: number,
+        growth_value: number,
+        initial_value: number
+    }
 }
 
 
@@ -110,26 +118,28 @@ let options = {
 };
 
 function Chest(props: Props) {
-    const { user_products } = props
+    const { user_products, range, portfolioHistory, portfolioStats } = props
     let [portfolio, setPortfolio] = useState(true)
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let { open } = useContext(ModalsContext)
     let current_value = 0
-    let all_prices = user_products?.flatMap((up) => up.prices)
-    let price_values = all_prices?.flatMap((ap) => ap.value)
+    let all_prices = user_products?.flatMap((up) => up?.prices)
+    let price_values = all_prices?.flatMap((ap) => ap?.value)
     let current_prices = user_products?.flatMap((up) => up.latest_price?.value)
     current_prices?.map((cp) => current_value += parseInt(cp, 10))
-    let dates = all_prices?.flatMap((dt) => moment(dt.created_at, 'YYYY-MM-DD').format('D.'))
+    let dates = all_prices?.flatMap((dt) => moment(dt?.created_at, 'YYYY-MM-DD').format('D.'))
 
+    let historyDates = portfolioHistory.flatMap((pH) => pH.date)
+    let historyValues = portfolioHistory.flatMap((pH) => pH.value)
 
 
     const data = {
-        labels: dates,
+        labels: historyDates,
         datasets: [
             {
                 label: 'Profit',
-                data: price_values,
+                data: historyValues,
                 stack: 'Stack 1',
                 borderColor: '#16A049',
                 backgroundColor: '#46BD0F80',
@@ -152,19 +162,24 @@ function Chest(props: Props) {
                     <div className='flex items-center w-full justify-between'>
                         <div className='flex items-center'>
                             <div className='font-bold text-4xl'>$</div>
-                            <div className='font-bold text-6xl'>{current_value}</div>
+                            <div className='font-bold text-6xl'>{portfolioStats.current_value}</div>
                             {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                         </div>
-                        {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
-                            <ArrowUpRight color="white" />
-                            <div className='text-white'>+4,1 %</div>
-                        </div> */}
+                        <div className={`${portfolioStats?.growth_percentage >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
+                            {
+                                portfolioStats?.growth_percentage >= 0 ?
+                                    <ArrowUpRight color="white" />
+                                    :
+                                    <ArrowDownRight color="white" />
+                            }
+                            <div className='text-white'>{Math.floor(portfolioStats.growth_percentage)} %</div>
+                        </div>
                     </div>
                     <div className='w-full flex items-center justify-end'>
                         <div className='border-2 border-black'>
-                            <div className='font-bold text-lg text-center px-24px py-4px bg-[#F7AA1A] '>{t('Tento týden')}</div>
-                            <div className='font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black mob:hidden'>{t('Tento měsíc')}</div>
-                            <div className='font-bold text-lg text-center px-24px py-4px mob:hidden'>{t('Tento rok')}</div>
+                            <div onClick={() => { router.post(route('chest', { range: 'week' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "week" ? " bg-[#F7AA1A] " : " "}`}>{t('Tento týden')}</div>
+                            <div onClick={() => { router.post(route('chest', { range: 'month' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black ${range == "month" ? " bg-[#F7AA1A] " : " "}`}>{t('Tento měsíc')}</div>
+                            <div onClick={() => { router.post(route('chest', { range: 'year' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "year" ? " bg-[#F7AA1A] " : ""} `}>{t('Tento rok')}</div>
                         </div>
                     </div>
                 </div>
@@ -182,10 +197,10 @@ function Chest(props: Props) {
                     portfolio ?
                         <>
                             {
-                                auth?.user?.products?.length > 0 ?
+                                user_products?.length > 0 ?
                                     <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
                                         {
-                                            auth?.user?.products?.map((s) =>
+                                            user_products?.map((s) =>
                                                 <ProductCard wide {...s} />
                                             )
                                         }

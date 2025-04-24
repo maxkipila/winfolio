@@ -47,7 +47,7 @@ function AuthenticatedLayout(props: Props) {
                         <MenuItem text={t("Awards")} link='#' />
                     </div>
                 </div>
-                <div className='nMob:hidden fixed bottom-0 left-0 flex w-full bg-white'>
+                <div className='nMob:hidden fixed bottom-0 left-0 flex w-full bg-white z-max'>
                     <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('dashboard') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
                         <House size={24} />
                     </Link>
@@ -61,7 +61,7 @@ function AuthenticatedLayout(props: Props) {
                         <Star size={24} />
                     </Link>
                 </div>
-                <div className='flex fixed top-0 justify-between items-center px-24px mob:py-16px w-full border-b z-50  border-[#E6E6E6] bg-white'>
+                <div className='flex fixed top-0 justify-between items-center px-24px mob:py-16px w-full border-b z-50  border-[#E6E6E6] bg-white z-max'>
                     <div className='flex items-center gap-24px mob:hidden'>
 
                         <Img src="/assets/img/logo.png" />
@@ -81,14 +81,14 @@ function AuthenticatedLayout(props: Props) {
                         </div>
                     </div>
 
-                    <div className='flex gap-48px mob:hidden'>
+                    <div className='flex gap-48px mob:hidden '>
                         <div className='flex gap-24px'>
                             <MenuItem text={t("Dashboard")} link={route('dashboard')} active={route()?.current()?.includes('dashboard')} />
                             <MenuItem text={t("Catalogue")} link={route('catalog')} active={route()?.current()?.includes('catalog')} />
                             <MenuItem text={t("Chest")} link={route('chest')} active={route()?.current()?.includes('chest')} />
                             <MenuItem text={t("Awards")} link={route('awards')} active={route()?.current()?.includes('awards')} />
                         </div>
-                        <div className='flex gap-16px items-center'>
+                        <div className='flex gap-16px items-center z-max bg-white'>
                             <MagnifyingGlass size={24} />
                             <BellSimple className='cursor-pointer' onClick={() => { _OpenModal(MODALS.NOTIFICATION); }} size={24} />
                             <Door className='cursor-pointer' onClick={() => { logout() }} size={24} />
@@ -99,9 +99,13 @@ function AuthenticatedLayout(props: Props) {
                     </div>
                 </div>
                 <div className='mt-[72px] mob:pb-50px relative'>
-                    <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false) }} className='cursor-pointer fixed bottom-40px right-40px w-40px h-40px border border-black bg-[#F7AA1A] rounded-full flex items-center justify-center'>
-                        <Plus size={24} />
-                    </div>
+                    {
+                        route()?.current()?.includes('chest') &&
+                        <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false) }} className='cursor-pointer fixed bottom-64px right-40px w-40px h-40px border border-black bg-[#F7AA1A] rounded-full flex items-center justify-center'>
+                            <Plus size={24} />
+                        </div>
+                    }
+
                     {children}
 
                 </div>

@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Services\TrendService;
+use App\Traits\HasTrends;
 use App\Traits\isNullable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class _Product extends JsonResource
 {
-    use isNullable;
+    use isNullable, HasTrends;
     /**
      * Transform the resource into an array.
      *
@@ -32,9 +34,11 @@ class _Product extends JsonResource
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,
-            'annual_growth' => $this->annual_growth,
-            'monthly_growth' => $this->monthly_growth,
-            'weekly_growth' => $this->weekly_growth,
+
+            'annual_growth' => $this->getProductGrowth($this->id, 365),
+            'monthly_growth' => $this->getProductGrowth($this->id, 30),
+            'weekly_growth' => $this->getProductGrowth($this->id, 7),
+
             'favourited' => Auth::check() && get_class(Auth::user()) === User::class
                 ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists()
                 : false,
