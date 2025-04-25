@@ -115,7 +115,8 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        $range = $request->input('range', 'week');
+        $range = $request->input('range', 'year');
+        // dd($request, $range);
         $fromDate = match ($range) {
             'week' => now()->subDays(7),
             'month' => now()->subMonth(),

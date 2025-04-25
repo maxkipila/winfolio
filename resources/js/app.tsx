@@ -14,7 +14,7 @@ router.on('navigate', (e)=>{
     locale = (e?.detail?.page?.props?.locale as string) ?? 'en'
 })
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => `${title}`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.tsx`,

@@ -1,5 +1,8 @@
+import { ModalsContext } from '@/Components/contexts/ModalsContext'
+import { PortfolioContext } from '@/Components/contexts/PortfolioContext'
 import Img from '@/Components/Image'
 import { t } from '@/Components/Translator'
+import { MODALS } from '@/Fragments/Modals'
 import PointsGraph from '@/Fragments/PointsGraph'
 import ProductCard from '@/Fragments/ProductCard'
 import PromotionalCard from '@/Fragments/PromotionalCard'
@@ -9,18 +12,20 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question } from '@phosphor-icons/react'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 interface Props {
     product: Product
-    similar_products?: Array<Product>
+    similiar_products?: Array<Product>
 }
 
 function Product(props: Props) {
-    const { product, similar_products } = props
+    const { product, similiar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
     const form = useForm({});
     const { data, post } = form;
+    let { open } = useContext(ModalsContext)
+    let { setSelected } = useContext(PortfolioContext)
 
     return (
         <AuthenticatedLayout>
@@ -104,7 +109,7 @@ function Product(props: Props) {
 
                     </div>
                     <PointsGraph />
-                    <div className='mt-32px border-2 border-black p-32px'>
+                    {/* <div className='mt-32px border-2 border-black p-32px'>
                         <div className='font-bold text-xl w-full pb-16px border-b border-black'>{t('Set Predictions')}</div>
                         <div className='mt-16px font-bold text-lg'>{t('New/Sealed')}</div>
                         <div className='mt-16px'>
@@ -151,7 +156,7 @@ function Product(props: Props) {
                             </div>
                             <div className='mt-16px text-[#4D4D4D] font-semibold font-nunito'>6508941 Faunas’s House is projected to be valued between $32 - $33 within five years.</div>
                         </div>
-                    </div>
+                    </div> */}
                     <div className='mt-40px font-bold text-xl'>{t('Claim')}</div>
                     <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
 
@@ -216,8 +221,8 @@ function Product(props: Props) {
                         {/* <ProductCard wide />
                         <ProductCard wide /> */}
                         {
-                            similar_products?.length > 0 ?
-                                similar_products?.map((sp) =>
+                            similiar_products?.length > 0 ?
+                                similiar_products?.map((sp) =>
                                     <ProductCard wide {...sp} />
                                 )
                                 :
@@ -296,7 +301,7 @@ function Product(props: Props) {
                             <div className='text-[#4D4D4D]'>1</div>
                         </div> */}
                         <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{t('Availible at retail')}</div>
-                        <Button href={"#"} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
+                        <Button href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
                     </div>
                     <div className='mt-32px border-2 border-black p-32px'>
                         <div className='font-bold font-teko'>{t('Set Facts')}</div>

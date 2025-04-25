@@ -1,6 +1,8 @@
 import Img from '@/Components/Image'
 import { t } from '@/Components/Translator'
+import { Button } from '@/Fragments/UI/Button'
 import usePageProps from '@/hooks/usePageProps'
+import { router } from '@inertiajs/react'
 import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, List, LockKey, UserCircle, X, XLogo } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
 
@@ -12,6 +14,11 @@ function ProfileLayout(props: Props) {
     const { children } = props
     let [open, setOpen] = useState(false)
     const { auth } = usePageProps<{ auth: { user: User } }>();
+    function logout() {
+            console.log('logout')
+            /* router.post(route('logout.account')) */
+            router.post(route('logout.user.account'))
+        }
     return (
         <div className='nMob:flex mob:relative'>
             <div className={`flex-shrink-0 p-24px mob:py-12px nMob:border-r nMob:border-[#E6E6E6] min-h-screen-no-header mob:fixed mob:top-[60px] mob:z-50 mob:bg-white mob:overflow-y-scroll mob:h-screen-no-header mob:w-full mob:transform mob:duration-300 ${open ? "" : "mob:-translate-x-full"}`}>
@@ -108,7 +115,7 @@ function ProfileLayout(props: Props) {
                     </div>
                     <ArrowRight size={24} />
                 </div>
-                <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                <div className='w-full mb-24px bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <Files size={24} />
@@ -117,6 +124,7 @@ function ProfileLayout(props: Props) {
                     </div>
                     <ArrowRight size={24} />
                 </div>
+                <Button onClick={(e)=>{e.preventDefault(); logout();}} href="#">Odhlásit se</Button>
             </div>
             <div className='w-full'>
                 <div className='flex justify-start px-24px nMob:hidden'>
