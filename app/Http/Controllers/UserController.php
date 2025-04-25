@@ -88,7 +88,6 @@ class UserController extends Controller
             $topMoversQuery->paginate($request->paginate ?? 4)
         );
 
-        // Zbytek funkce zůstává stejný...
         $portfolioValue = $this->dashboardPortfolioValue();
 
         $portfolioStats = null;
@@ -125,15 +124,22 @@ class UserController extends Controller
         };
 
         $productIds = $user->products()->pluck('product_id')->toArray();
+
+        // Nejprve načti všechny produkty s jejich cenami
+        $user->load('products.latest_price');
+
+        // Vypočítej přesnou hodnotu portfolia z latest_price
+        $portfolioValue = $user->products->sum(function ($product) {
+            return $product->latest_price ? $product->latest_price->value : 0;
+        });
+
         $portfolioStats = $trendService->calculateGrowth($productIds, $fromDate);
 
+        // Přepiš hodnotu v portfolioStats hodnotou, kterou jsi právě vypočítal
+        if (isset($portfolioStats['total'])) {
+            $portfolioStats['total']['current_value'] = $portfolioValue;
+        }
 
-        $user->load('products.prices');
-        /*  foreach ($user->products as $product) {
-            $product->annual_growth = $this->trendService->getProductGrowth($product->id, 365);
-            $product->weekly_growth = $this->trendService->getProductGrowth($product->id, 7);
-            $product->monthly_growth = $this->trendService->getProductGrowth($product->id, 30);
-        } */
         if ($request->range == 'week') {
             $history = $trendService->getPortfolioHistory($productIds, 'day', 7);
         } else if ($request->range == 'month') {
@@ -141,7 +147,6 @@ class UserController extends Controller
         } else {
             $history = $trendService->getPortfolioHistory($productIds, 'month', 12);
         }
-
 
         $this->trendService->calculateTrendingProducts();
 
@@ -153,6 +158,7 @@ class UserController extends Controller
             'user_products' => $user_products,
             'portfolioStats' => $portfolioStats['total'],
             'portfolioProducts' => $portfolioStats['products'],
+            'portfolioValue' => $portfolioValue,
             'range' => $range,
             'fromDate' => $fromDate->toDateString(),
             'portfolioHistory' => $history
