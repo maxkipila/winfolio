@@ -18,4 +18,10 @@ interface Product {
     annual_growth: number,
     monthly_growth: number,
     weekly_growth: number,
+    growth: {
+        weekly: number,
+        monthly: number,
+        yearly: number,
+        annual: number
+    }
 }

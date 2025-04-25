@@ -93,7 +93,7 @@ function PortfolioModal(props: Props) {
                             <>
                                 <div className='mx-auto max-w-1/3 flex flex-col items-center justify-center'>
                                     <Img className='w-[84px] h-[84px]' src="/assets/img/user.png" />
-                                    <div className='py-16px'>Vítej ve Winfolio</div>
+                                    <div className='py-16px'>{t('Vítej ve Winfolio')}</div>
                                     <div className='font-bold text-6xl'>{auth?.user?.first_name}!</div>
                                 </div>
                                 <div className='flex gap-32px overflow-x-auto mt-32px'>
@@ -104,8 +104,8 @@ function PortfolioModal(props: Props) {
                                     <TextCard />
                                 </div>
                                 <div className='flex items-center justify-center gap-12px max-w-[200px] mx-auto mt-40px'>
-                                    <div className='cursor-pointer' onClick={() => { close(); }}>Přeskočit</div>
-                                    <Button href="#" icon={<HandPointing size={24} weight='bold' />} onClick={(e) => { e.preventDefault(); setCreatePortfolio(true); }}>Vytvořit portfolio</Button>
+                                    <div className='cursor-pointer' onClick={() => { close(); }}>{t('Přeskočit')}</div>
+                                    <Button href="#" icon={<HandPointing size={24} weight='bold' />} onClick={(e) => { e.preventDefault(); setCreatePortfolio(true); }}>{t('Vytvořit portfolio')}</Button>
                                 </div>
                             </>
                             :
@@ -116,11 +116,11 @@ function PortfolioModal(props: Props) {
 
                                         <div className='max-w-1/3 mx-auto grid'>
                                             <div className='flex justify-between mt-48px'>
-                                                <div className='font-bold font-teko text-xl mb-24px'>Nová položka</div>
-                                                <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>Cancel</div>
+                                                <div className='font-bold font-teko text-xl mb-24px'>{t('Nová položka')}</div>
+                                                <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>{t('Cancel')}</div>
                                             </div>
                                             <ProductCard wide {...selected} />
-                                            <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>Datum nákupu</div>
+                                            <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>{t('Datum nákupu')}</div>
                                             <div className='flex gap-8px'>
                                                 <Select name="day" placeholder='DD' options={[
                                                     { text: '01', value: '1' },
@@ -260,11 +260,11 @@ function PortfolioModal(props: Props) {
                                                     { text: 'Použitý', value: 'used' },
                                                 ]} />
                                             </div>
-                                            <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>Nahrát fotografie</div>
+                                            <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>{t('Nahrát fotografie')}</div>
                                             <ImageInput multiple imagePreview name="images" />
                                             <div className='flex justify-end items-center gap-24px'>
-                                                <div className='cursor-pointer font-bold font-teko' onClick={() => { add_to_portfolio() }}>Uložit a vytvořit další</div>
-                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio_and_close(); }}>Dokončit</Button>
+                                                <div className='cursor-pointer font-bold font-teko' onClick={() => { add_to_portfolio() }}>{t('Uložit a vytvořit další')}</div>
+                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio_and_close(); }}>{t('Dokončit')}</Button>
                                             </div>
                                         </div>
 
@@ -293,56 +293,63 @@ function PortfolioModal(props: Props) {
                                                         })}
                                                     />
                                                 </div>
-                                                <div className='flex justify-center items-center gap-12px mt-28px'>
-                                                    <ArrowUpRight size={24} weight='bold' />
-                                                    <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length: ''}`}</div>
-                                                </div>
+                                                
                                                 {
-                                                    search_products?.length > 0 ?
-                                                    <div className='grid grid-cols-2 gap-16px p-24px'>
+                                                    data['q']?.length > 0 &&
+                                                    <>
                                                         {
                                                             search_products?.length > 0 ?
-                                                                search_products?.map((sp) =>
-                                                                    <PortfolioProductCard wide {...sp} />
-                                                                )
+                                                                <>
+                                                                    <div className='flex justify-center items-center gap-12px mt-28px'>
+                                                                        <ArrowUpRight size={24} weight='bold' />
+                                                                        <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length : ''}`}</div>
+                                                                    </div>
+                                                                    <div className='grid grid-cols-2 gap-16px p-24px'>
+                                                                        {
+                                                                            search_products?.length > 0 ?
+                                                                                search_products?.map((sp) =>
+                                                                                    <PortfolioProductCard wide {...sp} />
+                                                                                )
+                                                                                :
+                                                                                products?.map((sp) =>
+                                                                                    <PortfolioProductCard wide {...sp} />
+                                                                                )
+
+                                                                        }
+                                                                    </div>
+                                                                </>
                                                                 :
-                                                                products?.map((sp) =>
-                                                                    <PortfolioProductCard wide {...sp} />
-                                                                )
-
+                                                                <div className='font-bold text-3xl text-center py-40px'>{t('Pro vaše vyhledávání nejsou výsledky, nebo jste zatím nic nevyhledali')}</div>
                                                         }
-                                                    </div>
-                                                    :
-                                                    <div className='font-bold text-3xl text-center py-40px'>{t('Pro vaše vyhledávání nejsou výsledky, nebo jste zatím nic nevyhledali')}</div>
-
+                                                    </>
                                                 }
                                                 <div className='flex justify-center mt-24px mb-48px'>
-                                                    <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>Dokončit</Button>
+                                                    <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>{t('Dokončit')}</Button>
                                                 </div>
                                             </div>
                                             {
                                                 _contextProducts?.length > 0 &&
                                                 <div className='px-32px flex-shrink-0 sticky top-0'>
-                                                    <div className='font-bold text-lg font-teko mb-24px text-center mt-48px'>Seznam položek</div>
+                                                    <div className='font-bold text-lg font-teko mb-24px text-center mt-48px'>{t('Seznam položek')}</div>
                                                     {
                                                         _contextProducts?.map((cp) =>
                                                             <div className='grid mb-16px'>
                                                                 <PortfolioProductCard wide {...cp.product} />
                                                                 <div className='flex border-l-2 border-r-2 border-b-2 border-black p-16px justify-between'>
                                                                     <div>
-                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Datum nákupu</div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>{t("Datum nákupu")}</div>
                                                                         <div className='font-bold font-nunito'>{cp?.purchase_date}</div>
                                                                     </div>
                                                                     <div>
-                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Nákupní cena</div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>{t('Nákupní cena')}</div>
                                                                         <div className='font-bold font-nunito'>{cp?.currency} {cp?.price}</div>
                                                                     </div>
                                                                     <div>
-                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>Stav</div>
+                                                                        <div className='font-nunito font-medium text-[#4D4D4D]'>{t('Stav')}</div>
                                                                         <div className='font-bold font-nunito'>{cp?.status}</div>
                                                                     </div>
                                                                 </div>
-                                                                <div onClick={() => { remove_from_portfolio(cp.product) }} className='font-nunito underline text-end cursor-pointer font-bold mt-12px'>Odstranit položku</div>
+                                                                <div onClick={() => { remove_from_portfolio(cp.product) }} className='font-nunito underline text-end cursor-pointer font-bold mt-12px'>{t('Odstranit položku')}</div>
                                                             </div>
                                                         )
                                                     }

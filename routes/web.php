@@ -68,7 +68,7 @@ Route::middleware('auth:web')->group(function () {
 
 
 
-        $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 10));
+        $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 100));
         // dd($themes);
         return Inertia::render('catalog', compact('products', 'themes'));
     })->name('catalog');

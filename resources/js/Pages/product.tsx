@@ -16,11 +16,11 @@ import React, { useContext, useState } from 'react'
 
 interface Props {
     product: Product
-    similar_products?: Array<Product>
+    similiar_products?: Array<Product>
 }
 
 function Product(props: Props) {
-    const { product, similar_products } = props
+    const { product, similiar_products } = props
     let [quickBuy, setQuickBuy] = useState(true)
     const form = useForm({});
     const { data, post } = form;
@@ -109,7 +109,7 @@ function Product(props: Props) {
 
                     </div>
                     <PointsGraph />
-                    <div className='mt-32px border-2 border-black p-32px'>
+                    {/* <div className='mt-32px border-2 border-black p-32px'>
                         <div className='font-bold text-xl w-full pb-16px border-b border-black'>{t('Set Predictions')}</div>
                         <div className='mt-16px font-bold text-lg'>{t('New/Sealed')}</div>
                         <div className='mt-16px'>
@@ -156,7 +156,7 @@ function Product(props: Props) {
                             </div>
                             <div className='mt-16px text-[#4D4D4D] font-semibold font-nunito'>6508941 Faunas’s House is projected to be valued between $32 - $33 within five years.</div>
                         </div>
-                    </div>
+                    </div> */}
                     <div className='mt-40px font-bold text-xl'>{t('Claim')}</div>
                     <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
 
@@ -221,8 +221,8 @@ function Product(props: Props) {
                         {/* <ProductCard wide />
                         <ProductCard wide /> */}
                         {
-                            similar_products?.length > 0 ?
-                                similar_products?.map((sp) =>
+                            similiar_products?.length > 0 ?
+                                similiar_products?.map((sp) =>
                                     <ProductCard wide {...sp} />
                                 )
                                 :
