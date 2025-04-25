@@ -34,7 +34,6 @@ class _Product extends JsonResource
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,
-
             'annual_growth' => $this->getProductGrowth($this->id, 365),
             'monthly_growth' => $this->getProductGrowth($this->id, 30),
             'weekly_growth' => $this->getProductGrowth($this->id, 7),

@@ -68,6 +68,11 @@ function PortfolioModal(props: Props) {
             onSuccess: () => { setProducts((d) => [...d, { product: selected, purchase_date: `${data['day']}. ${data['month']}. ${data['year']}`, price: data['price'], status: data['status'], currency: data['currency'] }]); setSelected(undefined); reset(); }
         })
     }
+    function add_to_portfolio_and_close() {
+        post(route('add_product_to_user', { product: selected?.id }), {
+            onSuccess: () => { setProducts((d) => [...d, { product: selected, purchase_date: `${data['day']}. ${data['month']}. ${data['year']}`, price: data['price'], status: data['status'], currency: data['currency'] }]); setSelected(undefined); reset(); close(); }
+        })
+    }
     function remove_from_portfolio(my_product: Product) {
         post(route('remove_product_from_user', { product: my_product.id }), {
             onSuccess: () => { setProducts(_contextProducts.filter((cp) => cp?.product?.id != my_product.id)); }
@@ -259,7 +264,7 @@ function PortfolioModal(props: Props) {
                                             <ImageInput multiple imagePreview name="images" />
                                             <div className='flex justify-end items-center gap-24px'>
                                                 <div className='cursor-pointer font-bold font-teko' onClick={() => { add_to_portfolio() }}>Uložit a vytvořit další</div>
-                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio(); close(); }}>Dokončit</Button>
+                                                <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); add_to_portfolio_and_close(); }}>Dokončit</Button>
                                             </div>
                                         </div>
 
@@ -290,9 +295,10 @@ function PortfolioModal(props: Props) {
                                                 </div>
                                                 <div className='flex justify-center items-center gap-12px mt-28px'>
                                                     <ArrowUpRight size={24} weight='bold' />
-                                                    <div className='font-bold font-teko text-xl'>{data['search_products']?.length > 0 ? `Výsledky vyhledávání ${search_products?.length ?? 0}` : "Momentálně trendují"}</div>
+                                                    <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length: ''}`}</div>
                                                 </div>
                                                 {
+                                                    search_products?.length > 0 ?
                                                     <div className='grid grid-cols-2 gap-16px p-24px'>
                                                         {
                                                             search_products?.length > 0 ?
@@ -306,6 +312,9 @@ function PortfolioModal(props: Props) {
 
                                                         }
                                                     </div>
+                                                    :
+                                                    <div className='font-bold text-3xl text-center py-40px'>{t('Pro vaše vyhledávání nejsou výsledky, nebo jste zatím nic nevyhledali')}</div>
+
                                                 }
                                                 <div className='flex justify-center mt-24px mb-48px'>
                                                     <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>Dokončit</Button>

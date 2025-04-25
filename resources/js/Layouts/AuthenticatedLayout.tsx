@@ -89,9 +89,9 @@ function AuthenticatedLayout(props: Props) {
                             <MenuItem text={t("Awards")} link={route('awards')} active={route()?.current()?.includes('awards')} />
                         </div>
                         <div className='flex gap-16px items-center z-max bg-white'>
-                            <MagnifyingGlass size={24} />
+                            {/* <MagnifyingGlass size={24} /> */}
                             <BellSimple className='cursor-pointer' onClick={() => { _OpenModal(MODALS.NOTIFICATION); }} size={24} />
-                            <Door className='cursor-pointer' onClick={() => { logout() }} size={24} />
+                            {/* <Door className='cursor-pointer' onClick={() => { logout() }} size={24} /> */}
                             <Link href={route('profile.index')}>
                                 <User size={24} />
                             </Link>
