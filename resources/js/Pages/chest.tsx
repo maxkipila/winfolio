@@ -126,10 +126,10 @@ const externalTooltipHandler = (context) => {
 
         titleLines.forEach(title => {
             const tr = document.createElement('tr');
-            tr.style.borderWidth = 0;
+            tr.style.borderWidth = '0';
 
             const th = document.createElement('th');
-            th.style.borderWidth = 0;
+            th.style.borderWidth = '0';
             const text = document.createTextNode(`${moment(title).format('DD. MM. YYYY')}`);
             th.style.fontWeight = '300';
             th.style.textAlign = 'left';
@@ -153,12 +153,12 @@ const externalTooltipHandler = (context) => {
 
             const tr = document.createElement('tr');
             tr.style.backgroundColor = 'inherit';
-            tr.style.borderWidth = 0;
+            tr.style.borderWidth = '0';
 
             const td = document.createElement('td');
             td.style.fontWeight = '700';
             
-            td.style.borderWidth = 0;
+            td.style.borderWidth = '0';
 
             const text = document.createTextNode(body);
 
@@ -305,7 +305,11 @@ function Chest(props: Props) {
                 {
                     user_products.length > 0 &&
                     <div className='w-full mt-24px'>
-                        <Line height={102} options={options} data={data} />
+                        {
+                            //@ts-expect-error
+                            <Line height={102} options={options} data={data} />
+                        }
+                        
                     </div>
                 }
                 <div className='flex'>
