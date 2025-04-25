@@ -36,12 +36,12 @@ function ProductCard(props: Props) {
                 </div>
                 <div>
                     <div className='text-[#4D4D4D]'>{t('Growth')}</div>
-                    <div className={`${growth.monthly >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center w-[78px] text-center py-2px rounded justify-center mt-6px`}>
+                    <div className={`${growth.monthly >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center w-[78px] text-center pb-2px pt-6px rounded justify-center mt-6px`}>
                         {
                             growth.monthly >= 0 ?
-                                <ArrowUpRight size={24} color="white" />
+                                <ArrowUpRight size={16} className='mb-4px' color="white" />
                                 :
-                                <ArrowDownRight size={24} color="white" />
+                                <ArrowDownRight size={16} className='mb-4px' color="white" />
                         }
                         <div className='text-white '>{growth.monthly} %</div>
                     </div>

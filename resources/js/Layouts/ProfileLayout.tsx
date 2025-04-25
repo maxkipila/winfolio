@@ -2,7 +2,7 @@ import Img from '@/Components/Image'
 import { t } from '@/Components/Translator'
 import { Button } from '@/Fragments/UI/Button'
 import usePageProps from '@/hooks/usePageProps'
-import { router } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { ArrowRight, Basket, BellSimple, FacebookLogo, Files, InstagramLogo, Lifebuoy, List, LockKey, UserCircle, X, XLogo } from '@phosphor-icons/react'
 import React, { ReactNode, useState } from 'react'
 
@@ -13,7 +13,7 @@ interface Props {
 function ProfileLayout(props: Props) {
     const { children } = props
     let [open, setOpen] = useState(false)
-    const { auth } = usePageProps<{ auth: { user: User } }>();
+    const { auth, locale } = usePageProps<{ auth: { user: User }, locale: string }>();
     function logout() {
             console.log('logout')
             /* router.post(route('logout.account')) */
@@ -42,8 +42,8 @@ function ProfileLayout(props: Props) {
                     <ArrowRight size={24} />
                 </div>
                 <div className='mt-12px border border-black p-2px flex'>
-                    <div className='w-full bg-black font-bold text-center text-white text-lg'>CZ</div>
-                    <div className='w-full bg-white font-bold text-center text-black text-lg'>ENG</div>
+                    <Link href={route('profile.index', {locale:'cs'})} className={`w-full font-bold text-center ${locale == "cs"?"bg-black text-white":"bg-white text-black"} text-lg`}>CZ</Link>
+                    <Link href={route('profile.index', {locale:'en'})} className={`w-full font-bold text-center ${locale == "en"?"bg-black text-white":"bg-white text-black"}  text-lg`}>ENG</Link>
                 </div>
                 <div className='mt-40px text-xl font-bold'>{t('Nové')}</div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
