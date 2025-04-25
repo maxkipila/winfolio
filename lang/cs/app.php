@@ -114,5 +114,13 @@ return [
     'Collectors'=>'Collectors',
     'Investors'=>'Investors',
     'Tento produkt jste už recenzovali'=>'Tento produkt jste už recenzovali',
-
+    'Jak to funguje'=>'Jak to funguje',
+    'Knihovna'=>'Knihovna',
+    'Pricing'=>'Pricing',
+    'Blog'=>'Blog',
+    'Stav si sbírku. Sleduj její růst.'=>'Stav si sbírku. Sleduj její růst.',
+    'Zlepšuj se a vyhrávej.'=>'Zlepšuj se a vyhrávej.',
+    'Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.'=>'Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.',
+    'Přijmout výzvu'=>'Přijmout výzvu',
+    
 ];

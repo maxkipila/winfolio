@@ -30,12 +30,8 @@ Route::middleware('guest:web')->group(function () {
 
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    // $products = _Product::collection(Product::all()->inRandomOrder()->take(4)->get());
+    return Inertia::render('Welcome');
 })->name('welcome');
 
 
