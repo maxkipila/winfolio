@@ -125,17 +125,14 @@ class UserController extends Controller
 
         $productIds = $user->products()->pluck('product_id')->toArray();
 
-        // Nejprve načti všechny produkty s jejich cenami
         $user->load('products.latest_price');
 
-        // Vypočítej přesnou hodnotu portfolia z latest_price
         $portfolioValue = $user->products->sum(function ($product) {
             return $product->latest_price ? $product->latest_price->value : 0;
         });
 
         $portfolioStats = $trendService->calculateGrowth($productIds, $fromDate);
 
-        // Přepiš hodnotu v portfolioStats hodnotou, kterou jsi právě vypočítal
         if (isset($portfolioStats['total'])) {
             $portfolioStats['total']['current_value'] = $portfolioValue;
         }

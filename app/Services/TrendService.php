@@ -278,7 +278,7 @@ class TrendService
     }
     private function calculateGrowthForProductOptimized(int $productId, int $days): ?float
     {
-        // Optimalizovaný SQL dotaz místo několika dotazů do DB
+
         $result = DB::selectOne("
             WITH current_price AS (
                 SELECT value
@@ -298,6 +298,7 @@ class TrendService
                 (SELECT value FROM current_price) as current_value,
                 (SELECT value FROM old_price) as old_value
         ", [$productId, $productId, Carbon::now()->subDays($days)]);
+
 
         if (!$result || !$result->current_value || !$result->old_value || $result->old_value == 0) {
             return null;
