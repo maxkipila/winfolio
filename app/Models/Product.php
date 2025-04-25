@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Traits\HasResource;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\MediaLibrary\HasMedia;
+use Paradigma\Pictura\Traits\HasWebp;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\HasMedia;
+
 
 class Product extends Model implements HasMedia
 {
@@ -30,6 +33,14 @@ class Product extends Model implements HasMedia
             'user_id'
         );
     }
+    /*  public function getImgUrlAttribute($value): string
+    {
+        $first = $this->getFirstMediaUrl('images');
+
+        return $first !== ''
+            ? $first
+            : $value;
+    } */
     public function prices()
     {
         return $this->hasMany(Price::class);
@@ -37,6 +48,14 @@ class Product extends Model implements HasMedia
     public function latest_price()
     {
         return $this->hasOne(Price::class)->latestOfMany();
+    }
+
+    public function images(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->getFiles('images'),
+            set: fn($value) => $this->addImages($value ?? []),
+        );
     }
 
     public function price()

@@ -59,6 +59,6 @@ class DatabaseSeeder extends Seeder
         Artisan::call('prices:aggregate');
         $this->call(SeedUserProductHistory::class);
 
-        /* Artisan::call('import:lego-images'); */
+        Artisan::call('import:lego-images');
     }
 }

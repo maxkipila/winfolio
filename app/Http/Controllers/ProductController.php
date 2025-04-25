@@ -35,10 +35,10 @@ class ProductController extends Controller
             $condition
         );
 
-        // Výpočet růstu za různá období
+        /*  // Výpočet růstu za různá období
         $weeklyGrowth = $this->trendService->getProductGrowth($product->id, 7);
         $monthlyGrowth = $this->trendService->getProductGrowth($product->id, 30);
-        $yearlyGrowth = $this->trendService->getProductGrowth($product->id, 365);
+        $yearlyGrowth = $this->trendService->getProductGrowth($product->id, 365); */
 
         // Načtení produktu a souvisejících dat
         /*  $product->load(['theme', 'minifigs']); */
@@ -50,11 +50,11 @@ class ProductController extends Controller
             'similiar_products' => $similar_products,
             'priceHistory' => $priceHistory,
             'stats' => $stats,
-            'growth' => [
+            /* 'growth' => [
                 'weekly' => $weeklyGrowth,
                 'monthly' => $monthlyGrowth,
                 'yearly' => $yearlyGrowth
-            ]
+            ] */
         ]);
     }
 

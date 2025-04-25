@@ -18,7 +18,7 @@ class TrendService
 {
 
 
-    public function calculateTrendingProducts(int $limit = 8, int $days = 7): array
+    public function calculateTrendingProducts(int $limit = 8, int $days = 30): array
     {
         // datum před X dny
         $startDate = Carbon::now()->subDays($days);
@@ -47,7 +47,8 @@ class TrendService
                     'calculated_at' => $today,
                 ],
                 [
-                    'weekly_growth' => $weeklyGrowth,
+                    'weekly_growth' => $this->calculateGrowthForProductOptimized($item->product_id, 7),
+                    'monthly_growth' => $weeklyGrowth,
                     'annual_growth' => $annualGrowth,
                     'favorites_count' => $item->favorites_count,
                 ]
@@ -184,44 +185,45 @@ class TrendService
     public function calculateTopMovers(int $limit = 8): array
     {
         $today = Carbon::today();
-        $weekAgo = Carbon::today()->subDays(7);
+        /* $weekAgo = Carbon::today()->subDays(7); */
+        $monthAgo = Carbon::today()->subDays(30);
 
         // Vytvoření indexů pro lepší výkon
         $this->ensureIndexesForPriceQueries();
 
         // Optimalizovaný SQL dotaz
         $topMovers = DB::select("
-            WITH product_prices AS (
-                SELECT 
-                    p1.product_id,
-                    p1.value as current_value,
-                    p2.value as week_old_value
-                FROM
-                    (SELECT product_id, MAX(created_at) as latest_date
-                     FROM prices
-                     GROUP BY product_id) latest
-                JOIN prices p1 ON p1.product_id = latest.product_id AND p1.created_at = latest.latest_date
-                LEFT JOIN (
-                    SELECT product_id, value, created_at
-                    FROM prices p
-                    WHERE created_at <= ?
-                    AND created_at = (
-                        SELECT MAX(created_at)
-                        FROM prices
-                        WHERE product_id = p.product_id AND created_at <= ?
-                    )
-                ) p2 ON p2.product_id = p1.product_id
-                WHERE p2.value IS NOT NULL AND p2.value > 0
-            )
+        WITH product_prices AS (
             SELECT 
-                product_id,
-                current_value,
-                week_old_value,
-                ROUND(((current_value - week_old_value) / week_old_value) * 100, 1) as growth
-            FROM product_prices
-            ORDER BY ABS(growth) DESC
-            LIMIT ?
-        ", [$weekAgo, $weekAgo, $limit]);
+                p1.product_id,
+                p1.value as current_value,
+                p2.value as month_old_value
+            FROM
+                (SELECT product_id, MAX(created_at) as latest_date
+                 FROM prices
+                 GROUP BY product_id) latest
+            JOIN prices p1 ON p1.product_id = latest.product_id AND p1.created_at = latest.latest_date
+            LEFT JOIN (
+                SELECT product_id, value, created_at
+                FROM prices p
+                WHERE created_at <= ?
+                AND created_at = (
+                    SELECT MAX(created_at)
+                    FROM prices
+                    WHERE product_id = p.product_id AND created_at <= ?
+                )
+            ) p2 ON p2.product_id = p1.product_id
+            WHERE p2.value IS NOT NULL AND p2.value > 0
+        )
+        SELECT 
+            product_id,
+            current_value,
+            month_old_value,
+            ROUND(((current_value - month_old_value) / month_old_value) * 100, 1) as growth
+        FROM product_prices
+        ORDER BY ABS(growth) DESC
+        LIMIT ?
+    ", [$monthAgo, $monthAgo, $limit]);
 
         // Zpracování výsledků a vytvoření trendů
         $results = [];
@@ -233,7 +235,8 @@ class TrendService
                     'calculated_at' => $today,
                 ],
                 [
-                    'weekly_growth' => $mover->growth,
+                    'weekly_growth' => $this->calculateGrowthForProductOptimized($mover->product_id, 7),
+                    'monthly_growth' => $mover->growth,
                     'annual_growth' => $this->calculateGrowthForProductOptimized($mover->product_id, 365),
                 ]
             );

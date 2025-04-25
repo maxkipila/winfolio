@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -39,181 +40,75 @@ class UserController extends Controller
     public function dashboard(Request $request)
     {
         $user = auth()->user();
-        $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 4));
 
-        // $locale = App::currentLocale();
-        // dd($locale);
-        // App::setLocale('cs');
-
-
-        $trends = Trend::with(['product.latest_price', 'product.theme'])
-            ->where('type', 'trending')
-            ->where('calculated_at', Carbon::today())
-            ->orderBy('favorites_count', 'desc')
-            ->limit(8)
-            ->get();
-
-        if ($trends->isEmpty()) {
-            $trends = $this->trendService->calculateTrendingProducts();
-        }
-
-        $movers = Trend::with(['product.latest_price', 'product.theme'])
-            ->where('type', 'top_mover')
-            ->where('calculated_at', Carbon::today())
-            ->orderByRaw('ABS(weekly_growth) DESC')
-            ->limit(8)
-            ->get();
-
-        if ($movers->isEmpty()) {
-            $movers = $this->trendService->calculateTopMovers();
-        }
-        // $trendingProducts = Cache::remember('trending_products', Carbon::now()->addHours(12), function () {
-        //     $trends = Trend::with(['product.latest_price', 'product.theme'])
-        //         ->where('type', 'trending')
-        //         ->where('calculated_at', Carbon::today())
-        //         ->orderBy('favorites_count', 'desc')
-        //         ->limit(8)
-        //         ->get();
-
-        //     if ($trends->isEmpty()) {
-        //         return $this->trendService->calculateTrendingProducts();
-        //     }
-
-        //     return $trends;
-        // });
-
-        // $topMovers = Cache::remember('top_movers', Carbon::now()->addHours(12), function () {
-        //     $movers = Trend::with(['product.latest_price', 'product.theme'])
-        //         ->where('type', 'top_mover')
-        //         ->where('calculated_at', Carbon::today())
-        //         ->orderByRaw('ABS(weekly_growth) DESC')
-        //         ->limit(8)
-        //         ->get();
-
-        //     if ($movers->isEmpty()) {
-        //         return $this->trendService->calculateTopMovers();
-        //     }
-
-        //     return $movers;
-        // });
-
-        // $trendingData = collect($trendingProducts)->map(function ($trend) {
-        //     return [
-        //         'product' => new _Product($trend->product),
-        //         'weekly_growth' => $trend->weekly_growth,
-        //         'annual_growth' => $trend->annual_growth,
-        //     ];
-        // });
-
-        // $topMoversData = collect($topMovers)->map(function ($trend) {
-        //     return [
-        //         'product' => new _Product($trend->product),
-        //         'weekly_growth' => $trend->weekly_growth,
-        //         'annual_growth' => $trend->annual_growth,
-        //     ];
-        // });
-
-        $portfolioValue = $this->dashboardPortfolioValue();
-
-        $productIds = $user->products()->pluck('product_id')->toArray();
-
-        $portfolioStats = $this->trendService->calculateGrowth(
-            $productIds,
-            now()->subYear()->toDateString()
+        $products = _Product::collection(
+            Product::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())
+                ->paginate($request->paginate ?? 4)
         );
 
-        // Načtení rekordů uživatele
-        /*   $records = $user->records()->with('product')->get()->keyBy('record_type');
+        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
 
-
-        $formattedRecords = [
-            'highest_portfolio' => $records->get('highest_portfolio_value') ? $records->get('highest_portfolio_value')->value : 0,
-            'most_items' => $records->get('most_items') ? $records->get('most_items')->value : 0,
-            'best_purchase' => $records->get('best_purchase') ? [
-                'value' => $records->get('best_purchase')->value,
-                'product' => new _Product($records->get('best_purchase')->product)
-            ] : null,
-            'worst_purchase' => $records->get('worst_purchase') ? [
-                'value' => $records->get('worst_purchase')->value,
-                'product' => new _Product($records->get('worst_purchase')->product)
-            ] : null,
-        ]; */
-
-        // Načtení odznaků uživatele
-        /*    $userAwards = $user->userAwards()->with('award')->get();
-        $userAwardsData = collect($userAwards)->map(function ($userAward) {
-            return [
-                'id' => $userAward->award->id,
-                'name' => $userAward->award->name,
-                'description' => $userAward->award->description,
-                'category' => $userAward->award->category,
-                'icon' => $userAward->award->icon,
-                'earned_at' => $userAward->earned_at,
-            ];
-        });
- */
-
-        /*  $trending_products = _Trend::collection(Trend::with(['product.latest_price', 'product.theme', 'product'])
+        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
             ->where('type', 'trending')
-            ->orderBy('favorites_count', 'desc')
-            ->paginate($request->paginate ?? 10)); */
+            ->where('calculated_at', $latestDate)
+            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+
+        if ($trendingQuery->count() === 0) {
+            $this->trendService->calculateTrendingProducts(8, 30);
+            $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+
+            $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+                ->where('type', 'trending')
+                ->where('calculated_at', $latestDate)
+                ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+        }
+
         $trending_products = _Trend::collection(
-            Cache::remember('trending_products_page_' . ($request->page ?? 1), Carbon::now()->addHours(12), function () use ($request) {
-                $trends = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                    ->where('type', 'trending')
-                    ->where('calculated_at', Carbon::today())
-                    ->orderBy('favorites_count', 'desc');
-
-                if ($trends->count() === 0) {
-                    // Uložíme výsledky výpočtu do databáze
-                    $this->trendService->calculateTrendingProducts();
-
-                    // Znovu načteme data, teď už s vypočítanými trendy
-                    $trends = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                        ->where('type', 'trending')
-                        ->where('calculated_at', Carbon::today())
-                        ->orderBy('favorites_count', 'desc');
-                }
-
-                return $trends->paginate($request->paginate ?? 10);
-            })
+            $trendingQuery->paginate($request->paginate ?? 4)
         );
+
+        $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+
+        $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'top_mover')
+            ->where('calculated_at', $latestDateMovers)
+            ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+
+        if ($topMoversQuery->count() === 0) {
+            $this->trendService->calculateTopMovers();
+            $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+
+            $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+                ->where('type', 'top_mover')
+                ->where('calculated_at', $latestDateMovers)
+                ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+        }
 
         $top_movers = _Trend::collection(
-            Cache::remember('top_movers_page_' . ($request->page ?? 1), Carbon::now()->addHours(12), function () use ($request) {
-                $movers = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                    ->where('type', 'top_mover')
-                    ->where('calculated_at', Carbon::today())
-                    ->orderByRaw('ABS(weekly_growth) DESC');
-
-                if ($movers->count() === 0) {
-                    // Uložíme výsledky výpočtu do databáze
-                    $this->trendService->calculateTopMovers();
-
-                    // Znovu načteme data, teď už s vypočítanými trendy
-                    $movers = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                        ->where('type', 'top_mover')
-                        ->where('calculated_at', Carbon::today())
-                        ->orderByRaw('ABS(weekly_growth) DESC');
-                }
-
-                return $movers->paginate($request->paginate ?? 4);
-            })
+            $topMoversQuery->paginate($request->paginate ?? 4)
         );
-        /* $top_movers = _Trend::collection(Trend::with(['product.latest_price', 'product.theme', 'product'])
-            ->where('type', 'top_mover')
-            ->orderByRaw('ABS(weekly_growth) DESC')
-            ->paginate($request->paginate ?? 10)); */
 
+        // Zbytek funkce zůstává stejný...
+        $portfolioValue = $this->dashboardPortfolioValue();
+
+        $portfolioStats = null;
+        if ($user) {
+            $productIds = $user->products()->pluck('product_id')->toArray();
+
+            if (!empty($productIds)) {
+                $portfolioStats = $this->trendService->calculateGrowth(
+                    $productIds,
+                    now()->subYear()->toDateString()
+                )['total'];
+            }
+        }
 
         return Inertia::render('Dashboard', [
             'products' => $products,
             'trendingProducts' => $trending_products,
             'topMovers' => $top_movers,
             'portfolioValue' => $portfolioValue,
-            'portfolioStats' => $portfolioStats['total'],
-            /*   'records' => $formattedRecords,
-            'awards' => $userAwardsData, */
+            'portfolioStats' => $portfolioStats,
         ]);
     }
 
@@ -234,11 +129,11 @@ class UserController extends Controller
 
 
         $user->load('products.prices');
-        foreach ($user->products as $product) {
+        /*  foreach ($user->products as $product) {
             $product->annual_growth = $this->trendService->getProductGrowth($product->id, 365);
             $product->weekly_growth = $this->trendService->getProductGrowth($product->id, 7);
             $product->monthly_growth = $this->trendService->getProductGrowth($product->id, 30);
-        }
+        } */
         if ($request->range == 'week') {
             $history = $trendService->getPortfolioHistory($productIds, 'day', 7);
         } else if ($request->range == 'month') {
