@@ -45,49 +45,49 @@ class UserController extends Controller
 
         $products = _Product::collection(Product::where('theme_id', $star_wars_theme->id)->inRandomOrder()->take(4)->get());
 
-        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
-        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
-            ->where('type', 'trending')
-            ->where('calculated_at', $latestDate)
-            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+        // $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+        // $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        //     ->where('type', 'trending')
+        //     ->where('calculated_at', $latestDate)
+        //     ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
 
-        if ($trendingQuery->count() === 0) {
-            $this->trendService->calculateTrendingProducts(8, 30);
-            $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+        // if ($trendingQuery->count() === 0) {
+        //     $this->trendService->calculateTrendingProducts(8, 30);
+        //     $latestDate = Trend::where('type', 'trending')->max('calculated_at');
 
-            $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                ->where('type', 'trending')
-                ->where('calculated_at', $latestDate)
-                ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
-        }
+        //     $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        //         ->where('type', 'trending')
+        //         ->where('calculated_at', $latestDate)
+        //         ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+        // }
 
-        $trending_products = _Trend::collection(
-            $trendingQuery->paginate($request->paginate ?? 4)
-        );
+        // $trending_products = _Trend::collection(
+        //     $trendingQuery->paginate($request->paginate ?? 4)
+        // );
 
-        $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+        // $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
-        $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
-            ->where('type', 'top_mover')
-            ->where('calculated_at', $latestDateMovers)
-            ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+        // $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        //     ->where('type', 'top_mover')
+        //     ->where('calculated_at', $latestDateMovers)
+        //     ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
-        if ($topMoversQuery->count() === 0) {
-            $this->trendService->calculateTopMovers();
-            $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+        // if ($topMoversQuery->count() === 0) {
+        //     $this->trendService->calculateTopMovers();
+        //     $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
-            $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
-                ->where('type', 'top_mover')
-                ->where('calculated_at', $latestDateMovers)
-                ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
-        }
+        //     $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        //         ->where('type', 'top_mover')
+        //         ->where('calculated_at', $latestDateMovers)
+        //         ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+        // }
 
-        $top_movers = _Trend::collection(
-            $topMoversQuery->paginate($request->paginate ?? 4)
-        );
+        // $top_movers = _Trend::collection(
+        //     $topMoversQuery->paginate($request->paginate ?? 4)
+        // );
 
 
-        return Inertia::render('Welcome', compact('products', 'trending_products', 'top_movers'));
+        return Inertia::render('Welcome', compact('products'));
     }
     public function dashboard(Request $request)
     {
