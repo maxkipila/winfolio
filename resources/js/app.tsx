@@ -9,8 +9,8 @@ import PortfolioContextProvider from './Components/contexts/PortfolioContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 export let locale = 'en'
-router.on('navigate', (e)=>{
-    
+router.on('navigate', (e) => {
+
     locale = (e?.detail?.page?.props?.locale as string) ?? 'en'
 })
 createInertiaApp({
@@ -24,9 +24,9 @@ createInertiaApp({
         if (import.meta.env.SSR) {
             hydrateRoot(el,
                 <ModalsProvider>
-                    <PortfolioContextProvider>
-                        <App {...props} />
-                    </PortfolioContextProvider>
+
+                    <App {...props} />
+
                 </ModalsProvider>
             );
             return;
@@ -34,9 +34,9 @@ createInertiaApp({
 
         createRoot(el).render(
             <ModalsProvider>
-                <PortfolioContextProvider>
-                    <App {...props} />
-                </PortfolioContextProvider>
+
+                <App {...props} />
+
             </ModalsProvider>
         );
     },
