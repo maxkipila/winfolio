@@ -26,7 +26,7 @@ function Product(props: Props) {
     const { data, post } = form;
     let { open } = useContext(ModalsContext)
     let { setSelected } = useContext(PortfolioContext)
-
+    console.log(' set selcted', setSelected)
     return (
         <AuthenticatedLayout>
             <Head title={`${product?.name} | Winfolio`} />

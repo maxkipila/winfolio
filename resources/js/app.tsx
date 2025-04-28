@@ -24,9 +24,9 @@ createInertiaApp({
         if (import.meta.env.SSR) {
             hydrateRoot(el,
                 <ModalsProvider>
-
-                    <App {...props} />
-
+                    <PortfolioContextProvider pageProps={props}>
+                        <App {...props} />
+                    </PortfolioContextProvider>
                 </ModalsProvider>
             );
             return;
@@ -34,9 +34,9 @@ createInertiaApp({
 
         createRoot(el).render(
             <ModalsProvider>
-
-                <App {...props} />
-
+                <PortfolioContextProvider pageProps={props}>
+                    <App {...props} />
+                </PortfolioContextProvider>
             </ModalsProvider>
         );
     },

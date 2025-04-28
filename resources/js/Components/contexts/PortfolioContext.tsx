@@ -31,9 +31,9 @@ const initialState: {
 
 export const PortfolioContext = createContext(initialState);
 
-export default function PortfolioContextProvider(props: { children: any }) {
+export default function PortfolioContextProvider(props: { children: any, pageProps: any }) {
 
-    const { } = props
+    const { pageProps } = props
     // const { auth } = usePageProps<{ auth: { user: User } }>();
     let { open, close } = useContext(ModalsContext)
     let [products, setProducts] = useState([])
@@ -41,24 +41,24 @@ export default function PortfolioContextProvider(props: { children: any }) {
     let [displayModal, setDisplayModal] = useState(true)
     let [selected, setSelected] = useState(undefined)
 
-    let [user, setUser] = useState(undefined)
+    let [user, setUser] = useState(pageProps.initialPage.props.auth.user)
+    // console.log(pageProps.initialPage.props.auth.user)
+    // async function getUser() {
 
-    async function getUser() {
+    //     let response = await axios.get(route('get_user')).then((r) => {
+            
+    //         if (r?.data?.user?.products > 0) {
+    //             close();
+    //         }
+    //         setUser(r.data)
+    //     })
+    // }
 
-        let response = await axios.get(route('get_user')).then((r) => {
-            // console.log(r.data)
-            if (r?.data?.user?.products > 0) {
-                close();
-            }
-            setUser(r.data)
-        })
-    }
-
-    useEffect(() => {
-        if(user == undefined){
-            getUser()
-        }
-    }, [])
+    // useEffect(() => {
+    //     if(user == undefined){
+    //         getUser()
+    //     }
+    // }, [])
 
     useEffect(() => {
 
