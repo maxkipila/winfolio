@@ -1,12 +1,15 @@
-import Img from '@/Components/Image'
-import { FormContext } from '@/Fragments/forms/FormContext'
-import Table from '@/Fragments/Table/Table'
-import Td from '@/Fragments/Table/Td'
-import Th from '@/Fragments/Table/Th'
-import AdminLayout from '@/Layouts/AdminLayout'
-import { Link } from '@inertiajs/react'
-import { Pencil } from '@phosphor-icons/react'
-import React, { useContext, useEffect } from 'react'
+import { ModalsContext } from "@/Components/contexts/ModalsContext";
+import Modals, { MODALS, } from "@/Fragments/Modals";
+import { DefaultButtons } from "@/Fragments/modals/DefaultButtons";
+import Table from "@/Fragments/Table/Table";
+import Td from "@/Fragments/Table/Td";
+import Th from "@/Fragments/Table/Th";
+import AdminLayout from "@/Layouts/AdminLayout";
+import { Link } from "@inertiajs/react";
+import { Pencil, Trash } from "@phosphor-icons/react";
+import { useContext } from "react";
+
+
 
 
 interface Props {
@@ -45,9 +48,26 @@ export function AwardTable({ absolute_items, hide_meta }: { absolute_items?: Arr
     );
 }
 function Row(props: Award & { setItems: React.Dispatch<React.SetStateAction<Award[]>> }) {
-    const { id, name, description } = props;
+    const { id, name, description, setItems } = props;
 
+    const { open, close } = useContext(ModalsContext)
 
+    const removeItem = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+        e.preventDefault();
+
+        open(MODALS.CONFIRM, false, {
+            title: "Potvrdit smazání",
+            message: "Opravdu chcete smazat ocenění?",
+            buttons: <DefaultButtons
+                href={route('admin.awards.destroy', { award: id })}
+                onCancel={close}
+                onSuccess={() => {
+                    setItems(pr => pr.filter(f => f.id != id));
+                    close();
+                }}
+            />
+        })
+    }
     return (
         <tr className="odd:bg-[#F5F5F5] hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black">
             <Td ><Link href={route('admin.awards.edit', { award: id })}>{id}</Link></Td>
@@ -76,7 +96,12 @@ function Row(props: Award & { setItems: React.Dispatch<React.SetStateAction<Awar
             <Td>{props.category}</Td>
             <Td></Td>
             <Td>
-                <Link href={route('admin.awards.edit', { award: id })} className=""><Pencil size={24} /></Link>
+                <div className='flex gap-8px items-center justify-end'>
+                    <Link href={route('admin.awards.edit', { award: id })} className=""><Pencil size={24} /></Link>
+                    {/* <button onClick={(e) => removeItem(e, id)}><Trash size={24} className='text-app-input-error' /></button> */}
+                    <Link href={route('admin.awards.destroy', { award: id })} method="delete" as="button"><Trash size={24} className='text-app-input-error' /></Link>
+
+                </div>
             </Td>
 
 

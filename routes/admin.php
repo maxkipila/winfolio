@@ -33,11 +33,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/store', [AwardController::class, 'store'])->name('store');
             Route::match(['POST', 'GET'], '/edit/{award}', [AwardController::class, 'edit'])->name('edit');
             Route::match(['POST', 'GET'], '/{award}', [AwardController::class, 'update'])->name('update');
-            Route::delete('/{award}', [AwardController::class, 'destroy'])->name('awards.destroy');
+            Route::delete('/{award}', [AwardController::class, 'destroy'])->name('destroy');
             Route::delete(
                 '/awards/{award}/conditions/{condition}/remove/{field}',
                 [AwardController::class, 'removeField']
-            )->name('admin.awards.removeField');
+            )->name('removeField');
         });
 
         Route::group(['prefix' => 'news', 'as' => 'news.'], function () {

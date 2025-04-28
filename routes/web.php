@@ -99,7 +99,15 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/chest', [UserController::class, 'chest'])->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
-    Route::match(['GET', 'POST'], '/catalog', function (Request $request) {
+
+    Route::match(['GET', 'POST'], '/catalog', [UserController::class, 'catalog'])->name('catalog');
+
+    Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
+
+    Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
+
+    Route::match(['GET', 'POST'], '/product/{product}', [ProductController::class, 'show'])->name('product.detail');
+    /*  Route::match(['GET', 'POST'], '/catalog', function (Request $request) {
         // dd($request->parent_theme, $request->theme_children);
         $query = $request->search;
         $column = 'name';
@@ -119,12 +127,10 @@ Route::middleware('auth:web')->group(function () {
         $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 100));
         // dd($themes);
         return Inertia::render('catalog', compact('products', 'themes'));
-    })->name('catalog');
+    })->name('catalog'); */
+    // V souboru routes/web.php
 
-    Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
-    Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 
-    Route::match(['GET', 'POST'], '/product/{product}', [ProductController::class, 'show'])->name('product.detail');
 
     /*   Route::match(['GET', 'POST'], '/product/{product}', function (Request $request, Product $product) {
         $product = _Product::init($product->load(['reviews', 'prices', 'price', 'theme', 'minifigs', 'sets.theme']));

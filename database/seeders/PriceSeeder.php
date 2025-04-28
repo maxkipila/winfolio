@@ -20,20 +20,14 @@ class PriceSeeder extends Seeder
         // Vyčištění paměti po seedování základních cen
         gc_collect_cycles();
 
-        // Omezený počet produktů pro další operace
-        $limitedProductIds = Product::limit(20)->pluck('id')->toArray();
-
-        // Vyčištění paměti po získání ID
-        unset($products);
-        gc_collect_cycles();
-
-        $this->simulateHistoricalPriceUpdates();
+        // Generování historických dat pro lepší trendy
+        $this->createHistoricalPriceTimeline();
 
         // Vyčištění paměti po simulaci
         gc_collect_cycles();
 
-        // Velmi omezený počet měsíců
-        $this->generateAggregatedData(6);
+        // Generování agregovaných dat
+        $this->generateAggregatedData(12);
     }
 
     /**
@@ -82,7 +76,106 @@ class PriceSeeder extends Seeder
     }
 
     /**
-     * 
+     * Vytvoří historické ceny pro 50 produktů za poslední 3 roky
+     * s realistickým trendem
+     */
+    private function createHistoricalPriceTimeline()
+    {
+        DB::disableQueryLog();
+        $faker = Faker::create();
+
+        // Omezíme počet produktů kvůli paměti
+        $products = Product::limit(50)->get();
+
+        foreach ($products as $product) {
+            // Definice specifických datumů pro různá časová období
+            $timepoints = [
+                Carbon::now()->subDays(7),                 // týden zpět
+                Carbon::now()->subDays(30),                // měsíc zpět
+                Carbon::now()->subMonths(3),               // 3 měsíce zpět
+                Carbon::now()->subMonths(6),               // 6 měsíců zpět
+                Carbon::now()->subYear(),                  // rok zpět
+                Carbon::now()->subYear()->subMonths(6),    // 1.5 roku zpět 
+                Carbon::now()->subYears(2),                // 2 roky zpět
+                Carbon::now()->subYears(3)                 // 3 roky zpět
+            ];
+
+            // Rozhodnutí o celkovém trendu ceny
+            $trendType = $faker->randomElement(['rising', 'falling', 'volatile', 'stable']);
+            $latestPrice = Price::where('product_id', $product->id)->latest('created_at')->first();
+
+            if (!$latestPrice) {
+                continue;
+            }
+
+            $baseValue = $latestPrice->value;
+            $priceData = [];
+
+            // Pro každý časový bod vytváříme cenový záznam
+            foreach ($timepoints as $index => $date) {
+                // Aplikujeme trend různě podle typu trendu
+                $trendFactor = $this->calculateTrendFactor($trendType, $index, count($timepoints), $faker);
+
+                // Hodnoty ceny
+                $value = round($baseValue * $trendFactor, 2);
+                $retail = round($value * 1.3, 2);
+                $wholesale = round($value * 0.7, 2);
+
+                $priceData[] = [
+                    'product_id' => $product->id,
+                    'retail'     => $retail,
+                    'wholesale'  => $wholesale,
+                    'value'      => $value,
+                    'condition'  => $latestPrice->condition,
+                    'type'       => 'market',
+                    'created_at' => $date,
+                    'updated_at' => $date,
+                ];
+            }
+
+            // Ukládáme ceny po dávkách
+            DB::table('prices')->insert($priceData);
+
+            // Čištění paměti
+            unset($priceData);
+        }
+
+        gc_collect_cycles();
+    }
+
+    /**
+     * Vypočítá faktor trendu ceny podle typu trendu
+     */
+    private function calculateTrendFactor($trendType, $index, $totalPoints, $faker)
+    {
+        $position = $index / ($totalPoints - 1); // 0 = nejnovější, 1 = nejstarší
+
+        switch ($trendType) {
+            case 'rising':
+                // Starší ceny jsou nižší (klesáme jak jdeme do minulosti)
+                return 1 - ($position * $faker->randomFloat(2, 0.2, 0.5));
+
+            case 'falling':
+                // Starší ceny jsou vyšší (stoupáme jak jdeme do minulosti)
+                return 1 + ($position * $faker->randomFloat(2, 0.1, 0.4));
+
+            case 'volatile':
+                // Ceny náhodně kolísají
+                $baseTrend = 1 - ($position * 0.1); // Mírný pokles do minulosti
+                $volatility = $faker->randomFloat(2, -0.2, 0.2);
+                return $baseTrend + $volatility;
+
+            case 'stable':
+                // Ceny se mění jen minimálně
+                return 1 + ($faker->randomFloat(2, -0.05, 0.05));
+
+            default:
+                return 1;
+        }
+    }
+
+    /**
+     * Seed price for a specific product
      */
     private function seedPriceForProduct(Product $product, $faker)
     {
@@ -101,87 +194,23 @@ class PriceSeeder extends Seeder
     }
 
     /**
-     * Simuluje historické týdenní aktualizace cen.
-     */
-    /*  private function simulateHistoricalPriceUpdates()
-    {
-        $faker = Faker::create();
-        $startDate = Carbon::now()->subDays(30);
-
-        for ($i = 0; $i < 8; $i++) {
-            $fakeDate = $startDate->copy()->addDays($i * 5);
-            $this->weeklyPriceUpdate($fakeDate);
-        }
-    } */
-    /*   private function simulateHistoricalPriceUpdates()
-    {
-
-        $offsets = [30, 25, 20, 15, 10, 5, 2, 1];
-        foreach ($offsets as $offset) {
-            $fakeDate = Carbon::now()->subDays($offset);
-            $this->weeklyPriceUpdate($fakeDate);
-        }
-    } */
-    private function simulateHistoricalPriceUpdates()
-    {
-        DB::disableQueryLog();
-
-        // Vygenerujeme ceny pro poslední 3 měsíce pro 10 produktů
-        $startDate = Carbon::now()->subMonths(3);
-        $faker = Faker::create();
-
-        $limitedProductIds = Product::limit(10)->pluck('id')->toArray();
-
-        foreach ($limitedProductIds as $productId) {
-            $product = Product::find($productId);
-
-            for ($i = 0; $i < 3; $i++) {
-                $date = $startDate->copy()->addMonths($i)->startOfMonth();
-                $basePrice = 10 * pow(1.01, $i);
-
-                DB::table('prices')->insert([
-                    'product_id' => $product->id,
-                    'retail'     => round($basePrice * 1.3, 2),
-                    'wholesale'  => round($basePrice * 0.7, 2),
-                    'value'      => round($basePrice, 2),
-                    'condition'  => $product->product_type === 'set' ? 'New' : 'Mint',
-                    'type'       => 'market',
-                    'created_at' => $date,
-                    'updated_at' => $date,
-                ]);
-            }
-        }
-
-        gc_collect_cycles();
-    }
-
-
-    /**
-     * Generuje agregovaná historická data pro grafy
-     */
-    /**
-     * Generuje minimální množství agregovaných dat pro testování
-     */
-    /**
      * Generuje agregovaná historická data pro grafy na základě reálných průměrů mediánů (TrendService).
-     * Pro každý produkt a měsíc zavolá TrendService::getMonthlyAverageOfDailyMedians.
-     * Pokud nejsou žádná denní data, agregace se přeskočí.
      */
     public function generateAggregatedData($months = 12)
     {
         DB::disableQueryLog();
-        // TrendService je potřeba pro výpočet průměrů mediánů
+
         $trendService = app(\App\Services\TrendService::class);
         $now = Carbon::now();
 
-        // Limitujte počet produktů na 50, chunkujte po 10
-        Product::take(50)->chunk(10, function ($products) use ($trendService, $now, $months) {
+
+        Product::take(200)->chunk(50, function ($products) use ($trendService, $now, $months) {
             $aggregatedData = [];
 
             foreach ($products as $product) {
                 for ($i = 0; $i < $months; $i++) {
                     $month = $now->copy()->subMonths($i)->startOfMonth();
-                    // Výpočet reálného průměru mediánů za měsíc
+
                     $avg = $trendService->getMonthlyAverageOfDailyMedians($product->id, $month);
                     if ($avg === null) continue;
 
@@ -207,11 +236,10 @@ class PriceSeeder extends Seeder
         });
     }
 
-
     /**
-     * 
+     * Weekly price update simulation
      *
-     * @param Carbon 
+     * @param Carbon $fakeDate
      */
     public function weeklyPriceUpdate(?Carbon $fakeDate = null, ?array $specificProductIds = null)
     {
@@ -222,11 +250,9 @@ class PriceSeeder extends Seeder
         $faker = Faker::create();
         $productQuery = Product::query();
 
-        // Pokud jsou specifikovány konkrétní ID produktů, použijeme je
         if ($specificProductIds) {
             $productQuery->whereIn('id', $specificProductIds);
         }
-
 
         $productQuery->chunk(10, function ($products) use ($faker, $fakeDate) {
             $data = [];
@@ -241,10 +267,13 @@ class PriceSeeder extends Seeder
                 if (isset($latestPrices[$product->id]) && $latestPrices[$product->id]->isNotEmpty()) {
                     $latestPrice = $latestPrices[$product->id]->first();
 
+                    // Realističtější variace podle typu produktu
                     if ($product->product_type === 'set') {
-                        $variationFactor = $faker->randomFloat(nbMaxDecimals: 2, min: 0.97, max: 1.03);
+                        // Sety mohou mít větší cenové skoky
+                        $variationFactor = $faker->randomFloat(nbMaxDecimals: 2, min: 0.95, max: 1.05);
                     } elseif ($product->product_type === 'minifig') {
-                        $variationFactor = $faker->randomFloat(nbMaxDecimals: 2, min: 0.98, max: 1.02);
+                        // Minifigurky mají obecně stabilnější ceny
+                        $variationFactor = $faker->randomFloat(nbMaxDecimals: 2, min: 0.98, max: 1.03);
                     } else {
                         $variationFactor = $faker->randomFloat(nbMaxDecimals: 2, min: 0.97, max: 1.03);
                     }
@@ -255,21 +284,20 @@ class PriceSeeder extends Seeder
                         'wholesale'  => round($latestPrice->wholesale * $variationFactor, 2),
                         'value'      => round($latestPrice->value * $variationFactor, 2),
                         'condition'  => $latestPrice->condition,
-                        'type'       => 'market', // Přidáno pole type
+                        'type'       => 'market',
                         'created_at' => $fakeDate,
                         'updated_at' => $fakeDate,
                     ];
                 }
             }
 
-            // Insert po menších částech
             if (!empty($data)) {
                 foreach (array_chunk($data, 20) as $chunk) {
                     DB::table('prices')->insert($chunk);
                 }
             }
 
-            // Uvolnění paměti
+
             unset($data, $latestPrices);
             gc_collect_cycles();
         });
@@ -301,7 +329,7 @@ class PriceSeeder extends Seeder
             'wholesale'  => round($basePrice * 0.7, 2),
             'value'      => round($basePrice, 2),
             'condition'  => $condition,
-            'type'       => 'market', // Přidáno nové pole
+            'type'       => 'market',
         ];
     }
 }

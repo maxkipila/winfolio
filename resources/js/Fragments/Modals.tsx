@@ -7,6 +7,7 @@ import BuyPremiumModal from './BuyPremiumModal';
 import SuccessModal from './SuccessModal';
 import PortfolioModal from './PortfolioModal';
 import UnclaimedModal from './UnclaimedModal';
+import ConfirmModal from './modals/ConfirmModal';
 
 interface Props { }
 
@@ -17,7 +18,8 @@ export enum MODALS {
     REVIEW_POSTED,
     GET_PREMIUM,
     PORTFOLIO,
-    UNCLAIMED_AWARDS
+    UNCLAIMED_AWARDS,
+    CONFIRM,
 }
 
 export function ModalsProvider(props) {
@@ -66,18 +68,18 @@ function Modals(props: Props) {
     const { } = props
 
     const { modal, open, close } = useContext(ModalsContext)
-    
+
     const closeOnEsc = (e: KeyboardEvent) => {
         // console.log(e.key)
-        if(e.key == 'Escape')
+        if (e.key == 'Escape')
             close()
     }
 
     useEffect(() => {
         try {
             window?.addEventListener('keydown', closeOnEsc)
-        } catch (error) {}
-      
+        } catch (error) { }
+
 
         return () => {
             try {
@@ -95,6 +97,7 @@ function Modals(props: Props) {
             {(modal?.modal == MODALS.REVIEW_POSTED) && <ReviewPostedModal  {...modal.data} />}
             {(modal?.modal == MODALS.PORTFOLIO) && <PortfolioModal  {...modal.data} />}
             {(modal?.modal == MODALS.UNCLAIMED_AWARDS) && <UnclaimedModal  {...modal.data} />}
+            {(modal?.modal == MODALS.CONFIRM) && <ConfirmModal  {...modal.data} />}
         </>
     )
 }

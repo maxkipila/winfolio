@@ -5,22 +5,23 @@ namespace App\Services;
 use App\Models\Award;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\NewAwardNotification;
 
 class AwardCheckerService
 {
+
+
     public function checkUserAwards(User $user): array
     {
         $newAwards = [];
 
         try {
-            // Získáme všechny odznaky, které uživatel ještě nemá
             $awards = Award::with('conditions')->get();
             $userAwardIds = $user->awards()->pluck('awards.id')->toArray();
             $awards = $awards->filter(function ($award) use ($userAwardIds) {
                 return !in_array($award->id, $userAwardIds);
             });
 
-            /*  \Log::info("Kontrola {$awards->count()} odznaků pro uživatele {$user->id}"); */
 
             foreach ($awards as $award) {
                 $meetsConditions = true;
@@ -28,16 +29,15 @@ class AwardCheckerService
                 $value = null;
                 $percentage = null;
 
-                /*   \Log::info("Kontrola odznaku {$award->name} pro uživatele {$user->id}"); */
 
-                // Zkontrolujeme všechny podmínky odznaku
                 foreach ($award->conditions as $condition) {
-                    // Získáme hodnotu z enumu
                     $conditionType = $condition->condition_type->value ?? (string)$condition->condition_type;
 
                     switch ($conditionType) {
                         case 'specific_product':
-                            if (!$this->checkSpecificProduct($user, $condition->product_id)) {
+                            $productId = $condition->product_id ?? null;
+                            // Skip or fail safely if no product_id provided
+                            if (!$productId || !$this->checkSpecificProduct($user, (int) $productId)) {
                                 $meetsConditions = false;
                             }
                             break;
@@ -75,13 +75,11 @@ class AwardCheckerService
                     }
 
                     if (!$meetsConditions) {
-                        break;  // Pokud jedna podmínka není splněna, přerušíme kontrolu
+                        break;
                     }
                 }
 
                 if ($meetsConditions) {
-                    /*  \Log::info("Uživatel {$user->id} splňuje podmínky pro odznak {$award->name}, přidělování..."); */
-
                     try {
                         $user->awards()->attach($award->id, [
                             'earned_at' => now(),
@@ -90,26 +88,23 @@ class AwardCheckerService
                             'value' => $value,
                             'percentage' => $percentage
                         ]);
-                        // Přidejte tyto řádky pro odeslání notifikace
+
+
                         $user->notify(new \App\Notifications\NewAwardNotification($award));
 
-                        // Označíme odznak jako notifikovaný
+
                         $user->awards()->updateExistingPivot($award->id, [
                             'notified' => true
                         ]);
 
-                        Log::info("Odznak {$award->name} úspěšně přidělen uživateli {$user->id}");
                         $newAwards[] = $award;
                     } catch (\Exception $e) {
                         Log::error("Chyba při přidělování odznaku {$award->name} uživateli {$user->id}: " . $e->getMessage());
                         throw $e;
                     }
-                } else {
-                    /*   \Log::info("Uživatel {$user->id} nesplňuje podmínky pro odznak {$award->name}"); */
                 }
             }
         } catch (\Exception $e) {
-            /*  \Log::error("Chyba v checkUserAwards: " . $e->getMessage()); */
             throw $e;
         }
 
@@ -124,12 +119,10 @@ class AwardCheckerService
         });
     }
 
-    // Pomocná metoda pro výpočet procentuálního růstu portfolia
 
 
     private function checkAwardConditions(User $user, Award $award): bool
     {
-        // Pro každý odznak zkontrolujeme všechny jeho podmínky
         foreach ($award->conditions as $condition) {
             switch ($condition->condition_type) {
                 case 'specific_product':
@@ -162,7 +155,6 @@ class AwardCheckerService
             }
         }
 
-        // Všechny podmínky byly splněny
         return true;
     }
 
