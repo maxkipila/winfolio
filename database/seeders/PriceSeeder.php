@@ -199,18 +199,18 @@ class PriceSeeder extends Seeder
     public function generateAggregatedData($months = 12)
     {
         DB::disableQueryLog();
-        // TrendService je potřeba pro výpočet průměrů mediánů
+
         $trendService = app(\App\Services\TrendService::class);
         $now = Carbon::now();
 
 
-        Product::take(600)->chunk(50, function ($products) use ($trendService, $now, $months) {
+        Product::take(200)->chunk(50, function ($products) use ($trendService, $now, $months) {
             $aggregatedData = [];
 
             foreach ($products as $product) {
                 for ($i = 0; $i < $months; $i++) {
                     $month = $now->copy()->subMonths($i)->startOfMonth();
-                    // Výpočet reálného průměru mediánů za měsíc
+
                     $avg = $trendService->getMonthlyAverageOfDailyMedians($product->id, $month);
                     if ($avg === null) continue;
 
@@ -250,7 +250,6 @@ class PriceSeeder extends Seeder
         $faker = Faker::create();
         $productQuery = Product::query();
 
-        // Pokud jsou specifikovány konkrétní ID produktů, použijeme je
         if ($specificProductIds) {
             $productQuery->whereIn('id', $specificProductIds);
         }
@@ -292,14 +291,13 @@ class PriceSeeder extends Seeder
                 }
             }
 
-            // Insert po menších částech
             if (!empty($data)) {
                 foreach (array_chunk($data, 20) as $chunk) {
                     DB::table('prices')->insert($chunk);
                 }
             }
 
-            // Uvolnění paměti
+
             unset($data, $latestPrices);
             gc_collect_cycles();
         });
