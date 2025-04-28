@@ -32,7 +32,7 @@ Route::middleware('guest:web')->group(function () {
 });
 
 
-Route::get('/', function () {
+Route::match(['POST', 'GET'], '/', function () {
     $star_wars_theme = _Theme::init(Theme::where('name', 'Star Wars')->first());
 
     $products = _Product::collection(Product::where('theme_id', $star_wars_theme->id)->inRandomOrder()->take(4)->get());
@@ -78,7 +78,7 @@ Route::get('/', function () {
         $topMoversQuery->paginate($request->paginate ?? 4)
     );
 
-    
+
     return Inertia::render('Welcome', compact('products', 'trending_products', 'top_movers'));
 })->name('welcome');
 

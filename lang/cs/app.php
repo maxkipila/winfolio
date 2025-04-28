@@ -163,5 +163,15 @@ return [
     'Přístup do uzavřené komunity'=>'Přístup do uzavřené komunity',
     'Začít naplno'=>'Začít naplno',
     '© 2025, winfolio. Všechna práva vyhrazena.'=>'© 2025, winfolio. Všechna práva vyhrazena.',
-    'Sign Up / Login'=>'Sign Up / Login'
+    'Sign Up / Login'=>'Sign Up / Login',
+    'Přidej své LEGO sety během pár minut a sleduj, jaká je jejich aktuální hodnota. Winfolio čerpá data z celosvětových trhů a automaticky ti ukáže, jak si tvoje sbírka vede.'=>'Přidej své LEGO sety během pár minut a sleduj, jaká je jejich aktuální hodnota. Winfolio čerpá data z celosvětových trhů a automaticky ti ukáže, jak si tvoje sbírka vede.',
+    'Vytvoř si svou vlastní investiční truhlu'=>'Vytvoř si svou vlastní investiční truhlu',
+    'Díky analýze tisíců cen a trendů ti Winfolio napoví, které sety mají investiční potenciál. Nakupuj ve správný čas a buduj sbírku, která získává na hodnotě.'=>'Díky analýze tisíců cen a trendů ti Winfolio napoví, které sety mají investiční potenciál. Nakupuj ve správný čas a buduj sbírku, která získává na hodnotě.',
+    'Buduj své sběratelské impérium a bav se u toho'=>'Buduj své sběratelské impérium a bav se u toho',
+    'Plň investiční mise, sbírej odměny a seznam se s dalšími sběrateli. Winfolio tě provede světem LEGO investic zábavným a hravým způsobem.'=>'Plň investiční mise, sbírej odměny a seznam se s dalšími sběrateli. Winfolio tě provede světem LEGO investic zábavným a hravým způsobem.',
+    'Dělej chytřejší nákupní rozhodnutí'=>'Dělej chytřejší nákupní rozhodnutí',
+    'Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.'=>'Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.',
+    'Vyber si, jak chceš stavět své portfolio'=>'Vyber si, jak chceš stavět své portfolio',
+    'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.'=>'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.',
+    'Přihlásit se' => 'Přihlásit se'
 ];
