@@ -11,11 +11,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Resources\_Product;
 use App\Http\Resources\_Set;
 use App\Http\Resources\_Theme;
+use App\Http\Resources\_Trend;
 use App\Models\Product;
 use App\Models\Set;
 use App\Models\Theme;
+use App\Models\Trend;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
@@ -30,13 +33,58 @@ Route::middleware('guest:web')->group(function () {
 
 
 Route::get('/', function () {
-    // $products = _Product::collection(Product::all()->inRandomOrder()->take(4)->get());
-    return Inertia::render('Welcome');
+    $star_wars_theme = _Theme::init(Theme::where('name', 'Star Wars')->first());
+
+    $products = _Product::collection(Product::where('theme_id', $star_wars_theme->id)->inRandomOrder()->take(4)->get());
+
+    $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+    $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        ->where('type', 'trending')
+        ->where('calculated_at', $latestDate)
+        ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+
+    if ($trendingQuery->count() === 0) {
+        $this->trendService->calculateTrendingProducts(8, 30);
+        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+
+        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'trending')
+            ->where('calculated_at', $latestDate)
+            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+    }
+
+    $trending_products = _Trend::collection(
+        $trendingQuery->paginate($request->paginate ?? 4)
+    );
+
+    $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+
+    $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+        ->where('type', 'top_mover')
+        ->where('calculated_at', $latestDateMovers)
+        ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+
+    if ($topMoversQuery->count() === 0) {
+        $this->trendService->calculateTopMovers();
+        $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
+
+        $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'top_mover')
+            ->where('calculated_at', $latestDateMovers)
+            ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
+    }
+
+    $top_movers = _Trend::collection(
+        $topMoversQuery->paginate($request->paginate ?? 4)
+    );
+
+    
+    return Inertia::render('Welcome', compact('products', 'trending_products', 'top_movers'));
 })->name('welcome');
 
 
 Route::middleware('auth:web')->group(function () {
-    
+
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     /*  Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data'); */
     Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');
