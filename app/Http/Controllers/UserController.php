@@ -115,37 +115,26 @@ class UserController extends Controller
 
     public function catalog(Request $request)
     {
-        $query = $request->search ?? '';
+        $query = $request->search;
         $column = 'name';
 
-        $productsQuery = Product::with(['media', 'latest_price', 'theme'])
-            ->when($request->type, fn($q) => $q->where('product_type', $request->type))
-            ->when($request->parent_theme || $request->theme_children, function ($q) use ($request) {
-                $themeIds = $request->theme_children ? (array)$request->theme_children : [];
-                if ($request->parent_theme) {
-                    $themeIds[] = $request->parent_theme;
-                }
-                return $q->whereIn('theme_id', $themeIds);
-            })
-            ->where($column, 'LIKE', '%' . $query . '%')
-            ->orderByRaw("
-            CASE 
-                WHEN $column LIKE '" . e($query) . "' THEN 1
+        $products = _Product::collection(
+            Product::with('media')
+                ->when($request->type, fn($k) => $k->where('product_type', $request->type))
+                ->when(
+                    $request->parent_theme || $request->theme_children,
+                    fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+                )
+                ->where($column, 'LIKE', '%' . $query . '%')
+                ->orderByRaw("
+            CASE WHEN $column LIKE '" . e($query) . "' THEN 1
                 WHEN $column LIKE '" . e($query) . "%' THEN 2
                 WHEN $column LIKE '%" . e($query) . "%' THEN 3
                 WHEN $column LIKE '%" . e($query) . "' THEN 4
                 ELSE 5
             END")
-            ->latest();
-
-        if ($request->input('filter_with_images', true)) {
-            $productsQuery->whereHas('media', function ($q) {
-                $q->where('collection_name', 'images');
-            });
-        }
-
-        $products = _Product::collection(
-            $productsQuery->paginate($request->paginate ?? 10)
+                ->latest()
+                ->paginate($request->paginate ?? 10)
         );
 
         $themes = _Theme::collection(
@@ -154,18 +143,7 @@ class UserController extends Controller
                 ->paginate($request->paginate ?? 10)
         );
 
-        return Inertia::render('catalog', [
-            'products' => $products,
-            'themes' => $themes,
-            'filters' => [
-                'search' => $query,
-                'type' => $request->type,
-                'parent_theme' => $request->parent_theme,
-                'theme_children' => $request->theme_children,
-                'filter_with_images' => $request->input('filter_with_images', true)
-            ]
-        ]);
-
+        return Inertia::render('catalog', compact('products', 'themes'));
         /* $query = $request->search;
         $column = 'name';
         $products = _Product::collection(Product::when($request->type, fn($k) => $k->where('product_type', $request->type))->when($request->parent_theme || $request->theme_children, fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])]))->where($column, 'LIKE', '%' . $query . '%')

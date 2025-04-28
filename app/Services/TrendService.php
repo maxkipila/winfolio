@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class TrendService
@@ -279,56 +278,36 @@ class TrendService
     }
     public function calculateGrowthForProductOptimized(int $productId, int $days): ?float
     {
-        ini_set('memory_limit', '1G');
-        // Nejprve zjistíme, zda máme pro produkt dostatek historických dat
-        $historyCount = DB::table('prices')
-            ->where('product_id', $productId)
-            ->count();
 
-        // Pokud nemáme dostatek dat pro produkt, vrátíme null
-        if ($historyCount < 2) {
-            return null;
-        }
-
-        // Získáme aktuální a historickou cenu
         $result = DB::selectOne("
-        WITH current_price AS (
-            SELECT value
-            FROM prices
-            WHERE product_id = ? AND value > 0
-            ORDER BY created_at DESC
-            LIMIT 1
-        ),
-        old_price AS (
-            SELECT value
-            FROM prices
-            WHERE product_id = ? AND created_at <= ? AND value > 0
-            ORDER BY created_at DESC
-            LIMIT 1
-        )
-        SELECT 
-            (SELECT value FROM current_price) as current_value,
-            (SELECT value FROM old_price) as old_value
+            WITH current_price AS (
+                SELECT value
+                FROM prices
+                WHERE product_id = ?
+                ORDER BY created_at DESC
+                LIMIT 1
+            ),
+            old_price AS (
+                SELECT value
+                FROM prices
+                WHERE product_id = ? AND created_at <= ?
+                ORDER BY created_at DESC
+                LIMIT 1
+            )
+            SELECT 
+                (SELECT value FROM current_price) as current_value,
+                (SELECT value FROM old_price) as old_value
         ", [$productId, $productId, Carbon::now()->subDays($days)]);
 
-        // Pokud nemáme obě hodnoty nebo jsou hodnoty neplatné, vrátíme null
-        if (!$result || !$result->current_value || !$result->old_value || $result->old_value < 0.01) {
+        if (!$result || !$result->current_value || !$result->old_value || $result->old_value < 0.1) {
             return null;
         }
 
-        // Výpočet růstu s ošetřením dělení nulou
         $growthPercentage = (($result->current_value - $result->old_value) / $result->old_value) * 100;
 
-        // Ověříme, zda není výsledek NaN nebo Infinity
-        if (!is_finite($growthPercentage)) {
-            return null;
-        }
-
-        // Realistické limity pro růst
         $maxGrowth = 100;
         $minGrowth = -75;
 
-        // Upravíme limity podle období
         if ($days <= 7) {
             $maxGrowth = 50;
             $minGrowth = -30;
@@ -337,13 +316,7 @@ class TrendService
             $minGrowth = -50;
         }
 
-        // Zaokrouhlení a aplikace limitů
-        $value = min($maxGrowth, max($minGrowth, round($growthPercentage, 1)));
-
-        // Logování pro debug
-        Log::debug("Product ID: $productId, Days: $days - Current: $result->current_value, Old: $result->old_value, Growth: $growthPercentage%, Limited Growth: $value%");
-
-        return $value;
+        return min($maxGrowth, max($minGrowth, round($growthPercentage, 1)));
     }
 
 
@@ -357,117 +330,6 @@ class TrendService
         return round(($difference / $oldValue) * 100, 1);
     }
 
-    public function getGrowthForDisplay(float $rawGrowth): string
-    {
-        // Limity pro zobrazení
-        $maxDisplayGrowth = 500;
-        $minDisplayGrowth = -75;
-
-        if ($rawGrowth > $maxDisplayGrowth) {
-            return "+{$maxDisplayGrowth}%+"; // Například "+500%+"
-        } elseif ($rawGrowth < $minDisplayGrowth) {
-            return "{$minDisplayGrowth}%-"; // Například "-75%-"
-        } else {
-            return round($rawGrowth, 1) . "%";
-        }
-    }
-
-    // Pro výpočet ročního růstu s realistickými limity
-    public function calculateAnnualizedGrowth(float $growthPercentage, int $daysDiff): ?float
-    {
-        // Ignorujeme příliš krátká období
-        if ($daysDiff < 30) {
-            return null;
-        }
-
-        // Výpočet anualizovaného růstu
-        $annualizedGrowth = (pow(1 + ($growthPercentage / 100), 365 / $daysDiff) - 1) * 100;
-
-        // Limity pro roční růst
-        $maxAnnualGrowth = 500;
-        $minAnnualGrowth = -75;
-
-        return min($maxAnnualGrowth, max($minAnnualGrowth, round($annualizedGrowth, 1)));
-    }
-
-    /**
-     * Vypočítá hodnoty růstu pro více období najednou (omezí počet dotazů)
-     * 
-     * @param int $productId ID produktu
-     * @param array $daysPeriods Pole období ve dnech pro výpočet
-     * @return array Asociativní pole s výsledky
-     */
-    public function calculateMultipleGrowthValues(int $productId, array $daysPeriods): array
-    {
-        $results = [];
-        $newestDate = Carbon::now();
-
-        // Připravíme SQL dotaz, který získá všechny potřebné ceny najednou
-        $query = "
-    WITH current_price AS (
-        SELECT value
-        FROM prices
-        WHERE product_id = ?
-        ORDER BY created_at DESC
-        LIMIT 1
-    )";
-
-        // Dynamicky vytvoříme části pro každé období
-        $bindings = [$productId];
-        $selectParts = ["(SELECT value FROM current_price) as current_value"];
-
-        foreach ($daysPeriods as $days) {
-            $oldPriceKey = "old_price_{$days}";
-            $query .= ", {$oldPriceKey} AS (
-        SELECT value
-        FROM prices
-        WHERE product_id = ? AND created_at <= ?
-        ORDER BY created_at DESC
-        LIMIT 1
-    )";
-
-            $bindings[] = $productId;
-            $bindings[] = $newestDate->copy()->subDays($days);
-            $selectParts[] = "(SELECT value FROM {$oldPriceKey}) as old_value_{$days}";
-        }
-
-        // Sestavíme finální dotaz
-        $query .= " SELECT " . implode(", ", $selectParts);
-
-        $result = DB::selectOne($query, $bindings);
-
-        if (!$result || !$result->current_value) {
-            // Vrátíme null pro všechny období
-            foreach ($daysPeriods as $days) {
-                $results[$days] = null;
-            }
-            return $results;
-        }
-
-        // Zpracujeme výsledky pro každé období
-        foreach ($daysPeriods as $days) {
-            $oldValueKey = "old_value_{$days}";
-
-            if (!isset($result->$oldValueKey) || $result->$oldValueKey < 0.1) {
-                $results[$days] = null;
-                continue;
-            }
-
-            $growthPercentage = (($result->current_value - $result->$oldValueKey) / $result->$oldValueKey) * 100;
-
-            // Pouze zaokrouhlíme na jedno desetinné místo, bez omezení hodnot
-            $value = round($growthPercentage, 1);
-
-            // Pro účely logování můžeme zaznamenat pokud byly hodnoty extrémní
-            if (abs($value) > 100) {
-                Log::info("Velká změna ceny produktu {$productId} za {$days} dní: {$value}%");
-            }
-
-            $results[$days] = $value;
-        }
-
-        return $results;
-    }
 
     public function getMonthlyAverageOfDailyMedians(int $productId, Carbon $month, ?string $condition = null): ?float
     {
