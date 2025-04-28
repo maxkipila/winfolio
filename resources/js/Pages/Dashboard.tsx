@@ -29,7 +29,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t('Hodnota portfolia')}</div>
                 <div className='flex items-center'>
                     <div className='font-bold text-7xl'>$</div>
-                    <div className='font-bold text-9xl'>{portfolioValue}</div>
+                    <div className='font-bold text-9xl'>{Math.round(portfolioValue * 100) / 100}</div>
                     {/* <div className='text-[#999999] font-bold text-7xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
@@ -41,7 +41,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t('Hodnota portfolia')}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{portfolioValue}</div>
+                    <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
@@ -53,7 +53,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t("Hodnota portfolia")}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{portfolioValue}</div>
+                    <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
@@ -88,7 +88,7 @@ function CardsMobile(props: CardsProps) {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{portfolioValue}</div>
+                        <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
                         {/* <div className='text-[#999999] font-bold text-4xl'></div> */}
                     </div>
                     {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>

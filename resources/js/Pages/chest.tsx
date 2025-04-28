@@ -157,7 +157,7 @@ const externalTooltipHandler = (context) => {
 
             const td = document.createElement('td');
             td.style.fontWeight = '700';
-            
+
             td.style.borderWidth = '0';
 
             const text = document.createTextNode(body);
@@ -278,7 +278,7 @@ function Chest(props: Props) {
                     <div className='flex items-center w-full justify-between'>
                         <div className='flex items-center'>
                             <div className='font-bold text-4xl'>$</div>
-                            <div className='font-bold text-6xl'>{portfolioStats.current_value}</div>
+                            <div className='font-bold text-6xl'>{Math.round(portfolioStats.current_value * 100) / 100}</div>
                             {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                         </div>
                         {
@@ -309,7 +309,7 @@ function Chest(props: Props) {
                             //@ts-expect-error
                             <Line height={102} options={options} data={data} />
                         }
-                        
+
                     </div>
                 }
                 <div className='flex'>
