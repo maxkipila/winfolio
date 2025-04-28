@@ -332,4 +332,59 @@ class PriceSeeder extends Seeder
             'type'       => 'market',
         ];
     }
+
+    public function seedHistoricalPrices()
+    {
+        $products = Product::all();
+
+        foreach ($products as $product) {
+            // Vytvoření základní ceny pro produkt
+            $basePrice = $this->getBasePrice($product);
+
+            // Vytvoření historických záznamů
+            $this->createHistoricalPrices($product->id, $basePrice);
+        }
+    }
+    private function getBasePrice($product)
+    {
+        // Pokud už existuje cena, použijeme ji jako základ
+        $existingPrice = Price::where('product_id', $product->id)
+            ->latest('created_at')
+            ->first();
+
+        if ($existingPrice) {
+            return $existingPrice->value;
+        }
+
+        // Jinak vygenerujeme podle typu produktu
+        return match ($product->product_type) {
+            'set' => $product->num_parts ? max(10, $product->num_parts * 0.5) : rand(20, 500),
+            'minifig' => rand(1, 50),
+            default => rand(10, 200)
+        };
+    }
+
+    private function createHistoricalPrices($productId, $basePrice)
+    {
+        // Vytvoříme ceny za posledních X měsíců
+        for ($i = 12; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $variance = rand(-10, 15) / 100; // Náhodná změna -10% až +15%
+            $price = max(0.1, $basePrice * (1 + $variance));
+
+            Price::updateOrCreate(
+                [
+                    'product_id' => $productId,
+                    'type' => 'aggregated',
+                    'created_at' => $date->startOfMonth(),
+                ],
+                [
+                    'value' => round($price, 2),
+                    'retail' => round($price * 1.3, 2),
+                    'wholesale' => round($price * 0.7, 2),
+                    'condition' => 'New',
+                ]
+            );
+        }
+    }
 }

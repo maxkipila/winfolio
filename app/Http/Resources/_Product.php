@@ -24,24 +24,11 @@ class _Product extends JsonResource
     public function toArray(Request $request): array
     {
         $trendService = app(TrendService::class);
-
-        // Získáme základní ceny a vypočítáme růst
-        $latestValue = $this->latest_price ? $this->latest_price->value : null;
-        if (isset($this->pivot->purchase_price) && $this->pivot->purchase_price > 0) {
-            $basePrice = $this->pivot->purchase_price;
-            $weeklyGrowth = $latestValue !== null
-                ? round((($latestValue - $basePrice) / $basePrice) * 100, 1)
-                : null;
-        } else {
-            $weeklyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 7);
-        }
-
-        // Zbytek období stále z TrendService
+        $weeklyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 7);
         $monthlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 30);
         $yearlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 365);
 
-        // Roční růst s limitací
-        $annualGrowth = $this->calculateAnnualGrowth($yearlyGrowth);
+        $annualGrowth = $this->calculateAnnualGrowth();
 
         return [
             'id'          => $this->id,
@@ -50,9 +37,7 @@ class _Product extends JsonResource
             'name'        => $this->name,
             'year'        => $this->year,
             'num_parts'   => $this->num_parts,
-            /* 'img_url'      => $this->getFirstMediaUrl('images') ?: null, */
-
-            'img_url' => $this->getFirstMediaUrl('images') ?: null,
+            'img_url'      => $this->getFirstMediaUrl('images') ?: null,
             'theme'       => new _Theme($this->theme),
             'availability' => $this->availability,
             'created_at'  => $this->created_at,
@@ -63,10 +48,10 @@ class _Product extends JsonResource
             'monthly_growth' => $this->getProductGrowth($this->id, 30),
             'weekly_growth' => $this->getProductGrowth($this->id, 7), */
             'growth' => [
-                'weekly' => $weeklyGrowth,
-                'monthly' => $monthlyGrowth,
-                'yearly' => $yearlyGrowth,
-                'annual' => $annualGrowth
+                'weekly' => $weeklyGrowth ?? 0,
+                'monthly' => $monthlyGrowth ?? 0,
+                'yearly' => $yearlyGrowth ?? 0,
+                'annual' => $annualGrowth ?? 0
             ],
             'favourited' => Auth::check() && get_class(Auth::user()) === User::class
                 ? Auth::user()->favourites()->where('favourite_type', Product::class)->where('favourite_id', $this->id)->exists()
@@ -92,37 +77,23 @@ class _Product extends JsonResource
     /**
      * Vypočítá roční růst s ošetřením chybějících dat
      */
-    private function formatGrowthForDisplay(?float $growth): ?float
+    private function calculateAnnualGrowth(): ?float
     {
-        if ($growth === null) {
-            return null;
+        $trendService = app(TrendService::class);
+
+        // Pokusíme se získat standardní roční růst
+        $annualGrowth = $trendService->getProductGrowth($this->id, 365);
+
+        if ($annualGrowth !== null) {
+            // Omezíme extrémní hodnoty - přísnější limity
+            if ($annualGrowth > 100) {
+                return 100.0; // Maximálně 100% růst
+            } elseif ($annualGrowth < -75) {
+                return -75.0; // Minimálně -75% pokles
+            }
+            return $annualGrowth;
         }
 
-        // Limity pro zobrazení
-        $maxDisplayGrowth = 500;
-        $minDisplayGrowth = -75;
-
-        return min($maxDisplayGrowth, max($minDisplayGrowth, $growth));
-    }
-
-    /**
-     * Vypočítá roční růst s ošetřením chybějících dat a limitací extrémních hodnot.
-     */
-    private function calculateAnnualGrowth(?float $yearlyGrowth = null): ?float
-    {
-        // Použijeme cachování pro zabránění opakovaných volání
-        static $cachedResults = [];
-        if (isset($cachedResults[$this->id])) {
-            return $cachedResults[$this->id];
-        }
-
-        // Pokud máme platný roční růst z TrendService, použijeme ho
-        if ($yearlyGrowth !== null) {
-            $cachedResults[$this->id] = $yearlyGrowth;
-            return $yearlyGrowth;
-        }
-
-        // Alternativní výpočet pokud nemáme roční růst z TrendService
         $oldestPrice = Price::where('product_id', $this->id)
             ->orderBy('created_at', 'asc')
             ->first();
@@ -138,7 +109,8 @@ class _Product extends JsonResource
         $oldValue = $oldestPrice->value;
         $newValue = $latestPrice->value;
 
-        if ($oldValue < 0.1) {
+
+        if ($oldValue < 0.5) {
             return null;
         }
 
@@ -146,18 +118,17 @@ class _Product extends JsonResource
 
         $daysDiff = Carbon::parse($oldestPrice->created_at)->diffInDays(Carbon::parse($latestPrice->created_at));
 
+
         if ($daysDiff < 30) {
-            return null; // Příliš krátká doba pro smysluplný výpočet
+            return min(100, max(-75, round($growthPercentage, 1)));
         }
 
-        // Výpočet anualizovaného růstu
+        if ($daysDiff <= 0) {
+            return min(100, max(-75, round($growthPercentage, 1)));
+        }
+
         $annualizedGrowth = (pow(1 + ($growthPercentage / 100), 365 / $daysDiff) - 1) * 100;
 
-        // Zaokrouhlení a limitace pro rozumné zobrazení
-        $result = round($annualizedGrowth, 1);
-        $result = min(100, max(-75, $result));
-
-        $cachedResults[$this->id] = $result;
-        return $result;
+        return min(100, max(-75, round($annualizedGrowth, 1)));
     }
 }
