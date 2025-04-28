@@ -116,7 +116,7 @@ return [
     'Tento produkt jste už recenzovali' => 'Tento produkt jste už recenzovali',
     'Jak to funguje' => 'Jak to funguje',
     'Knihovna' => 'Knihovna',
-    'Pricing' => 'Pricing',
+    'Pricing' => 'Ceník',
     'Blog' => 'Blog',
     'Stav si sbírku. Sleduj její růst.' => 'Stav si sbírku. Sleduj její růst.',
     'Zlepšuj se a vyhrávej.' => 'Zlepšuj se a vyhrávej.',

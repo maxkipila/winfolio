@@ -24,7 +24,7 @@ function Welcome(props: Props) {
             <div className='grid'>
                 <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
                 <div className='w-full col-start-1 row-start-1 p-24px flex items-center'>
-                    <div className='text-white'>
+                    <div className='text-white z-max'>
                         <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
                         <div className='font-bold text-6xl'>{t('Zlepšuj se a vyhrávej.')}</div>
                         <div className='font-nunito mb-32px'>{t('Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.')}</div>
