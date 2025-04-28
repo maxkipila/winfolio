@@ -219,19 +219,23 @@ const Credit = ({ awards, conditions }: Props) => {
                                             </div>
                                         ))}
                                     </div>
-                                    <SearchMultiple<Award>
+                                    <SearchMultiple<any>
                                         name="category_id"
                                         keyName="search_themes"
                                         placeholder="Název kategorie"
                                         value={form.data.category_id}
                                         onChange={(value) => {
-
                                             const selectedId = Array.isArray(value) ? value[0] : value;
                                             form.setData('category_id', selectedId);
                                         }}
                                         optionsCallback={(r) => ({
-                                            text: r.name,
-                                            element: <div>{r.name}</div>,
+                                            text: r.parent && r.parent.name ? `${r.parent.name} > ${r.name}` : r.name,
+                                            element: <div>
+                                                {r.parent && r.parent.name ? (
+                                                    <span className="text-black font-bold  mr-4px">{r.parent.name} &gt;</span>
+                                                ) : null}
+                                                <span>{r.name}</span>
+                                            </div>,
                                             value: r.id,
                                             object: r
                                         })}
@@ -266,19 +270,23 @@ const Credit = ({ awards, conditions }: Props) => {
                                             ))}
                                         </div>
                                         <div className='flex flex-row gap-16px'>
-                                            <SearchMultiple<Award>
+                                            <SearchMultiple<any>
                                                 name="category_id"
                                                 keyName="search_themes"
                                                 placeholder="Název kategorie"
                                                 value={form.data.category_id}
                                                 onChange={(value) => {
-
                                                     const selectedId = Array.isArray(value) ? value[0] : value;
                                                     form.setData('category_id', selectedId);
                                                 }}
                                                 optionsCallback={(r) => ({
-                                                    text: r.name,
-                                                    element: <div>{r.name}</div>,
+                                                    text: r.parent && r.parent.name ? `${r.parent.name} > ${r.name}` : r.name,
+                                                    element: <div>
+                                                        {r.parent && r.parent.name ? (
+                                                            <span className="text-black font-bold  mr-4px">{r.parent.name} &gt;</span>
+                                                        ) : null}
+                                                        <span>{r.name}</span>
+                                                    </div>,
                                                     value: r.id,
                                                     object: r
                                                 })}

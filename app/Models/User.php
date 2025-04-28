@@ -124,10 +124,21 @@ class User extends Authenticatable
         return $this->records()->where('record_type', $type)->first();
     }
 
-    public function awards()
+    /*  public function awards()
     {
         return $this->belongsToMany(Award::class, 'user_awards')
             ->withPivot(['earned_at', 'notified', 'count', 'value', 'percentage'])
+            ->withTimestamps();
+    } */
+    public function awards()
+    {
+        return $this->belongsToMany(
+            Award::class,
+            'user_awards',
+            'user_id',
+            'award_id'
+        )
+            ->withPivot(['earned_at', 'claimed_at', 'notified', 'user_description', 'count', 'value', 'percentage'])
             ->withTimestamps();
     }
 }

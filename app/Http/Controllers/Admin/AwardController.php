@@ -179,6 +179,7 @@ class AwardController extends Controller
     public function destroy(Award $award)
     {
         $award->delete();
-        return response()->noContent();
+
+        return redirect()->route('admin.awards.index')->with('success', 'News deleted successfully.');
     }
 }

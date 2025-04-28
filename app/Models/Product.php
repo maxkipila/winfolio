@@ -41,6 +41,8 @@ class Product extends Model implements HasMedia
             ? $first
             : $value;
     } */
+
+
     public function prices()
     {
         return $this->hasMany(Price::class);

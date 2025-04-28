@@ -7,6 +7,7 @@ use App\Http\Resources\_Product;
 use App\Http\Resources\_UserAward;
 use App\Models\Award;
 use App\Models\UserAward;
+use App\Notifications\NewAwardNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -59,7 +60,30 @@ class AwardController extends Controller
             'totalAwardsCount' => $allAwards->count()
         ]);
     }
+
+    // Přidáme metodu do AwardController.php, která zajistí notifikaci při nárokování odznaku
+
     public function claimBadge(Request $request, Award $award)
+    {
+        $userAward = UserAward::where('user_id', auth()->id())
+            ->where('award_id', $award->id)
+            ->first();
+
+        if ($userAward) {
+            $userAward->update([
+                'user_description' => 'Gratulujeme! Získal jsi odznak ' . $award->name . '!',
+                'claimed_at' => now(),
+                'updated_at' => now(),
+            ]);
+            if (!$userAward->notified) {
+                auth()->user()->notify(new NewAwardNotification($award));
+                $userAward->update(['notified' => true]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');
+    }
+    /*  public function claimBadge(Request $request, Award $award)
     {
 
         UserAward::where('user_id', auth()->id())
@@ -71,5 +95,5 @@ class AwardController extends Controller
             ]);
 
         return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');
-    }
+    } */
 }

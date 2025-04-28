@@ -30,5 +30,7 @@ Schedule::call(function () {
     $seeder->weeklyPriceUpdate();
 })->weekly()->timezone('Europe/Prague');
 
+Schedule::command('awards:notify')->hourly();
+
 //predpocitavani trndu
 Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague');
