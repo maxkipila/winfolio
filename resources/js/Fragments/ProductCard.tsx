@@ -10,7 +10,7 @@ interface Props extends Product {
 }
 
 function ProductCard(props: Props) {
-    const { wide = false, id, img_url, annual_growth, growth, monthly_growth, weekly_growth, name, num_parts, product_num, theme_id, thumbnail, year, theme, latest_price } = props
+    const { wide = false, id, img_url, annual_growth, availability, growth, monthly_growth, weekly_growth, name, num_parts, product_num, theme_id, thumbnail, year, theme, latest_price } = props
 
     return (
         <Link href={route('product.detail', { product: id })} className='border-2 border-black divide-y-2 divide-black'>
@@ -19,7 +19,7 @@ function ProductCard(props: Props) {
                 <div className='w-full'>
                     <div className='flex justify-between items-center w-full'>
                         <div className='font-bold'>{name}</div>
-                        <div className='w-16px h-16px bg-[#46BD0F] rounded-full flex-shrink-0'></div>
+                        <div className={`w-16px h-16px ${availability != null?"bg-[#46BD0F]":"bg-[#FEB34A]"} rounded-full flex-shrink-0`}></div>
                     </div>
                     <div className='mt-4px mb-8px'>{theme?.name ?? "---"}</div>
                     <div className='pt-8px border-t border-[#D0D4DB]'>{year}</div>

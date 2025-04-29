@@ -16,6 +16,7 @@ use App\Models\Product;
 use App\Models\Set;
 use App\Models\Theme;
 use App\Models\Trend;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -111,6 +112,17 @@ Route::post('/users/{user}/update-records', [RecordController::class, 'updateRec
 
 Route::get('/products/{product}/price-history', [ProductController::class, 'getPriceHistory']);
 Route::get('/products/{product}/price-statistics', [ProductController::class, 'getPriceStatistics']);
+
+
+Route::get('/email-preview/{email}', function (Request $request, $email) {
+    
+    return view('emails.' . $email, ["data" => $request->all(), 'user' => User::find(1)]);
+});
+
+Route::get('/email-testing/{email}', function (Request $request, $email) {
+    $user = User::find(1);
+    return view('emails.' . $email, ["data" => [$request->all(), 'link' => 'in_three_days', 'email' => 'svobodnik@paradigma.so', 'code'=>'123456'], 'user' => $user]);
+});
 
 
 require __DIR__ . '/admin.php';
