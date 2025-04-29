@@ -18,6 +18,7 @@ interface Product {
     annual_growth: number,
     monthly_growth: number,
     weekly_growth: number,
+    availability: any,
     growth: {
         weekly: number,
         monthly: number,

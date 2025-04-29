@@ -20,10 +20,18 @@ function PublicHeader(props: Props) {
                 {/* <Link className='font-nunito font-bold' href="">{t('Blog')}</Link> */}
                 {/* <Link className='font-nunito font-bold' href="">{t('How It Works')}</Link> */}
                 <div className='relative'>
-                    <Globe className='flex-shrink-0' size={24} />
+                    <Globe onClick={() => { setPicker((p) => !p) }} className='flex-shrink-0 cursor-pointer' size={24} />
                     {
-                        <div className=''>
-                            <Link href=""></Link>
+                        picker &&
+                        <div className='absolute bottom-0 bg-white transform translate-y-full w-64px'>
+                            <Link className='flex items-center gap-12px p-8px' href={route('welcome', { locale: 'cs' })}>
+                                <Img src="/assets/img/cz.svg" />
+                                <div>CZ</div>
+                            </Link>
+                            <Link className='flex items-center gap-12px p-8px' href={route('welcome', { locale: 'en' })}>
+                                <Img src="/assets/img/gb.svg" />
+                                <div>EN</div>
+                            </Link>
                         </div>
                     }
                 </div>

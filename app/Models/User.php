@@ -45,17 +45,19 @@ class User extends Authenticatable
         ];
     }
 
-    public function generateTwoFactorCode(): void
+    public function generateTwoFactorCode()
     {
         if ($this->two_fa_expires_at && now()->lt($this->two_fa_expires_at)) {
             return;
         }
 
         $this->timestamps = false;
-        $code = 123456;
+        $code = random_int(100000, 999999);
         $this->two_fa_code = Hash::make($code);
         $this->two_fa_expires_at = now()->addMinutes(10);
         $this->save();
+
+        return $code;
         // $this->sendTwoFactorCode($code);
     }
 

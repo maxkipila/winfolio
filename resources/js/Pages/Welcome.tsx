@@ -15,8 +15,8 @@ interface Props {
 function Welcome(props: Props) {
     const { products } = props
 
-    let [top_movers, button] = useLazyLoad<{ product: Product }>('top_movers');
-    let [trending_products, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trending_products');
+    // let [top_movers, button] = useLazyLoad<{ product: Product }>('top_movers');
+    // let [trending_products, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trending_products');
 
     return (
         <div className='pt-[82px] font-teko'>
@@ -24,7 +24,7 @@ function Welcome(props: Props) {
             <div className='grid'>
                 <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
                 <div className='w-full col-start-1 row-start-1 p-24px flex items-center'>
-                    <div className='text-white'>
+                    <div className='text-white z-max'>
                         <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
                         <div className='font-bold text-6xl'>{t('Zlepšuj se a vyhrávej.')}</div>
                         <div className='font-nunito mb-32px'>{t('Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.')}</div>
@@ -92,17 +92,17 @@ function Welcome(props: Props) {
                     </div>
                     <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
                         {
-                            trending_products?.map((s) =>
-                                <ProductCard {...s.product} />
+                            products?.map((s) =>
+                                <ProductCard {...s} />
                             )
                         }
 
                     </div>
-                    <div className='flex items-center justify-center w-full mt-24px'>
+                    {/* <div className='flex items-center justify-center w-full mt-24px'>
                         <div>
                             <Button {...trendButton}>{t('Zobrazit další')}</Button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className='py-24px pl-24px mob:pl-0 w-full'>
                     <div className='flex gap-8px items-center'>
@@ -111,16 +111,16 @@ function Welcome(props: Props) {
                     </div>
                     <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
                         {
-                            top_movers?.map((s) =>
-                                <ProductCard {...s.product} />
+                            products?.map((s) =>
+                                <ProductCard {...s} />
                             )
                         }
                     </div>
-                    <div className='flex items-center justify-center w-full mt-24px'>
+                    {/* <div className='flex items-center justify-center w-full mt-24px'>
                         <div>
                             <Button {...button}>{t('Zobrazit další')}</Button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
             </div>
