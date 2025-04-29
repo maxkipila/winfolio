@@ -16,6 +16,7 @@ use App\Models\Product;
 use App\Models\Set;
 use App\Models\Theme;
 use App\Models\Trend;
+use App\Services\TrendService;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -32,7 +33,7 @@ Route::middleware('guest:web')->group(function () {
 });
 
 
-Route::match(['POST', 'GET'], '/', function () {
+Route::match(['POST', 'GET'], '/', function (Request $request, TrendService $trendService) {
     $star_wars_theme = _Theme::init(Theme::where('name', 'Star Wars')->first());
 
     $products = _Product::collection(Product::where('theme_id', $star_wars_theme->id)->inRandomOrder()->take(4)->get());
@@ -44,7 +45,7 @@ Route::match(['POST', 'GET'], '/', function () {
         ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
 
     if ($trendingQuery->count() === 0) {
-        $this->trendService->calculateTrendingProducts(8, 30);
+        $trendService->calculateTrendingProducts(8, 30);
         $latestDate = Trend::where('type', 'trending')->max('calculated_at');
 
         $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
@@ -65,7 +66,7 @@ Route::match(['POST', 'GET'], '/', function () {
         ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
     if ($topMoversQuery->count() === 0) {
-        $this->trendService->calculateTopMovers();
+        $trendService->calculateTopMovers();
         $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
         $topMoversQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
@@ -103,6 +104,9 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/catalog', [UserController::class, 'catalog'])->name('catalog');
 
     Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
+
+    Route::delete('/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])
+        ->name('remove_product_from_user');
 
     Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 

@@ -34,11 +34,11 @@ class AwardController extends Controller
             ] : null,
         ];
 
-        // Získání odznaků, které uživatel má
+
         $userAwards = $user->awards()->get();
         $userAwardIds = $userAwards->pluck('id')->toArray();
 
-        // Načtení všech odznaků
+
         $allAwards = Award::with('conditions')->get();
 
         foreach ($allAwards as $award) {
@@ -65,20 +65,30 @@ class AwardController extends Controller
 
     public function claimBadge(Request $request, Award $award)
     {
-        $userAward = UserAward::where('user_id', auth()->id())
+        $userId = auth()->id();
+
+        $userAward = UserAward::where('user_id', $userId)
             ->where('award_id', $award->id)
             ->first();
 
-        if ($userAward) {
-            $userAward->update([
-                'user_description' => 'Gratulujeme! Získal jsi odznak ' . $award->name . '!',
-                'claimed_at' => now(),
-                'updated_at' => now(),
+        if (!$userAward) {
+            // Pokud neexistuje, vytvoříme nový záznam
+            $userAward = UserAward::create([
+                'user_id' => $userId,
+                'award_id' => $award->id,
+                'earned_at' => now(),
+                'notified' => false
             ]);
-            if (!$userAward->notified) {
-                auth()->user()->notify(new NewAwardNotification($award));
-                $userAward->update(['notified' => true]);
-            }
+        }
+
+        $userAward->update([
+            'user_description' => 'Gratulujeme! Získal jsi odznak ' . $award->name . '!',
+            'claimed_at' => now(),
+        ]);
+
+        if (!$userAward->notified) {
+            auth()->user()->notify(new NewAwardNotification($award));
+            $userAward->update(['notified' => true]);
         }
 
         return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');

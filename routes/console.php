@@ -32,5 +32,7 @@ Schedule::call(function () {
 
 Schedule::command('awards:notify')->hourly();
 
+Schedule::command('prices:update-historical')->dailyAt('01:00')->timezone('Europe/Prague');
+
 //predpocitavani trndu
 Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague');

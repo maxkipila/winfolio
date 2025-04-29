@@ -17,17 +17,14 @@ class PriceSeeder extends Seeder
 
         $this->seedPrices();
 
-        // Vyčištění paměti po seedování základních cen
         gc_collect_cycles();
 
-        // Generování historických dat pro lepší trendy
         $this->createHistoricalPriceTimeline();
 
-        // Vyčištění paměti po simulaci
         gc_collect_cycles();
 
         // Generování agregovaných dat
-        $this->generateAggregatedData(12);
+        // $this->generateAggregatedData(12);
     }
 
     /**
@@ -41,37 +38,61 @@ class PriceSeeder extends Seeder
         $faker = Faker::create();
 
         if ($product) {
+
             if (!Price::where('product_id', $product->id)->exists()) {
                 $this->seedPriceForProduct($product, $faker);
+
+                $basePrice = $this->generatePriceData($product, $faker)['value'];
+
+                for ($i = 1; $i <= 12; $i++) {
+                    $variationFactor = $faker->randomFloat(2, 0.85, 1.15); // 15% variace
+                    $date = now()->subMonths($i);
+
+                    DB::table('prices')->insert([
+                        'product_id' => $product->id,
+                        'retail' => round($basePrice * 1.3 * $variationFactor, 2),
+                        'wholesale' => round($basePrice * 0.7 * $variationFactor, 2),
+                        'value' => round($basePrice * $variationFactor, 2),
+                        'condition' => $product->product_type === 'set' ? 'New' : 'Mint',
+                        'type' => 'market',
+                        'created_at' => $date,
+                        'updated_at' => $date,
+                    ]);
+                }
             }
         } else {
-            Product::chunk(100, function ($products) use ($faker) {
-                $productIds = $products->pluck('id');
-                $existingPriceIds = Price::whereIn('product_id', $productIds)
-                    ->pluck('product_id')
-                    ->toArray();
 
-                $data = [];
-                foreach ($products as $product) {
-                    if (!in_array($product->id, $existingPriceIds)) {
-                        $priceData = $this->generatePriceData($product, $faker);
-                        $data[] = [
+            $chunkSize = 50;
+
+            Product::whereDoesntHave('prices')
+                ->chunkById($chunkSize, function ($products) use ($faker) {
+                    $priceData = [];
+
+                    foreach ($products as $product) {
+
+                        $priceInfo = $this->generatePriceData($product, $faker);
+
+                        $priceData[] = [
                             'product_id' => $product->id,
-                            'retail'     => $priceData['retail'],
-                            'wholesale'  => $priceData['wholesale'],
-                            'value'      => $priceData['value'],
-                            'condition'  => $priceData['condition'],
-                            'type'       => $priceData['type'],
+                            'retail' => $priceInfo['retail'],
+                            'wholesale' => $priceInfo['wholesale'],
+                            'value' => $priceInfo['value'],
+                            'condition' => $priceInfo['condition'],
+                            'type' => $priceInfo['type'],
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
                     }
-                }
 
-                if (!empty($data)) {
-                    DB::table('prices')->insert($data);
-                }
-            });
+                    // Vkládáme po menších částech pro lepší stabilitu
+                    foreach (array_chunk($priceData, 50) as $chunk) {
+                        DB::table('prices')->insert($chunk);
+                    }
+
+                    // Vyčištění paměti
+                    unset($priceData);
+                    gc_collect_cycles();
+                });
         }
     }
 
@@ -84,8 +105,8 @@ class PriceSeeder extends Seeder
         DB::disableQueryLog();
         $faker = Faker::create();
 
-        // Omezíme počet produktů kvůli paměti
-        $products = Product::limit(50)->get();
+        // Zvýšíme počet produktů pro zpracování
+        $products = Product::whereHas('prices')->limit(500)->get();
 
         foreach ($products as $product) {
             // Definice specifických datumů pro různá časová období
@@ -138,10 +159,10 @@ class PriceSeeder extends Seeder
 
             // Čištění paměti
             unset($priceData);
+            gc_collect_cycles();
         }
-
-        gc_collect_cycles();
     }
+
 
     /**
      * Vypočítá faktor trendu ceny podle typu trendu
@@ -203,8 +224,8 @@ class PriceSeeder extends Seeder
         $trendService = app(\App\Services\TrendService::class);
         $now = Carbon::now();
 
-
-        Product::take(200)->chunk(50, function ($products) use ($trendService, $now, $months) {
+        // Zvýšíme počet produktů pro zpracování
+        Product::chunkById(50, function ($products) use ($trendService, $now, $months) {
             $aggregatedData = [];
 
             foreach ($products as $product) {
@@ -212,7 +233,14 @@ class PriceSeeder extends Seeder
                     $month = $now->copy()->subMonths($i)->startOfMonth();
 
                     $avg = $trendService->getMonthlyAverageOfDailyMedians($product->id, $month);
-                    if ($avg === null) continue;
+                    if ($avg === null) {
+                        // Fallback to the closest available price if no daily medians exist
+                        $avg = $trendService->getMedianPriceForProduct($product->id, $month->toDateString());
+                    }
+                    if ($avg === null) {
+                        // Still no data, skip this month
+                        continue;
+                    }
 
                     $aggregatedData[] = [
                         'product_id' => $product->id,
@@ -366,25 +394,87 @@ class PriceSeeder extends Seeder
 
     private function createHistoricalPrices($productId, $basePrice)
     {
-        // Vytvoříme ceny za posledních X měsíců
+        // Create a realistic trend (growth or decline)
+        $trendType = rand(0, 100) < 70 ? 'growth' : 'decline'; // 70% chance of growth
+        $trendStrength = rand(5, 20) / 100; // 5-20% overall trend
+
+        // Volatility - how much random variation
+        $volatility = rand(3, 10) / 100; // 3-10% volatility
+
+        // Create prices for the last 12 months
         for ($i = 12; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $variance = rand(-10, 15) / 100; // Náhodná změna -10% až +15%
-            $price = max(0.1, $basePrice * (1 + $variance));
+            $month = now()->subMonths($i);
+
+            // Calculate trend component
+            $trendFactor = $trendType === 'growth'
+                ? 1 + ($trendStrength * (12 - $i) / 12)
+                : 1 - ($trendStrength * (12 - $i) / 12);
+
+            // Add random volatility
+            $randomFactor = 1 + (rand(-100, 100) / 100 * $volatility);
+
+            // Final price with trend and randomness
+            $price = $basePrice * $trendFactor * $randomFactor;
+
+            // Ensure the price stays positive and reasonable
+            $price = max(0.01, min($price, $basePrice * 3));
 
             Price::updateOrCreate(
                 [
                     'product_id' => $productId,
                     'type' => 'aggregated',
-                    'created_at' => $date->startOfMonth(),
+                    'created_at' => $month->startOfMonth(),
                 ],
                 [
                     'value' => round($price, 2),
                     'retail' => round($price * 1.3, 2),
                     'wholesale' => round($price * 0.7, 2),
-                    'condition' => 'New',
+                    'condition' => 'New', // Or use product type to determine
                 ]
             );
         }
+
+        /*  private function createHistoricalPrices($productId, $basePrice)
+    {
+        
+        $trendType = rand(0, 100) < 70 ? 'growth' : 'decline'; // 70% chance of growth
+        $trendStrength = rand(5, 20) / 100; // 5-20% overall trend
+
+        
+        $volatility = rand(3, 10) / 100; // 3-10% volatility
+
+    
+        for ($i = 12; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+
+      
+            $trendFactor = $trendType === 'growth'
+                ? 1 + ($trendStrength * (12 - $i) / 12)
+                : 1 - ($trendStrength * (12 - $i) / 12);
+
+        
+            $randomFactor = 1 + (rand(-100, 100) / 100 * $volatility);
+
+         
+            $price = $basePrice * $trendFactor * $randomFactor;
+
+           
+            $price = max(0.01, min($price, $basePrice * 3));
+
+            Price::updateOrCreate(
+                [
+                    'product_id' => $productId,
+                    'type' => 'aggregated',
+                    'created_at' => $month->startOfMonth(),
+                ],
+                [
+                    'value' => round($price, 2),
+                    'retail' => round($price * 1.3, 2),
+                    'wholesale' => round($price * 0.7, 2),
+                    'condition' => 'New', 
+                ]
+            );
+        }
+    } */
     }
 }

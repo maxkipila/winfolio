@@ -92,7 +92,9 @@ class User extends Authenticatable
     public function products()
     {
         return $this->belongsToMany(Product::class)
+            ->using(ProductUser::class)
             ->withPivot([
+                'id',
                 'purchase_day',
                 'purchase_month',
                 'purchase_year',
@@ -102,6 +104,7 @@ class User extends Authenticatable
             ])
             ->withTimestamps();
     }
+
     public function getPortfolioValue()
     {
         return $this->products->sum(function ($product) {

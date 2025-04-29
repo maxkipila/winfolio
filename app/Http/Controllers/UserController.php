@@ -12,9 +12,11 @@ use App\Http\Resources\_User;
 use App\Models\Favourite;
 use App\Models\Minifig;
 use App\Models\Product;
+use App\Models\ProductUser;
 use App\Models\Set;
 use App\Models\Theme;
 use App\Models\Trend;
+use App\Models\User;
 use App\Services\TrendService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -169,7 +172,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $range = $request->input('range', 'year');
-        // dd($request, $range);
+
         $fromDate = match ($range) {
             'week' => now()->subDays(7),
             'month' => now()->subMonth(),
@@ -178,27 +181,50 @@ class UserController extends Controller
 
         $productIds = $user->products()->pluck('product_id')->toArray();
 
+        if (empty($productIds)) {
+            return Inertia::render('chest', [
+                'products' => [],
+                'user_products' => [],
+                'portfolioStats' => null,
+                'portfolioProducts' => [],
+                'portfolioValue' => 0,
+                'range' => $range,
+                'fromDate' => $fromDate->toDateString(),
+                'portfolioHistory' => []
+            ]);
+        }
+
         $user->load('products.latest_price');
 
+        // Výpočet aktuální hodnoty portfolia
         $portfolioValue = $user->products->sum(function ($product) {
             return $product->latest_price ? $product->latest_price->value : 0;
         });
 
+        // Přidáme debug informace
+        Log::debug('Portfolio calculation', [
+            'user_id' => $user->id,
+            'range' => $range,
+            'fromDate' => $fromDate->toDateString(),
+            'productIds' => $productIds,
+            'portfolioValue' => $portfolioValue
+        ]);
+
+        // Výpočet růstu portfolia
         $portfolioStats = $trendService->calculateGrowth($productIds, $fromDate);
 
         if (isset($portfolioStats['total'])) {
             $portfolioStats['total']['current_value'] = $portfolioValue;
         }
 
-        if ($request->range == 'week') {
-            $history = $trendService->getPortfolioHistory($productIds, 'day', 7);
-        } else if ($request->range == 'month') {
-            $history = $trendService->getPortfolioHistory($productIds, 'week', 4);
-        } else {
-            $history = $trendService->getPortfolioHistory($productIds, 'month', 12);
-        }
 
-        $this->trendService->calculateTrendingProducts();
+        // Získání historie pro graf
+        $history = match ($range) {
+            'week' => $trendService->getPortfolioHistory($productIds, 'day', 7),
+            'month' => $trendService->getPortfolioHistory($productIds, 'day', 30),
+            default => $trendService->getPortfolioHistory($productIds, 'month', 12)
+        };
+
 
         $user_products = _Product::collection($user->products);
         $products = _Product::collection(Product::latest()->paginate($request->paginate ?? 10));
@@ -206,14 +232,16 @@ class UserController extends Controller
         return Inertia::render('chest', [
             'products' => $products,
             'user_products' => $user_products,
-            'portfolioStats' => $portfolioStats['total'],
-            'portfolioProducts' => $portfolioStats['products'],
+            'portfolioStats' => $portfolioStats['total'] ?? null,
+            'portfolioProducts' => $portfolioStats['products'] ?? [],
             'portfolioValue' => $portfolioValue,
             'range' => $range,
             'fromDate' => $fromDate->toDateString(),
             'portfolioHistory' => $history
         ]);
     }
+
+
     public function profile(Request $request)
     {
 
@@ -244,13 +272,20 @@ class UserController extends Controller
         return back();
     }
 
-    public function remove_product_from_user(Request $request, Product $product)
+    public function remove_product_from_user(Product $product)
+    {
+        /*  dd($product); */
+        Auth::user()->products()->detach($product->id);
+        return back()->with('success', 'Produkt byl odebrán.');
+    }
+
+    /*   public function remove_product_from_user(Request $request, Product $product)
     {
         $user = Auth::user();
 
         $user->products()->detach($product->id);
         return back();
-    }
+    } */
 
     public function toggleFavourite(Request $request, $type, $favouritable)
     {

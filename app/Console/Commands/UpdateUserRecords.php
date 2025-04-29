@@ -62,14 +62,14 @@ class UpdateUserRecords extends Command
         return false;
     }
 
-    protected function updateBestPurchase(User $user): bool
+    private function updateBestPurchase(User $user): bool
     {
         $products = $user->products()->with('price')->get();
         $bestGrowth = 0;
         $bestProductId = null;
 
         foreach ($products as $product) {
-            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+            if (!$product->pivot->purchase_price || $product->pivot->purchase_price <= 0 || !$product->price || !$product->price->value) {
                 continue;
             }
 
@@ -96,7 +96,7 @@ class UpdateUserRecords extends Command
         return false;
     }
 
-    protected function updateWorstPurchase(User $user): bool
+    private function updateWorstPurchase(User $user): bool
     {
         $products = $user->products()->with('price')->get();
         $worstGrowth = 0;
@@ -104,7 +104,7 @@ class UpdateUserRecords extends Command
         $foundNegativeGrowth = false;
 
         foreach ($products as $product) {
-            if (!$product->pivot->purchase_price || !$product->price || !$product->price->value) {
+            if (!$product->pivot->purchase_price || $product->pivot->purchase_price <= 0 || !$product->price || !$product->price->value) {
                 continue;
             }
 

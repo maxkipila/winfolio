@@ -2,15 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Console\Commands\SeedUserProductHistory;
-use App\Models\Admin;
-use App\Models\Minifig;
-use App\Models\Price;
 use App\Models\Set;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Admin;
+use App\Models\Price;
+use App\Models\Minifig;
 use Illuminate\Database\Seeder;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Seeders\DataSeeder;
+use Database\Seeders\NewsSeeder;
+use Database\Seeders\PriceSeeder;
+use Database\Seeders\ReviewSeeder;
 use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\SeedUserProductHistory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,11 +24,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-
         User::factory()->create([
             'first_name' => 'Test',
             'last_name' => 'User',
-            'email' => 'test@user.com',
+            'email' => 'tester@tester.com',
             'nickname' => 'TestUser',
             'prefix' => '+420',
             'phone' => '000000000',
@@ -49,7 +52,7 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-        Artisan::call('import:lego-data');
+        /*    Artisan::call('import:lego-data');
 
         $this->call(DataSeeder::class);
         $this->call(PriceSeeder::class);
@@ -57,7 +60,30 @@ class DatabaseSeeder extends Seeder
         $this->call(NewsSeeder::class);
 
         Artisan::call('prices:aggregate');
-        /* $this->call(SeedUserProductHistory::class); */
+
+        Artisan::call('prices:update-historical');
+        Artisan::call('import:lego-images'); */
+
+
+        // Naimportování LEGO dat (témata, sety, figurky)
+        Artisan::call('import:lego-data');
+
+
+        $this->call(DataSeeder::class);
+
+        $this->call(PriceSeeder::class);
+
+        $this->call(ReviewSeeder::class);
+
+        gc_collect_cycles();
+
+        $this->call(NewsSeeder::class);
+
+        // Agregace cen
+        Artisan::call('prices:aggregate');
+
+        // Aktualizace historických cen
+        Artisan::call('prices:update-historical');
 
         Artisan::call('import:lego-images');
     }

@@ -37,16 +37,16 @@ class ImportLegoData extends Command
         ],
         'inventories' => [
             'file'   => 'inventories.csv.gz',
-            'import' => null, // Tento soubor nebudeme importovat samostatně
+            'import' => null,
             'model'  => null
         ],
         'inventory_minifigs' => [
             'file'   => 'inventory_minifigs.csv.gz',
-            'import' => null, // Tento soubor nebudeme importovat samostatně
+            'import' => null,
             'model'  => null
         ],
         'relationships' => [
-            'file'   => null, // Není to skutečný soubor, ale označení pro proces vazeb
+            'file'   => null,
             'import' => SetMinifigImport::class,
             'model'  => null
         ]

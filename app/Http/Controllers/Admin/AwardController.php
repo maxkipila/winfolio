@@ -57,7 +57,16 @@ class AwardController extends Controller
     }
     public function store(Request $request)
     {
-        /*  dd($request->all()); */
+
+        if ($request->has('product_name') && is_array($request->input('product_name'))) {
+            $firstItem = $request->input('product_name')[0] ?? null;
+            if ($firstItem && isset($firstItem['id'])) {
+                $request->merge([
+                    'product_id' => $firstItem['id'],
+                ]);
+            }
+        }
+
 
         if ($request->has('category_id') && is_array($request->input('category_id'))) {
             $catArray = $request->input('category_id');
@@ -67,7 +76,6 @@ class AwardController extends Controller
                     'category_id' => $firstCatId,
                 ]);
             } else {
-
                 $request->merge([
                     'category_id' => null,
                 ]);
@@ -92,6 +100,10 @@ class AwardController extends Controller
         $award = Award::create($awardData);
 
         if (!empty($conditionData['condition_type'])) {
+
+            if ($request->has('product_id')) {
+                $conditionData['product_id'] = $request->input('product_id');
+            }
             $award->conditions()->create($conditionData);
         }
 
@@ -99,6 +111,7 @@ class AwardController extends Controller
             ->route('admin.awards.index')
             ->with('success', 'Ocenění bylo úspěšně vytvořeno.');
     }
+
     public function removeField(Request $request, Award $award, AwardCondition $condition, $field)
     {
         if (!in_array($field, ['category', 'product'])) {
@@ -120,7 +133,7 @@ class AwardController extends Controller
 
     public function update(Request $request, Award $award)
     {
-        // Zpracování pole pro product_name: pokud přichází jako pole, z merge se uloží první položka do product_id
+
         if ($request->has('product_name') && is_array($request->input('product_name'))) {
             $firstItem = $request->input('product_name')[0] ?? null;
             if ($firstItem && isset($firstItem['id'])) {
@@ -130,7 +143,7 @@ class AwardController extends Controller
             }
         }
 
-        // Zpracování pole pro category_id: pokud přichází jako pole, vezme se první položka
+
         if ($request->has('category_id') && is_array($request->input('category_id'))) {
             $catArray = $request->input('category_id');
             $firstCatId = $catArray[0]['id'] ?? null;

@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class _Product extends JsonResource
 {
@@ -29,6 +31,45 @@ class _Product extends JsonResource
         $yearlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 365);
 
         $annualGrowth = $this->calculateAnnualGrowth();
+        $isAdminContext = Gate::allows('admin');
+
+        $userOwns = [];
+        $favourited = false;
+
+        // Pro běžné uživatele ověřit vlastnictví a získat záznamy z pivot tabulky
+        if (Auth::check() && Auth::user() instanceof User && !Gate::allows('admin')) {
+            $user = Auth::user();
+
+            $userProductRelations = $user->products()
+                ->where('products.id', $this->id)
+                ->get()
+                ->map(function ($product) {
+                    return [
+                        'id' => $product->pivot->id,
+                        'product_id' => $product->pivot->product_id,
+                        'user_id' => $product->pivot->user_id,
+                        /* 'purchase_day' => $product->pivot->purchase_day,
+                        'purchase_month' => $product->pivot->purchase_month,
+                        'purchase_year' => $product->pivot->purchase_year,
+                        'purchase_price' => $product->pivot->purchase_price,
+                        'currency' => $product->pivot->currency,
+                        'condition' => $product->pivot->condition,
+                        'created_at' => $product->pivot->created_at,
+                        'updated_at' => $product->pivot->updated_at */
+                    ];
+                })
+                ->toArray();
+
+            $userOwns = $userProductRelations;
+
+            // Kontrola oblíbených
+            if (method_exists($user, 'favourites')) {
+                $favourited = $user->favourites()
+                    ->where('favourite_type', Product::class)
+                    ->where('favourite_id', $this->id)
+                    ->exists();
+            }
+        }
 
         return [
             'id'          => $this->id,
@@ -40,6 +81,7 @@ class _Product extends JsonResource
             'img_url'      => $this->getFirstMediaUrl('images') ?: null,
             'theme'       => new _Theme($this->theme),
             'availability' => $this->availability,
+            'user_owns'   => $userOwns,
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'latest_price' => $this->latest_price,

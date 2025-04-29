@@ -143,7 +143,7 @@ class SetMinifigImport
         try {
             $chunks = array_chunk($batch, 100);
             foreach ($chunks as $chunk) {
-                DB::table('set_minifigs')->insert($chunk);
+                DB::table('set_minifigs')->insertOrIgnore($chunk);
             }
         } catch (\Exception $e) {
             echo 'Chyba při vkládání vazeb set-minifig: ' . $e->getMessage() . "\n";

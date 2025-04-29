@@ -23,7 +23,7 @@ class Product extends Model implements HasMedia
     {
         return $this->belongsTo(\App\Models\Theme::class);
     }
-
+    /* 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -31,8 +31,30 @@ class Product extends Model implements HasMedia
             'product_user',
             'product_id',
             'user_id'
+
         );
+    } */
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->using(ProductUser::class)
+            ->withPivot([
+                'id',
+                'user_id',
+                'product_id',
+                'product_user',
+                'quantity',
+                'purchase_day',
+                'purchase_month',
+                'purchase_year',
+                'purchase_price',
+                'currency',
+                'condition'
+            ])
+            ->withTimestamps();
     }
+
+
     /*  public function getImgUrlAttribute($value): string
     {
         $first = $this->getFirstMediaUrl('images');

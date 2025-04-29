@@ -10,6 +10,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         $types = ['set', 'minifig'];
+        $availabilityOptions = ['Retail', 'Retired', 'Retiring soon', 'Unavailable', 'Coming soon'];
 
         return [
             'product_num' => $this->faker->unique()->bothify('####?'),
@@ -19,7 +20,7 @@ class ProductFactory extends Factory
             'theme_id' => Theme::inRandomOrder()->first()?->id ?? null,
             'num_parts' => $this->faker->numberBetween(1, 1000),
             'img_url' => $this->faker->imageUrl(),
-            'availability' => $this->faker->randomElement(['Retail', 'Retired']),
+            'availability' => $this->faker->randomElement($availabilityOptions),
         ];
     }
 }

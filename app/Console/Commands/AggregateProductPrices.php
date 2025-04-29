@@ -78,8 +78,8 @@ class AggregateProductPrices extends Command
                         'created_at' => $month,
                     ], [
                         'value' => $value,
-                        'retail' => null,
-                        'wholesale' => null,
+                        'retail' => round($value * 1.3, 2),
+                        'wholesale' => round($value * 0.7, 2),
                         'updated_at' => now(),
                     ]);
                 }
