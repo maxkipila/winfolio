@@ -48,14 +48,14 @@ class _Product extends JsonResource
                         'id' => $product->pivot->id,
                         'product_id' => $product->pivot->product_id,
                         'user_id' => $product->pivot->user_id,
-                        /* 'purchase_day' => $product->pivot->purchase_day,
+                        'purchase_day' => $product->pivot->purchase_day,
                         'purchase_month' => $product->pivot->purchase_month,
                         'purchase_year' => $product->pivot->purchase_year,
                         'purchase_price' => $product->pivot->purchase_price,
                         'currency' => $product->pivot->currency,
                         'condition' => $product->pivot->condition,
                         'created_at' => $product->pivot->created_at,
-                        'updated_at' => $product->pivot->updated_at */
+                        'updated_at' => $product->pivot->updated_at
                     ];
                 })
                 ->toArray();

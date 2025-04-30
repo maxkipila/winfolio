@@ -50,6 +50,7 @@ function Award(props: Props) {
     useEffect(() => {
         let unclaimed = awards?.filter((a) => a?.pivot?.is_claimed == false)
         if (unclaimed?.length > 0) {
+            console.log('otviram')
             open(MODALS.UNCLAIMED_AWARDS, false, { awards: unclaimed })
         }
     }, [])
@@ -67,13 +68,13 @@ function Award(props: Props) {
                             <>
                                 {
                                     <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>
-                                    <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
-                                        <Medal size={24} />
+                                        <div className='w-40px h-40px rounded-full bg-white flex items-center justify-center'>
+                                            <Medal size={24} />
+                                        </div>
+                                        <div className='font-bold font-nunito text-center'>{t('Nejlepší koupě')}</div>
+                                        <div>{records?.best_purchase?.product?.name}</div>
+                                        <div>{records?.best_purchase?.value}</div>
                                     </div>
-                                    <div className='font-bold font-nunito text-center'>{t('Nejlepší koupě')}</div>
-                                    <div>{records?.best_purchase?.product?.name}</div>
-                                    <div>{records?.best_purchase?.value}</div>
-                                </div>
                                 }
 
                                 <div className='w-full bg-[#F5F5F5] flex flex-col items-center justify-center gap-8px min-h-[190px] min-w-[110px]'>

@@ -19,6 +19,14 @@ interface Product {
     monthly_growth: number,
     weekly_growth: number,
     availability: any,
+    user_owns?: Array<{
+        condition: string,
+        currency: string,
+        purchase_day: string,
+        purchase_month: string,
+        purchase_year: string,
+        purchase_price: number
+    }>
     growth: {
         weekly: number,
         monthly: number,
