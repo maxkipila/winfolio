@@ -195,7 +195,11 @@ function PointsGraph(props: Props) {
 
     return (
         <div className='mt-32px'>
-            <Line height={180} options={options} data={dummyData} />
+            {
+                //@ts-expect-error
+                <Line height={180} options={options} data={dummyData} />
+            }
+            
         </div>
     )
 }
