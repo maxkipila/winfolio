@@ -10,7 +10,7 @@ import ReviewCard from '@/Fragments/ReviewCard'
 import { Button } from '@/Fragments/UI/Button'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { ArrowRight, Basket, Export, Heart, Lock, Plus, Question, X } from '@phosphor-icons/react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, Basket, Export, Heart, Lock, Plus, Question, X } from '@phosphor-icons/react'
 import axios from 'axios'
 import moment from 'moment'
 import React, { useContext, useState } from 'react'
@@ -18,10 +18,11 @@ import React, { useContext, useState } from 'react'
 interface Props {
     product: Product
     similiar_products?: Array<Product>
+    priceHistory: any
 }
 
 function Product(props: Props) {
-    const { product, similiar_products } = props
+    const { product, similiar_products, priceHistory } = props
     let [quickBuy, setQuickBuy] = useState(true)
     const form = useForm({});
     const { data, post } = form;
@@ -113,7 +114,7 @@ function Product(props: Props) {
                         </div>
 
                     </div>
-                    <PointsGraph />
+                    <PointsGraph product={product} priceHistory={priceHistory} />
                     {/* <div className='mt-32px border-2 border-black p-32px'>
                         <div className='font-bold text-xl w-full pb-16px border-b border-black'>{t('Set Predictions')}</div>
                         <div className='mt-16px font-bold text-lg'>{t('New/Sealed')}</div>
@@ -305,7 +306,10 @@ function Product(props: Props) {
                             <div className='text-[#4D4D4D]'>Minifigs</div>
                             <div className='text-[#4D4D4D]'>1</div>
                         </div> */}
-                        <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{t('Availible at retail')}</div>
+                        {
+                            product?.availability != null &&
+                            <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{t('Availible at retail')}</div>
+                        }
 
                         {
                             product?.user_owns?.length > 0 ?
@@ -314,7 +318,7 @@ function Product(props: Props) {
                                         product?.user_owns?.map((u) =>
                                             <div className='w-full border-2 border-black px-12px py-8px'>
                                                 <div className='flex items-center justify-end mb-24px'>
-                                                    <div onClick={()=>{remove_from_portfolio(product)}} className='cursor-pointer h-32px w-32px bg-[#ED2E1B] flex items-center justify-center'>
+                                                    <div onClick={() => { remove_from_portfolio(product) }} className='cursor-pointer h-32px w-32px bg-[#ED2E1B] flex items-center justify-center'>
                                                         <X size={24} color="white" />
                                                     </div>
                                                 </div>
@@ -340,6 +344,66 @@ function Product(props: Props) {
                                 :
                                 <Button href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
                         }
+                    </div>
+                    <div className='border-2 border-black p-24px flex flex-col gap-12px mt-32px'>
+                        <div className='font-bold text-xl'>{t('Pricing')}</div>
+
+                        <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('Value')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div>{product.latest_price.value}</div>
+                        </div>
+
+                        <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('Growth')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div className={`${product.growth.monthly >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center w-[78px] text-center pb-2px pt-6px rounded justify-center mt-6px`}>
+                                {
+                                    product.growth.monthly >= 0 ?
+                                        <ArrowUpRight size={16} className='mb-4px' color="white" />
+                                        :
+                                        <ArrowDownRight size={16} className='mb-4px' color="white" />
+                                }
+                                <div className='text-white '>{product.growth.monthly} %</div>
+                            </div>
+                        </div>
+
+                        <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('Annual growth')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div>{product.growth.annual}%</div>
+                        </div>
+
+                        <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('Rolling growth')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div></div>
+                        </div>
+
+                        <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('1-year growth')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div></div>
+                        </div>
+
+                        <div className='flex items-center justify-between w-full border-t border-b border-[#D0D4DB] pt-12px pb-12px'>
+                            <div className='flex items-center gap-4px'>
+                                <div>{t('Future growth')}</div>
+                                <Question size={20} color="#4D4D4D" />
+                            </div>
+                            <div></div>
+                        </div>
+
                     </div>
                     <div className='mt-32px border-2 border-black p-32px'>
                         <div className='font-bold font-teko'>{t('Set Facts')}</div>

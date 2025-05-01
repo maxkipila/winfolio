@@ -540,12 +540,21 @@ class TrendService
             ];
         })->toArray();
 
+
+        $historyPoints = $chartPoints->map(function ($point) {
+            return [
+                'date' => $point->created_at->format('Y-m-d'),
+                'value' => (float)$point->value,
+                'condition' => $point->condition
+            ];
+        })->groupBy('date')->toArray();
+
         $forecast = $this->calculateForecast($formattedPoints, 90); // Předpověď na 90 dní
 
         $currentPrice = $this->getMedianPriceForProduct($productId, null, $condition);
 
         return [
-            'history' => $formattedPoints,
+            'history' => $historyPoints,
             'forecast' => $forecast,
             'current_price' => $currentPrice,
             'min_price' => !empty($formattedPoints) ? min(array_column($formattedPoints, 'value')) : null,

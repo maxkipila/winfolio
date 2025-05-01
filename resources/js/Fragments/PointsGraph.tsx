@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
+import { externalTooltipHandler } from '@/Pages/chest';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -40,33 +41,7 @@ let daysLabel = Object.keys(days ?? {}).map(d => moment(d, 'YYYY-MM-DD').format(
 let max = Math.max(...Object.values(days ?? {}), 1);
 
 
-const dummyData = {
-    labels: daysLabel,
-    datasets: [
-        {
-            label: 'Profit',
-            data: Object.values(days ?? {}),
-            stack: 'Stack 1',
-            borderColor: '#16A049',
-            backgroundColor: '#46BD0F80',
-            borderWidth: 0,
-            borderRadius: 4,
-            borderSkipped: false,
-            barThickness: 16,
-            pointHitRadius: 2,
-            pointBorderWidth: 0,
-            pointRadius: 4,
-            fill: false
-        },
-        // {
-        //     label: 'Filled',
-        //     backgroundColor: 'rgba(196, 234, 178, 0.3)',
-        //     borderColor: 'rgba(196, 234, 178, 0.3)',
-        //     data: Object.values(days ?? {}),
-        //     fill: true,
-        //   }
-    ]
-};
+
 
 let options = {
     responsive: true,
@@ -79,6 +54,11 @@ let options = {
             display: false,
             text: 'Chart.js Bar Chart',
         },
+        tooltip: {
+            enabled: false,
+            position: 'nearest',
+            external: externalTooltipHandler
+        }
     },
     scales: {
         x: {
@@ -103,10 +83,115 @@ let options = {
     maintainAspectRatio: false,
 };
 
-interface Props { }
+interface Props {
+    product: Product,
+    priceHistory: any
+}
 
 function PointsGraph(props: Props) {
-    const { } = props
+    const { product, priceHistory } = props
+
+    let prevDates = Object.keys(priceHistory.history)
+    let prevValues = Object.values(priceHistory.history)
+    let historicValues = prevValues.flatMap((h) => h[0])
+    let dates = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.date)
+    let values = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.value) as Array<number>
+
+    let avarageValue = values.reduce((p, c) => c + p, 0) / values?.length
+    let max = Math.max(...values)
+    let min = Math.min(...values)
+    let last = values[values.length - 1]
+    let isGrowing = last > avarageValue
+    let difference = (max - min) / values?.length
+    let seventh = isGrowing ? last + difference : last - difference
+    let nextMonth = moment(dates[dates?.length - 1]).add(1, 'M')
+    let untilYear = 11 - nextMonth.month()
+    let amountOfMonths = untilYear + 24
+    let nextDates = [moment(dates[dates?.length - 1]).format('YYYY-MM-DD')]
+    let nextValues = [last]
+
+    for (let index = 0; index < amountOfMonths; index++) {
+
+        nextDates.push(moment(nextDates[nextDates.length - 1]).add(1, 'M').format('YYYY-MM-DD'))
+    }
+
+    for (let index = 0; index < amountOfMonths; index++) {
+        if (isGrowing) {
+            nextValues.push(nextValues[nextValues?.length - 1] + difference)
+        } else {
+            nextValues.push(nextValues[nextValues?.length - 1] - difference)
+        }
+
+    }
+
+
+    let graphDates = [...dates, ...nextDates]
+    let graphValues = [...values, ...nextValues]
+    let OsaDiff = max - avarageValue
+    let osa1 = graphValues.map((g) => g + OsaDiff)
+    let osa2 = graphValues.map((g) => g - OsaDiff)
+    console.log(graphDates, graphValues, 'osa:')
+
+    const dummyData = {
+        labels: graphDates,
+        datasets: [
+
+            {
+                label: 'Total: ',
+                data: osa2,
+                stack: 'Stack 1',
+                borderColor: 'transparent',
+                backgroundColor: 'rgba(196, 234, 178, 0.3)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 16,
+                pointHitRadius: 0,
+                pointBorderWidth: 0,
+                pointRadius: 0,
+
+                fill: '1'
+            },
+            {
+                label: 'Profit',
+                data: graphValues,
+                stack: 'Stack 1',
+                borderColor: '#16A049',
+                backgroundColor: '#46BD0F80',
+                borderWidth: 0,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 16,
+                pointHitRadius: 2,
+                pointBorderWidth: 0,
+                pointRadius: 4,
+                fill: false
+            },
+            {
+                label: 'Total: ',
+                data: osa1,
+                stack: 'Stack 1',
+                borderColor: 'transparent',
+                backgroundColor: 'rgba(196, 234, 178, 0.3)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 16,
+                pointHitRadius: 0,
+                pointBorderWidth: 0,
+                pointRadius: 0,
+
+                fill: '-1'
+            }
+            // {
+            //     label: 'Filled',
+            //     backgroundColor: 'rgba(196, 234, 178, 0.3)',
+            //     borderColor: 'rgba(196, 234, 178, 0.3)',
+            //     data: Object.values(days ?? {}),
+            //     fill: true,
+            //   }
+        ]
+    };
 
     return (
         <div className='mt-32px'>

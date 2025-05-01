@@ -82,7 +82,7 @@ const dummyData = {
     ]
 };
 
-const getOrCreateTooltip = (chart) => {
+export const getOrCreateTooltip = (chart) => {
     let tooltipEl = chart.canvas.parentNode.querySelector('div');
 
     if (!tooltipEl) {
@@ -106,7 +106,7 @@ const getOrCreateTooltip = (chart) => {
     return tooltipEl;
 };
 
-const externalTooltipHandler = (context) => {
+export const externalTooltipHandler = (context) => {
     // Tooltip Element
     const { chart, tooltip } = context;
     const tooltipEl = getOrCreateTooltip(chart);
