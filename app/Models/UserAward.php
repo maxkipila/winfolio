@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class UserAward extends Model
+class UserAward extends Pivot
 {
     use HasFactory;
 
     protected $guarded = [];
-
+    protected $table = 'user_awards';
     protected $casts = [
         'earned_at' => 'datetime',
         'notified' => 'boolean',

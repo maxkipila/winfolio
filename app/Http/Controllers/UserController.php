@@ -326,7 +326,7 @@ class UserController extends Controller
     {
         /*  dd($product); */
         Auth::user()->products()->detach($product->id);
-        return back()->with('success', 'Produkt byl odebrán.');
+        return back();
     }
 
     /*   public function remove_product_from_user(Request $request, Product $product)

@@ -9,6 +9,7 @@ use App\Models\Award;
 use App\Models\UserAward;
 use App\Notifications\NewAwardNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AwardController extends Controller
@@ -66,30 +67,18 @@ class AwardController extends Controller
     public function claimBadge(Request $request, Award $award)
     {
         $userId = auth()->id();
+        $user = Auth::user();
 
-        $userAward = UserAward::where('user_id', $userId)
-            ->where('award_id', $award->id)
-            ->first();
-
-        if (!$userAward) {
-            // Pokud neexistuje, vytvoříme nový záznam
-            $userAward = UserAward::create([
-                'user_id' => $userId,
-                'award_id' => $award->id,
-                'earned_at' => now(),
-                'notified' => false
-            ]);
-        }
-
-        $userAward->update([
+        $user->awards()->syncWithoutDetaching([$award->id => [
             'user_description' => 'Gratulujeme! Získal jsi odznak ' . $award->name . '!',
             'claimed_at' => now(),
-        ]);
+            'earned_at' => now(),
+            'notified' => true
+        ]]);
 
-        if (!$userAward->notified) {
-            auth()->user()->notify(new NewAwardNotification($award));
-            $userAward->update(['notified' => true]);
-        }
+
+        auth()->user()->notify(new NewAwardNotification($award));
+
 
         return redirect()->back()->with('success', 'Odznak byl úspěšně nárokován!');
     }
