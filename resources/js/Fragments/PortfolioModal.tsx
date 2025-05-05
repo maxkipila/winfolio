@@ -114,7 +114,7 @@ function PortfolioModal(props: Props) {
                                 {
                                     selected ?
 
-                                        <div className='max-w-1/3 mx-auto grid'>
+                                        <div className='max-w-1/3 mob:max-w-max mx-auto grid'>
                                             <div className='flex justify-between mt-48px'>
                                                 <div className='font-bold font-teko text-xl mb-24px'>{t('Nová položka')}</div>
                                                 <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>{t('Cancel')}</div>
@@ -276,7 +276,7 @@ function PortfolioModal(props: Props) {
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                 </div>
-                                                <div className='max-w-1/3 mx-auto'>
+                                                <div className='max-w-1/3 mob:max-w-max mx-auto'>
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
                                                     <Search<Product>
                                                         // className="min-w-[400px]"
@@ -304,7 +304,7 @@ function PortfolioModal(props: Props) {
                                                                         <ArrowUpRight size={24} weight='bold' />
                                                                         <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length : ''}`}</div>
                                                                     </div>
-                                                                    <div className='grid grid-cols-2 gap-16px p-24px'>
+                                                                    <div className='grid grid-cols-2 mob:grid-cols-1 gap-16px p-24px'>
                                                                         {
                                                                             search_products?.length > 0 ?
                                                                                 search_products?.map((sp) =>

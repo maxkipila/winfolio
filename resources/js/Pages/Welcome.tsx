@@ -19,28 +19,30 @@ function Welcome(props: Props) {
     // let [trending_products, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trending_products');
 
     return (
-        <div className='pt-[82px] font-teko'>
+        <div className='pt-[82px] font-teko relative'>
             <PublicHeader />
-            <div className='grid'>
-                <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
-                <div className='w-full col-start-1 row-start-1 p-24px flex items-center'>
-                    <div className='text-white z-max'>
-                        <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
-                        <div className='font-bold text-6xl'>{t('Zlepšuj se a vyhrávej.')}</div>
-                        <div className='font-nunito mb-32px'>{t('Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.')}</div>
-                        <Button className='max-w-[140px]' href={route('login')}>{t('Přijmout výzvu')}</Button>
+            <div className='w-full'>
+                <div className='grid'>
+                    <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
+                    <div className='w-full col-start-1 row-start-1 p-24px flex items-center'>
+                        <div className='text-white z-max'>
+                            <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
+                            <div className='font-bold text-6xl'>{t('Zlepšuj se a vyhrávej.')}</div>
+                            <div className='font-nunito mb-32px'>{t('Proměň svou sbírku v herní pole plné strategií, výzev a odměn. Sleduj tržní ceny, plň mise a staň se LEGO investičním šampionem.')}</div>
+                            <Button className='max-w-[140px]' href={route('login')}>{t('Přijmout výzvu')}</Button>
+                        </div>
                     </div>
-                </div>
-                <div className='w-full col-start-1 row-start-1 flex flex-col justify-end px-24px mob:hidden'>
-                    <div className='grid grid-cols-4 mob:flex overflow-x-auto gap-17px transform translate-y-[60%]'>
-                        {
-                            products?.map((p) =>
-                                <ProductCard {...p} />
-                            )
-                        }
+                    <div className='w-full col-start-1 row-start-1 flex flex-col justify-end px-24px mob:hidden'>
+                        <div className='grid grid-cols-4 mob:flex overflow-x-auto gap-17px transform translate-y-[60%]'>
+                            {
+                                products?.map((p) =>
+                                    <ProductCard {...p} />
+                                )
+                            }
+                        </div>
                     </div>
-                </div>
 
+                </div>
             </div>
             <div className='w-full col-start-1 row-start-1 flex flex-col justify-end px-24px nMob:hidden mob:py-24px'>
                 <div className='grid grid-cols-4 mob:grid-cols-1 overflow-x-auto gap-17px'>

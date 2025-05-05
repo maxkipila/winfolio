@@ -278,7 +278,7 @@ function Chest(props: Props) {
                     <div className='flex items-center w-full justify-between'>
                         <div className='flex items-center'>
                             <div className='font-bold text-4xl'>$</div>
-                            <div className='font-bold text-6xl'>{Math.round(portfolioStats.current_value * 100) / 100}</div>
+                            <div className='font-bold text-6xl'>{current_value == 0 ? 0 : Math.round(portfolioStats?.current_value * 100) / 100}</div>
                             {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                         </div>
                         {

@@ -73,13 +73,13 @@ function Login(props: Props) {
         post(route('register.account'));
     };
     return (
-        <div className='flex items-center p-40px h-screen font-teko'>
+        <div className='flex items-center p-40px mob:p-16px h-screen font-teko'>
             <Head title="Login | Winfolio" />
             <div className='w-full h-full flex flex-col'>
                 <div className='flex items-center justify-center'>
                     <Link href={route('welcome')}><Img src="/assets/img/logo.png" /></Link>
                 </div>
-                <div className='h-full justify-center items-center flex p-80px'>
+                <div className='h-full justify-center items-center flex p-80px mob:p-0'>
                     <Form className='w-full gap-12px flex-col flex' form={form}>
                         {
                             !emailConfirmed &&
@@ -276,7 +276,7 @@ function Login(props: Props) {
                     </Form>
                 </div>
             </div>
-            <div className='w-full h-full'>
+            <div className='w-full h-full mob:hidden'>
                 <ChangingCarousel />
             </div>
         </div>

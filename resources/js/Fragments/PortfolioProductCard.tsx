@@ -17,8 +17,8 @@ function PortfolioProductCard(props: Props) {
         <div onClick={() => { setSelected({ ...props }) }} className='border-2 border-black divide-y-2 divide-black'>
             <div className='p-16px w-full flex bg-[#F5F5F5] gap-16px'>
                 <Img className='w-80px h-80px object-contain' src={img_url} />
-                <div>
-                    <div className='flex justify-between items-center'>
+                <div className='w-full'>
+                    <div className='flex justify-between items-center w-full'>
                         <div className='font-bold'>{name}</div>
                         <div className={`w-16px h-16px ${availability != null?"bg-[#46BD0F]":"bg-[#FEB34A]"} rounded-full flex-shrink-0`}></div>
                     </div>
@@ -37,7 +37,7 @@ function PortfolioProductCard(props: Props) {
                 </div>
                 <div>
                     <div className='text-[#4D4D4D]'>{t('Growth')}</div>
-                    <div className={`${growth.monthly >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"} pt-6px  flex items-center w-[78px] text-center py-2px rounded justify-center mt-6px`}>
+                    <div className={`${growth.monthly >= 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"} pt-6px  flex items-center w-full text-center py-2px rounded justify-center mt-6px`}>
                         {
                             growth.monthly >= 0 ?
                                 <ArrowUpRight className='mb-4px' color="white" />

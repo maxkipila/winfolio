@@ -205,10 +205,10 @@ function Product(props: Props) {
                                 <div className='mt-16px text-[#4D4D4D] font-nunito'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</div>
                                 {
                                     product?.minifigs?.length > 0 ?
-                                        <div className='grid grid-cols-4 mob:grid-cols-2 gap-12px mob:overflow-y-auto'>
+                                        <div className='grid grid-cols-4 mob:grid-cols-1 gap-12px mob:overflow-y-auto'>
                                             {
                                                 product?.minifigs?.map((m) =>
-                                                    <Link href={route('product.detail', { product: m.id })} className='border-2 border-black flex flex-col gap-8px bg-white py-12px w-full max-h-[200px]'>
+                                                    <Link href={route('product.detail', { product: m.id })} className='border-2 border-black flex flex-col gap-8px bg-white py-12px px-12px w-full mob:max-h-[200px]'>
                                                         <div className='text-center font-bold font-nunito'>{m.name}</div>
                                                         <Img className='max-h-100px object-contain' src={m.img_url} />
                                                     </Link>
@@ -317,7 +317,8 @@ function Product(props: Props) {
                                     {
                                         product?.user_owns?.map((u) =>
                                             <div className='w-full border-2 border-black px-12px py-8px'>
-                                                <div className='flex items-center justify-end mb-24px'>
+                                                <div className='flex items-center justify-between mb-24px'>
+                                                    <div className='font-bold text-lg'>{moment(`${u.purchase_day}.${u.purchase_month}.${u.purchase_year}`).format('DD. MM. YYYY')}</div>
                                                     <div onClick={() => { remove_from_portfolio(product) }} className='cursor-pointer h-32px w-32px bg-[#ED2E1B] flex items-center justify-center'>
                                                         <X size={24} color="white" />
                                                     </div>
@@ -333,10 +334,10 @@ function Product(props: Props) {
                                                         <div className='font-bold text-lg'>{u.condition}</div>
                                                     </div>
                                                 }
-                                                <div className='flex items-center justify-between'>
+                                                {/* <div className='flex items-center justify-between'>
                                                     <div className='font-nunito'>{t('Datum nákupu')}</div>
                                                     <div className='font-bold text-lg'>{moment(`${u.purchase_day}.${u.purchase_month}.${u.purchase_year}`).format('DD. MM. YYYY')}</div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )
                                     }
