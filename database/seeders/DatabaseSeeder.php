@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
+
         /*    Artisan::call('import:lego-data');
 
         $this->call(DataSeeder::class);
@@ -86,5 +87,8 @@ class DatabaseSeeder extends Seeder
         Artisan::call('prices:update-historical');
 
         Artisan::call('import:lego-images');
+
+        // Přiřazení témat k minifigurkám
+        Artisan::call('app:assign-themes-to-minifigs');
     }
 }

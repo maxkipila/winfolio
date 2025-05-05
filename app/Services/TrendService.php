@@ -632,7 +632,7 @@ class TrendService
      */
     private function calculateInterpolatedValue($priceData, Carbon $date): ?float
     {
-        // Najdeme nejbližší předchozí a následující cenu
+
         $prevPrice = $priceData->filter(function ($price) use ($date) {
             return $price->created_at->lt($date);
         })->sortByDesc('created_at')->first();

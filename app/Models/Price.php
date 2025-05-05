@@ -8,10 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
     use HasFactory;
-    protected $guarded = [];/* 
-    protected $primaryKey = 'price_id';
-    protected $keyType = 'string';
-    public $incrementing = false; */
+    protected $fillable = [
+        'product_id',
+        'retail',
+        'wholesale',
+        'value',
+        'condition',
+        'type',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
+    ];
+
 
     public function product()
     {
@@ -48,5 +58,29 @@ class Price extends Model
     public function scopeByCurrency($query, $currency)
     {
         return $query->where('currency', $currency);
+    }
+
+    public function getPlatformAttribute()
+    {
+        $metadata = $this->metadata;
+        return $metadata['platform'] ?? null;
+    }
+
+    public function getDescriptionAttribute()
+    {
+        $metadata = $this->metadata;
+        return $metadata['description'] ?? null;
+    }
+
+    public function getChangeAttribute()
+    {
+        $metadata = $this->metadata;
+        return $metadata['change'] ?? null;
+    }
+
+    public function getLinkAttribute()
+    {
+        $metadata = $this->metadata;
+        return $metadata['link'] ?? null;
     }
 }
