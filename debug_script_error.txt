@@ -1,0 +1,30 @@
+        const puppeteer = require("puppeteer-extra");
+        const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+        puppeteer.use(StealthPlugin());
+        
+        (async () => {
+            const url = process.argv[2] || '';
+            if (!url) {
+                console.log(JSON.stringify({ error: "URL není zadána" }));
+                process.exit(1);
+            }
+        
+            const args = ["--no-sandbox", "--disable-setuid-sandbox"];
+            
+        
+            const browser = await puppeteer.launch({
+                headless: true,
+                args: args,
+            });
+        
+            const page = await browser.newPage();
+        
+            await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36");
+        
+            await page.setExtraHTTPHeaders({
+                "Accept-Language": "en-US,en;q=0.9,cs;q=0.8",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache"
+            });

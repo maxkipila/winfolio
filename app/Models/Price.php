@@ -8,15 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Price extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'product_id',
-        'retail',
-        'wholesale',
-        'value',
-        'condition',
-        'type',
-        'metadata',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'metadata' => 'array',
