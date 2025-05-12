@@ -20,7 +20,7 @@ class ImportCommand extends Command
         switch ($type) {
             case 'all':
                 $this->importProducts();
-                /* $this->importImages(); */
+                $this->importImages();
                 $this->importMappings();
                 $this->importPrices();
                 break;
@@ -29,9 +29,9 @@ class ImportCommand extends Command
                 $this->importProducts();
                 break;
 
-            /*  case 'images':
+            case 'images':
                 $this->importImages();
-                break; */
+                break;
 
             case 'mappings':
                 $this->importMappings();
@@ -57,12 +57,12 @@ class ImportCommand extends Command
         $this->info(Artisan::output());
     }
 
-    /*  private function importImages(): void
+    private function importImages(): void
     {
         $this->info('Import obrázků...');
         Artisan::call('import:lego-images', ['--skip-existing' => true]);
         $this->info(Artisan::output());
-    } */
+    }
 
 
     private function importMappings(): void
