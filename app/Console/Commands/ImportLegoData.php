@@ -171,7 +171,7 @@ class ImportLegoData extends Command
 
     protected function importDataset($type)
     {
-        ini_set('memory_limit', '512M'); // Increase memory limit
+        ini_set('memory_limit', '1024M');
 
         if ($this->option('truncate')) {
             $this->info("Vyprazdňuji tabulku {$type} před importem");

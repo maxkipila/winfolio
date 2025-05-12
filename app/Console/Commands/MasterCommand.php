@@ -34,21 +34,21 @@ class MasterCommand extends Command
             $this->info(Artisan::output());
 
             // Dodatečné produkční nastavení
-            $this->info('Nastavuji produkční prostředí...');
+            /* $this->info('Nastavuji produkční prostředí...'); */
 
             // Import základních LEGO dat
-            $this->info('Importuji základní LEGO data...');
+            /*  $this->info('Importuji základní LEGO data...');
             Artisan::call('app:import', ['--type' => 'products']);
-            $this->info(Artisan::output());
+            $this->info(Artisan::output()); */
 
             // Zajištění základních cen
-            $this->info('Zajišťuji základní cenové údaje...');
+            /* $this->info('Zajišťuji základní cenové údaje...');
             Artisan::call('prices:ensure-all', ['--chunk' => 500]);
-            $this->info(Artisan::output());
+            $this->info(Artisan::output()); */
 
             // Agregace cen
-            Artisan::call('prices:aggregate');
-            $this->info(Artisan::output());
+            /*   Artisan::call('prices:aggregate');
+            $this->info(Artisan::output()); */
         } else {
             $this->error('Musíte zadat --dev nebo --prod volbu');
             return self::FAILURE;
