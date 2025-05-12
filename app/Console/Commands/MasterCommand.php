@@ -17,7 +17,7 @@ class MasterCommand extends Command
     {
         if ($this->option('dev')) {
 
-            $this->info('Inicializace vývojového prostředí...');
+            $this->info('Inicializace ');
 
             // Spustí kompletní seed 
             Artisan::call('db:seed');
@@ -37,18 +37,11 @@ class MasterCommand extends Command
             /* $this->info('Nastavuji produkční prostředí...'); */
 
             // Import základních LEGO dat
-            /*  $this->info('Importuji základní LEGO data...');
+            $this->info('Importuji základní LEGO data...');
             Artisan::call('app:import', ['--type' => 'products']);
-            $this->info(Artisan::output()); */
-
-            // Zajištění základních cen
-            /* $this->info('Zajišťuji základní cenové údaje...');
-            Artisan::call('prices:ensure-all', ['--chunk' => 500]);
-            $this->info(Artisan::output()); */
-
-            // Agregace cen
-            /*   Artisan::call('prices:aggregate');
-            $this->info(Artisan::output()); */
+            $this->info(Artisan::output());
+            $this->info('Přiřazuji témata k minifigurkám...');
+            Artisan::call('app:assign-themes-to-minifigs');
         } else {
             $this->error('Musíte zadat --dev nebo --prod volbu');
             return self::FAILURE;

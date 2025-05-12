@@ -60,14 +60,5 @@ class EssentialsSeeder extends Seeder
 
             $this->command->info('Testovací uživatel vytvořen: tester@tester.com');
         }
-
-        $this->command->info('Import základních LEGO dat...');
-        Artisan::call('import:lego-data');
-        $this->command->info(Artisan::output());
-
-        // Přiřazování témat k minifigurkám
-        $this->command->info('Přiřazuji témata k minifigurkám...');
-        Artisan::call('app:assign-themes-to-minifigs');
-        $this->command->info(Artisan::output());
     }
 }
