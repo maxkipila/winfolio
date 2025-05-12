@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Theme;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
@@ -28,6 +29,14 @@ class MasterCommand extends Command
         } elseif ($this->option('prod')) {
             // Produkční prostředí jen s nutnými daty
             $this->info('Inicializace produkčního prostředí...');
+
+        // Import základních témat
+        if (Theme::count() === 0) {
+            $this->info('Importuji základní témata...');
+            Artisan::call('import:lego-data', ['dataType' => 'themes']);
+            $this->info(Artisan::output());
+        }
+        }
 
             // Spustí pouze EssentialsSeeder
             Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\EssentialsSeeder']);

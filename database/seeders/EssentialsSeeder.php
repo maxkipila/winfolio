@@ -30,12 +30,6 @@ class EssentialsSeeder extends Seeder
             $this->command->info('Admin uživatel již existuje');
         }
 
-        // Import základních témat
-        if (Theme::count() === 0) {
-            $this->command->info('Importuji základní témata...');
-            Artisan::call('import:lego-data', ['dataType' => 'themes']);
-            $this->command->info(Artisan::output());
-        }
 
         // Vytvoření testovacího uživatele pro produkci (volitelné)
         if (!User::where('email', 'tester@tester.com')->exists()) {
