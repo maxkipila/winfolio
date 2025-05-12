@@ -16,53 +16,43 @@ Artisan::command('inspire', function () {
 if (!function_exists('schedule')) {
     function schedule(Schedule $schedule)
     {
-        // Nastavení plánovače
+        // Denní aktualizace
         $schedule->command('app:update --mode=daily')
             ->dailyAt('03:00')
             ->timezone('Europe/Prague')
             ->description('Denní aktualizace cen a odznaků');
 
+        // Týdenní aktualizace
         $schedule->command('app:update --mode=weekly')
-            ->weeklyOn(0, '02:00')  // Neděle ve 2:00
+            ->weeklyOn(0, '02:00')
             ->timezone('Europe/Prague')
             ->description('Týdenní aktualizace cen a trendů');
 
+        // Měsíční aktualizace
         $schedule->command('app:update --mode=monthly')
-            ->monthlyOn(1, '01:00')  // 1. den v měsíci v 1:00
+            ->monthlyOn(1, '01:00')
             ->timezone('Europe/Prague')
             ->description('Měsíční aktualizace dat a import nových produktů');
 
-        $schedule->command('app:maintenance --action=fix-prices')
-            ->weeklyOn(1, '04:00')  // Pondělí ve 4:00
-            ->timezone('Europe/Prague')
-            ->description('Týdenní údržba cenových údajů');
-
+        //
         $schedule->command('telescope:prune --hours=48')
             ->daily()
             ->timezone('Europe/Prague');
 
-        $schedule->command('app:check-awards')
-            ->dailyAt('23:30')
-            ->timezone('Europe/Prague')
-            ->description('Kontrola odznaků');
-
-        $schedule->command('app:update-user-records')
-            ->dailyAt('23:40')
-            ->timezone('Europe/Prague')
-            ->description('Aktualizace uživatelských rekordů');
-
         $schedule->command('awards:notify')
             ->hourly()
             ->timezone('Europe/Prague')
-            ->description('Odesílání notifikací o odznacích');
+            ->description('Odesílání notifikací ');
+    }
 
-        $schedule->command('prices:aggregate')
+    /*  $schedule->command('prices:aggregate')
             ->dailyAt('03:00')
             ->timezone('Europe/Prague')
-            ->description('Agregace cen produktů');
+            ->description('Agregace cen produktů'); */
 
-        // Seeder commands using closure
-        $schedule->call(function () {
+
+    // Seeder commands using closure
+    /*   $schedule->call(function () {
             $seeder = new PriceSeeder();
             $seeder->seedPrices();
         })
@@ -77,7 +67,7 @@ if (!function_exists('schedule')) {
             ->weekly()
             ->timezone('Europe/Prague')
             ->description('Týdenní aktualizace cen');
-    }
+    } */
 }
 
 /* 

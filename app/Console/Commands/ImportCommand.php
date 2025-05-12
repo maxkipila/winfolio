@@ -88,12 +88,11 @@ class ImportCommand extends Command
         $this->info(Artisan::output());
     }
 
-    private function importPrices(): void
+    /*   private function importPrices(): void
     {
         $this->info('Import cen...');
         Artisan::call('actual:prices-brickeconomy'); // limit 100, delay 3, throttle 5
         $this->info(Artisan::output());
-
         $this->info('Ceny byly úspěšně importovány');
-    }
+    } */
 }
