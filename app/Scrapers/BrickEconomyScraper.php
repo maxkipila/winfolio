@@ -216,7 +216,7 @@ class BrickEconomyScraper
                     'theme_id' => $themeId,
                     'num_parts' => $productData['num_parts'] ?? null,
                     'img_url' => $productData['img_url'] ?? null,
-                    'availability' => $productData['availability'] ?? null,  // Zajistíme, že availability se ukládá
+                    'availability' => $productData['availability'] ?? null,
                 ]
             );
 
