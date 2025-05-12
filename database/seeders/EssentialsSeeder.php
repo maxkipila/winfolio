@@ -10,10 +10,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class EssentialsSeeder extends Seeder
 {
-    /**
-     * Seed základních dat pro produkční prostředí.
-     * Vytvoří administrátora, nastaví základní kategorie a další nezbytná data.
-     */
+
     public function run(): void
     {
 

@@ -11,13 +11,13 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class BulkScrapeBrickEconomyCommand extends Command
+class ActualPricesBrickEconomyCommand extends Command
 {
-    protected $signature = 'scrape:brickeconomy-bulk
+    protected $signature = 'actual:prices-brickeconomy
                             {--type=all : Type of products to scrape (all, set, minifig)}
-                            {--limit=50 : Maximum number of products to process}
+                            {--limit=100 : Maximum number of products to process}
                             {--chunk=10 : Number of products to process in one batch}
-                            {--delay=2 : Delay between batches in seconds}
+                            {--delay=3 : Delay between batches in seconds}
                             {--offset=0 : Start from this offset in the database query}
                             {--use-existing-mappings : Only scrape products that already have BrickEconomy ID mappings}
                             {--force : Force scrape even if price already exists}
@@ -59,19 +59,19 @@ class BulkScrapeBrickEconomyCommand extends Command
             $query->where('product_type', $type);
         }
 
+        // Přeskočíme produkty s cenami z posledních 7 dní, pokud není zadán --force
+        if (!$force) {
+            $query->whereDoesntHave('prices', function ($priceQuery) {
+                $priceQuery->where('created_at', '>=', now()->subDays(7));
+            });
+        }
+
         if ($useExistingMappings) {
             $brickEconomyIds = LegoIdMapping::whereNotNull('brickeconomy_id')
                 ->pluck('rebrickable_id')
                 ->toArray();
 
             $query->whereIn('product_num', $brickEconomyIds);
-
-
-            if (!$force) {
-                $query->whereDoesntHave('prices', function ($priceQuery) {
-                    $priceQuery->where('created_at', '>=', now()->subDays(7));
-                });
-            }
         }
 
         // Počet produktů ke zpracování

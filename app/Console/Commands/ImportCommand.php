@@ -20,7 +20,7 @@ class ImportCommand extends Command
         switch ($type) {
             case 'all':
                 $this->importProducts();
-                $this->importImages();
+                /* $this->importImages(); */
                 $this->importMappings();
                 $this->importPrices();
                 break;
@@ -29,9 +29,9 @@ class ImportCommand extends Command
                 $this->importProducts();
                 break;
 
-            case 'images':
+            /*  case 'images':
                 $this->importImages();
-                break;
+                break; */
 
             case 'mappings':
                 $this->importMappings();
@@ -57,12 +57,12 @@ class ImportCommand extends Command
         $this->info(Artisan::output());
     }
 
-    private function importImages(): void
+    /*  private function importImages(): void
     {
         $this->info('Import obrázků...');
         Artisan::call('import:lego-images', ['--skip-existing' => true]);
         $this->info(Artisan::output());
-    }
+    } */
 
 
     private function importMappings(): void
@@ -71,11 +71,11 @@ class ImportCommand extends Command
         Artisan::call('lego:fix-minifig-mappings');
         $this->info(Artisan::output());
 
-        $this->info('Generování mapování pro sety...');
+        $this->info('Mapování pro sety...');
         Artisan::call('lego:generate-mappings', ['--type' => 'set']);
         $this->info(Artisan::output());
 
-        $this->info('Generování mapování pro minifigurky...');
+        $this->info('Mapování pro minifigurky...');
         Artisan::call('lego:generate-mappings', ['--type' => 'minifig']);
         $this->info(Artisan::output());
 
@@ -91,12 +91,7 @@ class ImportCommand extends Command
     private function importPrices(): void
     {
         $this->info('Import cen...');
-
-        Artisan::call('prices:ensure-all');
-        $this->info(Artisan::output());
-
-        // Pak vygenerujeme agregované ceny
-        Artisan::call('prices:generate-history', ['--months' => 12]);
+        Artisan::call('actual:prices-brickeconomy'); // limit 100, delay 3, throttle 5
         $this->info(Artisan::output());
 
         $this->info('Ceny byly úspěšně importovány');

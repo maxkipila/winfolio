@@ -10,10 +10,6 @@ class SetMinifigImport
 {
     public function import($inventoriesPath, $inventoryMinifigsPath)
     {
-        if (DB::getSchemaBuilder()->hasTable('set_minifigs')) {
-            DB::table('set_minifigs')->truncate();
-        }
-
         echo "Načítám mapování inventories na sety...\n";
         $setNums = Product::where('product_type', 'set')->pluck('product_num')->toArray();
         $inventoryToSetMap = $this->loadInventoriesToSetsMapping($inventoriesPath, $setNums);
@@ -43,18 +39,14 @@ class SetMinifigImport
         $setNumMap = array_flip($setNums);
 
         if (($handle = fopen($path, 'r')) !== false) {
-
             fgetcsv($handle);
 
             while (($data = fgetcsv($handle)) !== false) {
-
                 if (count($data) >= 3) {
                     $inventoryId = $data[0];
                     $setNum = $data[2];
 
-                    // Zkontrolujeme, zda tento set máme v databázi
                     if (isset($setNumMap[$setNum])) {
-                        // Najdeme product_id pro daný set_num
                         $set = Product::where('product_num', $setNum)
                             ->where('product_type', 'set')
                             ->select('id')
@@ -91,13 +83,11 @@ class SetMinifigImport
                     $figNum = $data[1];
                     $quantity = intval($data[2]);
 
-
                     if (!isset($inventoryToSetMap[$inventoryId])) {
                         continue;
                     }
 
                     $setId = $inventoryToSetMap[$inventoryId];
-
 
                     if (!isset($minifigsMap[$figNum])) {
                         continue;
@@ -114,7 +104,6 @@ class SetMinifigImport
                     ];
 
                     $count++;
-
 
                     if (count($batch) >= $batchSize) {
                         $this->insertBatch($batch);
