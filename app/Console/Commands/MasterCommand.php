@@ -30,13 +30,12 @@ class MasterCommand extends Command
             // Produkční prostředí jen s nutnými daty
             $this->info('Inicializace produkčního prostředí...');
 
-        // Import základních témat
-        if (Theme::count() === 0) {
-            $this->info('Importuji základní témata...');
-            Artisan::call('import:lego-data', ['dataType' => 'themes']);
-            $this->info(Artisan::output());
-        }
-        }
+            // Import základních témat
+            if (Theme::count() === 0) {
+                $this->info('Importuji základní témata...');
+                Artisan::call('import:lego-data', ['dataType' => 'themes']);
+                $this->info(Artisan::output());
+            }
 
             // Spustí pouze EssentialsSeeder
             Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\EssentialsSeeder']);
