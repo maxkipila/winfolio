@@ -76,9 +76,9 @@ class UpdateCommand extends Command
         $this->info('Spouštím měsíční aktualizaci...');
 
         // Aktualizace vazeb
-        $this->info('Spouštím app:import');
+        /*   $this->info('Spouštím app:import');
         Artisan::call('app:import');
-        $this->info(Artisan::output());
+        $this->info(Artisan::output()); */
 
         /* // Aktualizace vazeb
         $this->info('Spouštím import:lego-data pro vazby...');

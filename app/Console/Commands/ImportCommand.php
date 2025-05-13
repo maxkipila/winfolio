@@ -67,24 +67,16 @@ class ImportCommand extends Command
 
     private function importMappings(): void
     {
-        $this->info('Oprava mapování minifigurek...');
+        /*  $this->info('Oprava mapování minifigurek...');
         Artisan::call('lego:fix-minifig-mappings');
-        $this->info(Artisan::output());
+        $this->info(Artisan::output()); */
 
-        $this->info('Mapování pro sety...');
-        Artisan::call('lego:generate-mappings', ['--type' => 'set']);
-        $this->info(Artisan::output());
-
-        $this->info('Mapování pro minifigurky...');
-        Artisan::call('lego:generate-mappings', ['--type' => 'minifig']);
+        $this->info('Generování mapování pro sety a minifigurky...');
+        Artisan::call('lego:generate-mappings');
         $this->info(Artisan::output());
 
         $this->info('Scraping Bricklink...');
-        Artisan::call('lego:scrape-bricklink', [
-            '--delay' => 2,
-            '--batch' => 20,
-            '--offset' => 0,
-        ]);
+        Artisan::call('lego:scrape-bricklink');
         $this->info(Artisan::output());
     }
 
