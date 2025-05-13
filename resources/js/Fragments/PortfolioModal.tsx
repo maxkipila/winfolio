@@ -43,13 +43,15 @@ function TextCard() {
     )
 }
 
-interface Props { }
+interface Props { 
+    create_portfolio?: boolean
+ }
 
 function PortfolioModal(props: Props) {
-    const { } = props
+    const { create_portfolio } = props
     let { close } = useContext(ModalsContext)
     let { setDisplayModal, hasProducts, selected, setSelected, setProducts, products: _contextProducts } = useContext(PortfolioContext)
-    let [createPortfolio, setCreatePortfolio] = useState(hasProducts)
+    let [createPortfolio, setCreatePortfolio] = useState(create_portfolio ?? hasProducts)
     const { auth, search_products } = usePageProps<{ auth: { user: User }, search_products: Array<Product> }>();
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const form = useForm({

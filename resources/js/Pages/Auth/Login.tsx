@@ -276,7 +276,7 @@ function Login(props: Props) {
                     </Form>
                 </div>
             </div>
-            <div className='w-full h-full mob:hidden'>
+            <div className='w-full h-full mob:hidden max-h-screen overflow-hidden'>
                 <ChangingCarousel />
             </div>
         </div>
