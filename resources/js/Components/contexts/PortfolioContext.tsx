@@ -67,7 +67,7 @@ export default function PortfolioContextProvider(props: { children: any, pagePro
             close();
         } else {
             if (displayModal) {
-                console.log('nema produkty')
+                
                 open(MODALS.PORTFOLIO)
             }
 

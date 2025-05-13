@@ -1,7 +1,7 @@
 import ProductCard from '@/Fragments/ProductCard'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { ArrowDownRight, ArrowUpRight, LegoSmiley } from '@phosphor-icons/react'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -237,6 +237,7 @@ function Chest(props: Props) {
     let [portfolio, setPortfolio] = useState(true)
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const { auth } = usePageProps<{ auth: { user: User } }>();
+    let [openCalendar, setOpenCalendar] = useState(false)
     let { open } = useContext(ModalsContext)
     let current_value = 0
     let all_prices = user_products?.flatMap((up) => up?.prices)
@@ -270,6 +271,10 @@ function Chest(props: Props) {
             },
         ]
     };
+    useEffect(() => {
+        setOpenCalendar(false)
+    }, [range])
+    
     return (
         <AuthenticatedLayout>
             <Head title="Chest | Winfolio" />
@@ -294,12 +299,16 @@ function Chest(props: Props) {
                             </div>
                         }
                     </div>
-                    <div className='w-full flex items-center justify-end'>
-                        <div className='border-2 border-black'>
-                            <div onClick={() => { router.post(route('chest', { range: 'week' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "week" ? " bg-[#F7AA1A] " : " "}`}>{t('Tento týden')}</div>
-                            <div onClick={() => { router.post(route('chest', { range: 'month' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black ${range == "month" ? " bg-[#F7AA1A] " : " "}`}>{t('Tento měsíc')}</div>
-                            <div onClick={() => { router.post(route('chest', { range: 'year' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "year" ? " bg-[#F7AA1A] " : ""} `}>{t('Tento rok')}</div>
-                        </div>
+                    <div className='w-full flex items-center justify-end relative'>
+                        <div onClick={() => { setOpenCalendar((p) => !p) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px bg-[#F7AA1A] border-2 border-black`}>{range == 'week' ? t('Tento týden') : range == 'month' ? t('Tento měsíc') : t('Tento rok')}</div>
+                        {
+                            openCalendar &&
+                            <div className={`border-2 border-black absolute right-0 top-55px z-10`}>
+                                <div onClick={() => { router.post(route('chest', { range: 'week' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "week" ? " bg-[#F7AA1A] " : "bg-white "}`}>{t('Tento týden')}</div>
+                                <div onClick={() => { router.post(route('chest', { range: 'month' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black ${range == "month" ? " bg-[#F7AA1A] " : "bg-white "}`}>{t('Tento měsíc')}</div>
+                                <div onClick={() => { router.post(route('chest', { range: 'year' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "year" ? " bg-[#F7AA1A] " : "bg-white"} `}>{t('Tento rok')}</div>
+                            </div>
+                        }
                     </div>
                 </div>
                 {
@@ -343,13 +352,28 @@ function Chest(props: Props) {
                             }
                         </>
                         :
-                        <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
+                        <>
                             {
-                                auth?.user?.favourites?.map((s) =>
-                                    <ProductCard wide {...s.favourite} />
-                                )
+                                auth?.user?.favourites?.length > 0 ?
+                                    <div className='mt-24px grid grid-cols-3 gap-24px mob:grid-cols-1'>
+                                        {
+                                            auth?.user?.favourites?.map((s) =>
+                                                <ProductCard wide {...s.favourite} />
+                                            )
+                                        }
+                                    </div>
+                                    :
+                                    <div className='w-full flex items-center justify-center h-full min-h-full mt-[180px]'>
+                                        <div className='h-full w-full flex-shrink-0'>
+                                            <LegoSmiley className='mx-auto' size={64} />
+                                            <div className='mt-24px font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
+                                            <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                                            {/* <Button className='max-w-150px mx-auto' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button> */}
+                                        </div>
+                                    </div>
                             }
-                        </div>
+                        </>
+
                 }
             </div>
         </AuthenticatedLayout>

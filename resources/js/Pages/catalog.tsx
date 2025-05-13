@@ -75,17 +75,20 @@ function Catalog(props: Props) {
                         <div onClick={() => { setType('set') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "set" ? "text-white bg-black" : ""}`}>{t('Sety')}</div>
                         <div onClick={() => { setType('minifig') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "minifig" ? "text-white bg-black" : ""}`}>{t('Minifigs')}</div>
                     </div>
-                    <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
-                        {
-                            selected?.children?.map((c) => {
-                                let included = themeChildren?.includes(c?.id)
-                                return (
-                                    <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#F7AA1A]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
+                    <div className='flex gap-12px items-center'>
+                        <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
+                            {
+                                selected?.children?.map((c) => {
+                                    let included = themeChildren?.includes(c?.id)
+                                    return (
+                                        <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#F7AA1A]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
+                                    )
+                                }
                                 )
                             }
-                            )
-                        }
-                        <SlidersHorizontal size={24} />
+
+                        </div>
+                        <SlidersHorizontal className='flex-shrink-0' size={24} />
                     </div>
                 </div>
                 <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
