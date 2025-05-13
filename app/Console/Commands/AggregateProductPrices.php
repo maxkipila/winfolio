@@ -15,15 +15,13 @@ class AggregateProductPrices extends Command
 
     public function handle()
     {
-
-        //vypnut telescope
+        // Vypnout telescope pro lepší výkon
         if (class_exists(\Laravel\Telescope\Telescope::class)) {
             \Laravel\Telescope\Telescope::stopRecording();
         }
 
         ini_set('memory_limit', '2G');
         DB::disableQueryLog();
-        $this->info('Start agreace...');
 
         $date = $this->option('date')
             ? Carbon::parse($this->option('date'))
@@ -32,7 +30,7 @@ class AggregateProductPrices extends Command
         $days = $this->option('days');
         $force = $this->option('force');
 
-        //  pro tento den
+        // Kontrola, zda již existují agregovaná data pro tento den
         if (
             !$force && Price::where('type', 'aggregated')
             ->whereDate('created_at', $date)
@@ -42,32 +40,33 @@ class AggregateProductPrices extends Command
             return 0;
         }
 
-        // Získáme všechny produkty
-        Product::chunk(100, function ($products) use ($date, $days) {
+        $this->info('Začínám agregaci cen...');
+
+        // Počítáme celkový počet produktů pro progress bar
+        $totalProducts = Product::count();
+        $bar = $this->output->createProgressBar($totalProducts);
+        $bar->start();
+
+        // Získáme všechny produkty po částech a agregujeme ceny
+        Product::chunk(100, function ($products) use ($date, $days, $bar) {
             foreach ($products as $product) {
                 $this->aggregateProductPrice($product, $date, $days);
+                $bar->advance();
             }
         });
 
-        // TrendService Prumer dennich medianu 
-        $trendService = app(\App\Services\TrendService::class);
+        $bar->finish();
+        $this->newLine();
+
+        // Měsíční agregace
+        $this->info('Počítám měsíční průměry...');
         $month = $date->copy()->startOfMonth();
-
-        Product::chunk(100, function ($products) use ($date, $days) {
-            foreach ($products as $product) {
-                $this->aggregateProductPrice($product, $date, $days);
-            }
-        });
-
-        // ➕ BLOK pro měsíční mediány
-
-        DB::disableQueryLog();
-        gc_collect_cycles();
-
         $trendService = app(\App\Services\TrendService::class);
-        $month = $date->copy()->startOfMonth();
 
-        Product::chunk(100, function ($products) use ($trendService, $month) {
+        $bar = $this->output->createProgressBar($totalProducts);
+        $bar->start();
+
+        Product::chunk(100, function ($products) use ($trendService, $month, $bar) {
             foreach ($products as $product) {
                 $value = $trendService->getMonthlyAverageOfDailyMedians($product->id, $month);
                 if (!is_null($value)) {
@@ -83,12 +82,20 @@ class AggregateProductPrices extends Command
                         'updated_at' => now(),
                     ]);
                 }
+                $bar->advance();
             }
+
+            // Uvolníme paměť
+            gc_collect_cycles();
         });
+
+        $bar->finish();
+        $this->newLine();
 
         $this->info('Agregace cen dokončena.');
         return 0;
     }
+
     private function aggregateProductPrice(Product $product, Carbon $date, int $days)
     {
         $startDate = $date->copy()->subDays($days);
@@ -167,67 +174,6 @@ class AggregateProductPrices extends Command
                     'updated_at' => now(),
                 ]
             );
-
-            $this->line("Agregována cena pro produkt {$product->id}, stav {$condition}: hodnota={$medianValue}, retail={$retailMedian}, wholesale={$wholesaleMedian}");
         }
     }
-    /* private function aggregateProductPrice(Product $product, Carbon $date, int $days)
-    {
-        $startDate = $date->copy()->subDays($days);
-        $endDate = $date;
-
-        //  produkt za  období
-        $prices = Price::where('product_id', $product->id)
-            ->where('type', '!=', 'aggregated')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get(['value', 'retail', 'wholesale', 'condition', 'created_at']);
-
-        $groupedByCondition = $prices->groupBy('condition');
-
-        foreach ($groupedByCondition as $condition => $conditionPrices) {
-            if ($conditionPrices->isEmpty()) {
-                continue;
-            }
-
-            // Výpočet mediánu pro value
-            $values = $conditionPrices->pluck('value')->toArray();
-            sort($values);
-            $count = count($values);
-            $middle = floor($count / 2);
-            $medianValue = $count % 2 === 0
-                ? ($values[$middle - 1] + $values[$middle]) / 2
-                : $values[$middle];
-
-            // Výpočet mediánu pro retail
-            $retailValues = $conditionPrices->pluck('retail')->toArray();
-            sort($retailValues);
-            $retailMedian = $count % 2 === 0
-                ? ($retailValues[$middle - 1] + $retailValues[$middle]) / 2
-                : $retailValues[$middle];
-
-            // Výpočet mediánu pro wholesale
-            $wholesaleValues = $conditionPrices->pluck('wholesale')->toArray();
-            sort($wholesaleValues);
-            $wholesaleMedian = $count % 2 === 0
-                ? ($wholesaleValues[$middle - 1] + $wholesaleValues[$middle]) / 2
-                : $wholesaleValues[$middle];
-
-            Price::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'type' => 'aggregated',
-                    'condition' => $condition,
-                    'created_at' => $date->copy()->startOfDay(),
-                ],
-                [
-                    'value' => $medianValue,
-                    'retail' => $retailMedian,
-                    'wholesale' => $wholesaleMedian,
-                    'updated_at' => now(),
-                ]
-            );
-
-            $this->line("Agregována cena pro produkt {$product->id}, stav {$condition}: hodnota={$medianValue}, retail={$retailMedian}, wholesale={$wholesaleMedian}");
-        }
-    } */
 }
