@@ -227,20 +227,21 @@ class ActualPricesBrickEconomyCommand extends Command
      */
     protected function getBrickEconomyId(Product $product): ?string
     {
-        // Zkusíme nejdřív najít v mapování
-        $mapping = LegoIdMapping::where('rebrickable_id', $product->product_num)->first();
+        // Zkusíme nejdřív najít v mapování podle product_id
+        $mapping = LegoIdMapping::where('product_id', $product->id)->first();
         if ($mapping && $mapping->brickeconomy_id) {
             return $mapping->brickeconomy_id;
         }
 
         // Pokud nemáme mapování, zkusíme odvodit podle typu
         if ($product->product_type === 'set') {
-            // Pro sety je formát často stejný
+            // Pro sety je formát často stejný jako product_num
             return $product->product_num;
         } elseif ($product->product_type === 'minifig') {
             // Pro minifigurky zkusíme najít v mapování podle jména
-            $mapping = LegoIdMapping::where('name', 'LIKE', $product->name)
-                ->whereNotNull('brickeconomy_id')
+            $mapping = LegoIdMapping::join('products', 'lego_id_mappings.product_id', '=', 'products.id')
+                ->where('products.name', 'LIKE', $product->name)
+                ->whereNotNull('lego_id_mappings.brickeconomy_id')
                 ->first();
 
             if ($mapping) {

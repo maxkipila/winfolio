@@ -6,11 +6,9 @@ use App\Models\User;
 use App\Services\AwardCheckerService;
 use Illuminate\Console\Command;
 
-
-
 class CheckAwards extends Command
 {
-    protected $signature = 'app:check-awards {--user_id= : ID konkrétního uživatele pro kontrolu}';
+    protected $signature = 'app:check-awards {--user_id= : ID konkrétního uživatele pro kontrolu} {--limit= : Omezení počtu zpracovaných uživatelů}';
     protected $description = 'Kontrola odznaků pro všechny nebo konkrétního uživatele';
 
     protected AwardCheckerService $awardChecker;
@@ -24,6 +22,7 @@ class CheckAwards extends Command
     public function handle()
     {
         $userId = $this->option('user_id');
+        $limit = (int)$this->option('limit');
 
         if ($userId) {
             $user = User::find($userId);
@@ -33,8 +32,13 @@ class CheckAwards extends Command
                 $this->error("Uživatel s ID {$userId} nebyl nalezen.");
             }
         } else {
-            // Kontrola pro všechny uživatele
-            User::chunk(100, function ($users) {
+            $query = User::query();
+
+            if ($limit > 0) {
+                $query->inRandomOrder()->limit($limit);
+            }
+
+            $query->chunk(100, function ($users) {
                 foreach ($users as $user) {
                     $this->checkAwardsForUser($user);
                 }
@@ -53,7 +57,6 @@ class CheckAwards extends Command
             return $product->price ? $product->price->value : 0;
         });
         $this->info("Hodnota portfolia: " . $portfolioValue);
-
 
         try {
             $newAwards = $this->awardChecker->checkUserAwards($user);

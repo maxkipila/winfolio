@@ -40,6 +40,5 @@
     "version": "1.0.0",
     "main": "index.js",
     "repository": "https://gitlab.com/synapse_hackers/gro/winfolio.git",
-    "author": "Jan Nezval <honzis019@gmail.com>",
     "license": "MIT"
 }

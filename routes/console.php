@@ -16,6 +16,12 @@ Artisan::command('inspire', function () {
 if (!function_exists('schedule')) {
     function schedule(Schedule $schedule)
     {
+        //minutove aktualizace
+        $schedule->command('app:update --mode=minute --limit=100')
+            ->everyFiveMinutes()
+            ->timezone('Europe/Prague')
+            ->description('Minutová kontrola odznaků a notifikací');
+
         // Denní aktualizace
         $schedule->command('app:update --mode=daily')
             ->dailyAt('03:00')
@@ -38,11 +44,6 @@ if (!function_exists('schedule')) {
         $schedule->command('telescope:prune --hours=48')
             ->daily()
             ->timezone('Europe/Prague');
-
-        $schedule->command('awards:notify')
-            ->hourly()
-            ->timezone('Europe/Prague')
-            ->description('Odesílání notifikací ');
     }
 
     /*  $schedule->command('prices:aggregate')
