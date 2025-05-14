@@ -10,7 +10,7 @@ class ImportCommand extends Command
 {
     protected $signature = 'app:import {--all : Import vše (alias pro --type=all)} {--type=all : Typ importu (all, products, prices, images, mappings)} {--limit=0 : Omezení počtu záznamů}';
 
-    protected $description = 'Jednotný příkaz pro import dat';
+    protected $description = 'Import dat';
 
     public function handle()
     {
@@ -21,6 +21,7 @@ class ImportCommand extends Command
             case 'all':
                 $this->importProducts();
                 $this->importImages();
+                $this->importThemes();
                 $this->importMappings();
                 $this->importPrices();
                 break;
@@ -33,6 +34,10 @@ class ImportCommand extends Command
                 $this->importImages();
                 break;
 
+            case 'themes':
+                $this->importThemes();
+                break;
+
             case 'mappings':
                 $this->importMappings();
                 break;
@@ -40,6 +45,7 @@ class ImportCommand extends Command
             case 'prices':
                 $this->importPrices();
                 break;
+
 
             default:
                 $this->error("Neznámý typ importu: {$type}");
@@ -64,27 +70,25 @@ class ImportCommand extends Command
         $this->info(Artisan::output());
     }
 
+    private function importThemes(): void
+    {
+        $this->info('Přiřazování témat minifigurkám...');
+        Artisan::call('app:assign-themes-to-minifigs');
+        $this->info(Artisan::output());
+    }
 
     private function importMappings(): void
     {
-        $this->info('Oprava mapování minifigurek...');
+        /*  $this->info('Oprava mapování minifigurek...');
         Artisan::call('lego:fix-minifig-mappings');
-        $this->info(Artisan::output());
+        $this->info(Artisan::output()); */
 
-        $this->info('Mapování pro sety...');
-        Artisan::call('lego:generate-mappings', ['--type' => 'set']);
-        $this->info(Artisan::output());
-
-        $this->info('Mapování pro minifigurky...');
-        Artisan::call('lego:generate-mappings', ['--type' => 'minifig']);
+        $this->info('Generování mapování pro sety a minifigurky...');
+        Artisan::call('lego:generate-mappings');
         $this->info(Artisan::output());
 
         $this->info('Scraping Bricklink...');
-        Artisan::call('lego:scrape-bricklink', [
-            '--delay' => 2,
-            '--batch' => 20,
-            '--offset' => 0,
-        ]);
+        Artisan::call('lego:scrape-bricklink');
         $this->info(Artisan::output());
     }
 

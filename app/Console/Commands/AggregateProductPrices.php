@@ -77,8 +77,8 @@ class AggregateProductPrices extends Command
                         'created_at' => $month,
                     ], [
                         'value' => $value,
-                        'retail' => round($value * 1.3, 2),
-                        'wholesale' => round($value * 0.7, 2),
+                        /*   'retail' => round($value * 1.3, 2),
+                        'wholesale' => round($value * 0.7, 2), */
                         'updated_at' => now(),
                     ]);
                 }
@@ -105,7 +105,8 @@ class AggregateProductPrices extends Command
         $prices = Price::where('product_id', $product->id)
             ->where('type', '!=', 'aggregated')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->get(['value', 'retail', 'wholesale', 'condition', 'created_at']);
+            /* ->get(['value', 'retail', 'wholesale', 'condition', 'created_at']); */
+            ->get(['value', 'condition', 'created_at']);
 
         $groupedByCondition = $prices->groupBy('condition');
 
@@ -133,7 +134,7 @@ class AggregateProductPrices extends Command
                     : $values[$middle];
                 $dailyMedians[] = $median;
 
-                // Retail
+                /*    // Retail
                 $retailValues = $prices->pluck('retail')->sort()->values()->toArray();
                 $retailCount = count($retailValues);
                 $retailMiddle = floor($retailCount / 2);
@@ -149,7 +150,7 @@ class AggregateProductPrices extends Command
                 $wholesaleMedian = $wholesaleCount % 2 === 0
                     ? ($wholesaleValues[$wholesaleMiddle - 1] + $wholesaleValues[$wholesaleMiddle]) / 2
                     : $wholesaleValues[$wholesaleMiddle];
-                $dailyWholesaleMedians[] = $wholesaleMedian;
+                $dailyWholesaleMedians[] = $wholesaleMedian; */
             }
 
             if (empty($dailyMedians)) {
@@ -157,9 +158,9 @@ class AggregateProductPrices extends Command
             }
 
             $medianValue = round(array_sum($dailyMedians) / count($dailyMedians), 2);
-            $retailMedian = round(array_sum($dailyRetailMedians) / count($dailyRetailMedians), 2);
+            /*             $retailMedian = round(array_sum($dailyRetailMedians) / count($dailyRetailMedians), 2);
             $wholesaleMedian = round(array_sum($dailyWholesaleMedians) / count($dailyWholesaleMedians), 2);
-
+ */
             Price::updateOrCreate(
                 [
                     'product_id' => $product->id,
@@ -169,8 +170,8 @@ class AggregateProductPrices extends Command
                 ],
                 [
                     'value' => $medianValue,
-                    'retail' => $retailMedian,
-                    'wholesale' => $wholesaleMedian,
+                    /* 'retail' => $retailMedian,
+                    'wholesale' => $wholesaleMedian, */
                     'updated_at' => now(),
                 ]
             );

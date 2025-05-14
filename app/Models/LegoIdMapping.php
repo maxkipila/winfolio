@@ -10,30 +10,27 @@ class LegoIdMapping extends Model
     use HasFactory;
 
     protected $fillable = [
-        'rebrickable_id',
+        'product_id',
         'brickeconomy_id',
-        'bricklink_id',
-        'name',
-        'notes',
     ];
 
     /**
-     * Přidá nebo aktualizuje mapování ID
+     * Vztah k produktu
      */
-    public static function addMapping(
-        string $rebrickableId,
-        ?string $brickeconomyId = null,
-        ?string $bricklinkId = null,
-        ?string $name = null,
-        ?string $notes = null
-    ): self {
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Statická metoda pro přidání nebo aktualizaci mapování
+     */
+    public static function addMapping(int $productId, ?string $brickeconomyId = null): self
+    {
         return self::updateOrCreate(
-            ['rebrickable_id' => $rebrickableId],
+            ['product_id' => $productId],
             [
                 'brickeconomy_id' => $brickeconomyId,
-                'bricklink_id' => $bricklinkId,
-                'name' => $name,
-                'notes' => $notes,
             ]
         );
     }

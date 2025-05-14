@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Artisan;
 class UpdateCommand extends Command
 {
     protected $signature = 'app:update
-                          {--mode=daily : Režim aktualizace (daily, weekly, monthly)}
-                          {--type=all : Typ produktů (all, set, minifig)}
-                          {--limit=1000 : Limit počtu produktů}';
+                            {--mode=daily : Režim aktualizace (daily, weekly, monthly)}
+                            {--type=all : Typ produktů (all, set, minifig)}
+                            {--limit=1000 : Limit počtu produktů}';
 
     protected $description = 'Jednotný příkaz pro aktualizaci dat';
 
@@ -21,6 +21,9 @@ class UpdateCommand extends Command
         $limit = (int) $this->option('limit');
 
         switch ($mode) {
+            case 'minute':
+                $this->minuteUpdate($type, $limit);
+                break;
             case 'daily':
                 $this->dailyUpdate($type, $limit);
                 break;
@@ -34,12 +37,27 @@ class UpdateCommand extends Command
                 break;
 
             default:
-                $this->error("Neznámý režim aktualizace: {$mode}. Povolené hodnoty: daily, weekly, monthly");
+                $this->error("Neznámý režim aktualizace: {$mode}. Povolené hodnoty: minute, daily, weekly, monthly");
                 return self::FAILURE;
         }
 
         $this->info("Aktualizace pro režim {$mode} byla úspěšně dokončena");
         return self::SUCCESS;
+    }
+
+    private function minuteUpdate(string $type, int $limit): void
+    {
+        $this->info('Spouštím minutovou aktualizaci...');
+
+        // Kontrola odznaků 
+        $this->info('Spouštím app:check-awards...');
+        Artisan::call('app:check-awards');
+        $this->info(Artisan::output());
+
+        // Odeslání notifikací o odznacích
+        $this->info('Spouštím awards:notify...');
+        Artisan::call('awards:notify');
+        $this->info(Artisan::output());
     }
 
     private function dailyUpdate(string $type, int $limit): void
@@ -60,6 +78,11 @@ class UpdateCommand extends Command
         $this->info('Spouštím app:check-awards...');
         Artisan::call('app:check-awards');
         $this->info(Artisan::output());
+
+        // Vypocet trendu
+        $this->info('Spouštím app:calculate-trends...');
+        Artisan::call('app:calculate-trends');
+        $this->info(Artisan::output());
     }
 
     private function weeklyUpdate(string $type, int $limit): void
@@ -76,14 +99,14 @@ class UpdateCommand extends Command
         $this->info('Spouštím měsíční aktualizaci...');
 
         // Aktualizace vazeb
-        $this->info('Spouštím app:import');
-        Artisan::call('app:import');
-        $this->info(Artisan::output());
+        /*   $this->info('Spouštím app:import');
+            Artisan::call('app:import');
+            $this->info(Artisan::output()); */
 
         /* // Aktualizace vazeb
-        $this->info('Spouštím import:lego-data pro vazby...');
-        Artisan::call('import:lego-data', ['dataType' => 'relationships']);
-        $this->info(Artisan::output()); */
+            $this->info('Spouštím import:lego-data pro vazby...');
+            Artisan::call('import:lego-data', ['dataType' => 'relationships']);
+            $this->info(Artisan::output()); */
 
         // Agregace cen pro celý měsíc
         $this->info('Spouštím prices:aggregate pro měsíční data...');
@@ -92,10 +115,6 @@ class UpdateCommand extends Command
             '--days' => 31,
             '--force' => true
         ]);
-        $this->info(Artisan::output());
-        // Vypocet trendu
-        $this->info('Spouštím app:calculate-trends...');
-        Artisan::call('app:calculate-trends');
         $this->info(Artisan::output());
     }
 }

@@ -13,163 +13,102 @@ class GenerateLegoIdMappingsCommand extends Command
                           {--chunk=100 : Počet produktů zpracovávaných v jedné dávce}
                           {--type=all : Typ produktů pro zpracování (all, set, minifig)}
                           {--limit=0 : Omezení počtu zpracovaných produktů}
-                          {--offset=0 : Začít od určitého offsetu}';
+                          {--offset=0 : Začít od určitého offsetu}
+                          {--force : Přepsat existující mapování}';
 
-    protected $description = 'Automatically generate mappings between Rebrickable and BrickEconomy IDs';
+    protected $description = 'Vytvoření mapování LEGO ID pro produkty';
 
     public function handle()
     {
-        // Nastavení
-        $chunkSize = (int) $this->option('chunk');
+        ini_set('memory_limit', '1G');
+        DB::disableQueryLog();
+
         $type = $this->option('type');
         $limit = (int) $this->option('limit');
         $offset = (int) $this->option('offset');
+        $chunkSize = (int) $this->option('chunk');
+        $force = $this->option('force');
 
-        // Zvýšení limitu paměti
-        ini_set('memory_limit', '1G');
+        if ($type === 'all') {
+            $this->info('Zpracování všech typů produktů');
 
-        // Vypnutí query logu pro úsporu paměti
-        DB::disableQueryLog();
+            $this->info('Krok 1: Sety');
+            $this->processProducts('set', $limit, $offset, $chunkSize, $force);
 
-        // Definice query
-        $query = Product::query();
-
-        // Filtrování podle typu
-        if ($type === 'set') {
-            $query->where('product_type', 'set');
-        } elseif ($type === 'minifig') {
-            $query->where('product_type', 'minifig');
+            $this->info('Krok 2: Minifigurky');
+            $this->processProducts('minifig', $limit, $offset, $chunkSize, $force);
+        } else {
+            $this->processProducts($type, $limit, $offset, $chunkSize, $force);
         }
 
-        // Aplikace offsetu
+        $this->info("Generování mapování dokončeno.");
+        return Command::SUCCESS;
+    }
+
+    protected function processProducts($type, $limit, $offset, $chunkSize, $force)
+    {
+        $query = Product::where('product_type', $type);
+
         if ($offset > 0) {
             $query->skip($offset);
         }
-
-        // Aplikace limitu
         if ($limit > 0) {
             $query->take($limit);
         }
 
-        // Počet produktů ke zpracování
         $totalCount = $query->count();
+        $this->info("Počet produktů (typ {$type}): {$totalCount}");
 
-        if ($limit > 0 && $totalCount > $limit) {
-            $totalCount = $limit;
+        if ($totalCount === 0) {
+            $this->info("Žádné produkty pro typ '{$type}'");
+            return;
         }
 
-        $this->info("Celkem ke zpracování: {$totalCount} produktů");
-        $this->info("Zpracovávám po {$chunkSize} produktech");
-
-        // Progress bar
         $bar = $this->output->createProgressBar($totalCount);
         $bar->start();
 
-        $createdCount = 0;
-        $skippedCount = 0;
+        $created = 0;
+        $skipped = 0;
+        $errors = 0;
 
-        // Zpracování po dávkách
-        $query->orderBy('id')->chunk($chunkSize, function ($products) use (&$createdCount, &$skippedCount, $bar) {
-            $mappingsToInsert = [];
-
+        $query->orderBy('id')->chunk($chunkSize, function ($products) use (&$created, &$skipped, &$errors, $bar, $force, $type) {
             foreach ($products as $product) {
-                // Přeskočit, pokud už mapování existuje
-                $existingMapping = LegoIdMapping::where('rebrickable_id', $product->product_num)->exists();
+                try {
+                    $productId = $product->id;
+                    $productNum = $product->product_num;
 
-                if ($existingMapping) {
-                    $skippedCount++;
-                } else {
-                    if ($product->product_type === 'set') {
-                        // Pro sety předpokládáme stejné ID
-                        $mappingsToInsert[] = [
-                            'rebrickable_id' => $product->product_num,
-                            'brickeconomy_id' => $product->product_num,
-                            'name' => $product->name,
-                            'notes' => 'Auto-generated: set ID mapping',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                        $createdCount++;
-                    } elseif ($product->product_type === 'minifig') {
-                        // Pro minifigurky vytvoříme záznam bez BrickEconomy ID, jen pro evidenci
-                        $mappingsToInsert[] = [
-                            'rebrickable_id' => $product->product_num,
-                            'name' => $product->name,
-                            'notes' => 'Auto-generated: minifig without mapping',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                        $createdCount++;
+
+                    $existingMapping = LegoIdMapping::where('product_id', $productId)->first();
+
+                    if ($existingMapping && !$force) {
+                        $skipped++;
+                    } else {
+                        $brickeconomyId = null;
+
+                        if ($type === 'set') {
+                            $brickeconomyId = $productNum;
+                        }
+
+                        LegoIdMapping::addMapping($productId, $brickeconomyId);
+                        $created++;
                     }
+                } catch (\Exception $e) {
+                    $errors++;
+                    $this->error("Chyba při zpracování produktu {$product->id}: " . $e->getMessage());
                 }
 
                 $bar->advance();
             }
 
-            // Hromadné vložení nasbíraných mapování
-            if (!empty($mappingsToInsert)) {
-                // Vkládáme po menších dávkách pro lepší stabilitu
-                foreach (array_chunk($mappingsToInsert, 500) as $chunk) {
-                    LegoIdMapping::insert($chunk);
-                }
-            }
-
-            // Vyčištění paměti
-            unset($mappingsToInsert);
             gc_collect_cycles();
         });
 
         $bar->finish();
         $this->newLine();
 
-        // Přidáme ručně mapované minifigurky
-        if ($type !== 'set') {
-            $this->info('Přidávám základní mapování pro populární minifigurky...');
-
-            $minifigMappings = [
-                // Star Wars minifigurky (jen několik příkladů)
-                'fig-015085' => 'sw0632', // Magister_Shimshard
-                'fig-015087' => 'sw0633', // Scout_Trooper
-                'fig-015089' => 'sw0635', // Ender_Explorer
-                'fig-015091' => 'sw0637', // Gabby_Party_Hats
-                // Harry Potter minifigurky
-                'fig-015111' => 'hp0149', // Ron Weasley
-                'fig-015112' => 'hp0150', // Harry Potter
-                'fig-015113' => 'hp0151', // Leanne
-                // Přidejte další známé mapování
-            ];
-
-            $customCreated = 0;
-
-            foreach ($minifigMappings as $rebrickableId => $brickEconomyId) {
-                $mapping = LegoIdMapping::updateOrCreate(
-                    ['rebrickable_id' => $rebrickableId],
-                    [
-                        'brickeconomy_id' => $brickEconomyId,
-                        'notes' => 'Manual mapping: popular minifig'
-                    ]
-                );
-
-                if ($mapping->wasRecentlyCreated) {
-                    $customCreated++;
-                }
-            }
-
-            $this->info("Přidáno {$customCreated} mapování pro populární minifigurky.");
-        }
-
-        // Statistika
-        $this->info("============================================");
-        $this->info("VYTVOŘENO: {$createdCount}");
-        $this->info("PŘESKOČENO (již existuje): {$skippedCount}");
-
-        $total = LegoIdMapping::count();
-        $withBE = LegoIdMapping::whereNotNull('brickeconomy_id')->count();
-
-        $this->info("CELKEM MAPOVÁNÍ: {$total}");
-        $this->info("S BRICKECONOMY ID: {$withBE}");
-        $this->info("POKRYTÍ: " . round(($withBE / max(1, $total)) * 100, 2) . "%");
-
-        return 0;
+        $this->info("Dokončeno zpracování typu {$type}:");
+        $this->info("- Vytvořeno/aktualizováno: {$created}");
+        $this->info("- Přeskočeno (již existuje): {$skipped}");
+        $this->info("- Chyby: {$errors}");
     }
 }
