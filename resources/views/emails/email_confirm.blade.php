@@ -50,7 +50,7 @@
             <table align="center" width="450" style="width:450px;max-width: 450px;vertical-align:top;padding-top:0px;padding-right:0px;padding-bottom:24px;padding-left:0px">
                 <tr>
                     
-                    <td style="background-color: #F7AA1A; padding: 14px 24px;text-align: center;border:2px solid black;">
+                    <td style="background-color: #FFB400; padding: 14px 24px;text-align: center;border:2px solid black;">
                         <table align="center">
                             <tr>
                                 <td class="font"><a class="font" style="color:black; text-decoration: none; font-weight: 700; padding-left: 12px; border-radius: 10px;" target="_blank" href="{{env('APP_URL')}}/email-preview/{{$data['link']}}?{{http_build_query(array_merge($data, ['email' => $data['email'], 'app_url' => env('APP_URL') ?? " "] ))}}">Otevřít na webu</a> </td>

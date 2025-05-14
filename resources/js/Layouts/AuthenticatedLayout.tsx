@@ -50,16 +50,16 @@ function AuthenticatedLayout(props: Props) {
                     </div>
                 </div>
                 <div className='nMob:hidden fixed bottom-0 left-0 flex w-full bg-white z-max'>
-                    <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('dashboard') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Link href={route('dashboard')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('dashboard') ? "border-black bg-[#FFB400]" : "border-[#DEDFE5] "}`}>
                         <House size={24} />
                     </Link>
-                    <Link href={route('catalog')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('catalog') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Link href={route('catalog')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('catalog') ? "border-black bg-[#FFB400]" : "border-[#DEDFE5] "}`}>
                         <MagnifyingGlass size={24} />
                     </Link>
-                    <Link href={route('chest')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('chest') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Link href={route('chest')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('chest') ? "border-black bg-[#FFB400]" : "border-[#DEDFE5] "}`}>
                         <ShippingContainer size={24} />
                     </Link>
-                    <Link href={route('awards')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('awards') ? "border-black bg-[#F7AA1A]" : "border-[#DEDFE5] "}`}>
+                    <Link href={route('awards')} className={`w-full py-12px flex justify-center items-center border-t-2 ${route()?.current()?.includes('awards') ? "border-black bg-[#FFB400]" : "border-[#DEDFE5] "}`}>
                         <Star size={24} />
                     </Link>
                 </div>
@@ -69,13 +69,13 @@ function AuthenticatedLayout(props: Props) {
                         <Link href={route('dashboard')}>
                             <Img src="/assets/img/logo.png" />
                         </Link>
-                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px cursor-pointer'>
+                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#FFB400] gap-8px rounded items-center px-12px py-4px cursor-pointer'>
                             <Sparkle size={24} />
                             <div className='font-bold'>Premium</div>
                         </div>
                     </div>
                     <div className='flex items-center gap-24px nMob:hidden w-full justify-between'>
-                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#F7AA1A] gap-8px rounded items-center px-12px py-4px'>
+                        <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#FFB400] gap-8px rounded items-center px-12px py-4px'>
                             <Sparkle size={14} />
                             <div className='font-bold text-sm'>Premium</div>
                         </div>
@@ -105,7 +105,7 @@ function AuthenticatedLayout(props: Props) {
                 <div className='mt-[72px] mob:pb-50px relative'>
                     {
                         route()?.current()?.includes('chest') &&
-                        <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} className='cursor-pointer fixed bottom-64px right-40px w-40px h-40px border border-black bg-[#F7AA1A] rounded-full flex items-center justify-center'>
+                        <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} className='cursor-pointer fixed bottom-64px right-40px w-40px h-40px border border-black bg-[#FFB400] rounded-full flex items-center justify-center'>
                             <Plus size={24} />
                         </div>
                     }

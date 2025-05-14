@@ -101,7 +101,7 @@ function Header(props: Props) {
                         <div className="pr-16px">
                             <Link
                                 preserveScroll
-                                className={`font-black py-12px px-16px bg-[#F7AA1A] border-black rounded-sm border-2 mr-16px2 flex items-center gap-8px ${customButtonClassName}`}
+                                className={`font-black py-12px px-16px bg-[#FFB400] border-black rounded-sm border-2 mr-16px2 flex items-center gap-8px ${customButtonClassName}`}
                                 href={props.customButtonHref || "#"}
                             >
                                 <Plus size={24} weight="bold" />

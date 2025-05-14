@@ -161,7 +161,7 @@ function Welcome(props: Props) {
                     </div>
                 </div>
             </div>
-            <div className='bg-[#E9C784] pt-64px pb-[264px] mob:px-24px'>
+            <div className='bg-[#FFD266] pt-64px pb-[264px] mob:px-24px'>
                 <div id="pricing" className='font-bold text-4xl text-center'>{t('Vyber si, jak chceš stavět své portfolio')}</div>
                 <div className='font-nunito text-center'>{t('Začni zdarma s Free balíčkem, nebo odemkni pokročilé funkce s Premium verzí.')}</div>
                 <div className='flex items-center gap-24px justify-center mt-32px max-w-3/4 mx-auto mob:flex-col mob:max-w-max'>

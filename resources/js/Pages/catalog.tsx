@@ -19,7 +19,7 @@ function ThemeCard(props: ThemeCardProps) {
     const { name, selected, id, setSelected } = props
 
     return (
-        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-[#F7AA1A]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
+        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
             <div className='w-40px h-40px bg-white flex items-center justify-center rounded-full  '>
                 <TrendUp size={24} />
             </div>
@@ -81,7 +81,7 @@ function Catalog(props: Props) {
                                 selected?.children?.map((c) => {
                                     let included = themeChildren?.includes(c?.id)
                                     return (
-                                        <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#F7AA1A]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
+                                        <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#FFB400]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
                                     )
                                 }
                                 )

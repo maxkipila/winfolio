@@ -39,7 +39,7 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 0 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
                                 <Star className='col-start-1 row-start-1' weight='bold' />
                             </div>
@@ -47,7 +47,7 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 1 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
                                 <Star className='col-start-1 row-start-1' weight='bold' />
 
@@ -56,7 +56,7 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 2 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
                                 <Star className='col-start-1 row-start-1' weight='bold' />
                             </div>
@@ -64,7 +64,7 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 3 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
                                 <Star className='col-start-1 row-start-1' weight='bold' />
                             </div>
@@ -72,7 +72,7 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 4 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
                                 <Star className='col-start-1 row-start-1' weight='bold' />
                             </div>
@@ -86,14 +86,14 @@ function ReviewCard(props: Props) {
                                 <div className='text-[#4D4D4D]'>{t('Collectors')}</div>
                                 <div className='grid w-110px'>
                                     <div className='col-start-1 row-start-1 h-8px w-full rounded-[4px] bg-[#F5F5F5]'></div>
-                                    <div className={`col-start-1 row-start-1 h-8px w-[${(colNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
+                                    <div className={`col-start-1 row-start-1 h-8px w-[${(colNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#FFB400]`}></div>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between w-full gap-24px'>
                                 <div className='text-[#4D4D4D]'>{t('Investors')}</div>
                                 <div className='grid w-110px'>
                                     <div className='col-start-1 row-start-1 h-8px w-full rounded-[4px] bg-[#F5F5F5]'></div>
-                                    <div className={`col-start-1 row-start-1 h-8px w-[${(invNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#F7AA1A]`}></div>
+                                    <div className={`col-start-1 row-start-1 h-8px w-[${(invNumber / product?.reviews?.length) * 100}%] rounded-[4px] bg-[#FFB400]`}></div>
                                 </div>
                             </div>
                         </div>

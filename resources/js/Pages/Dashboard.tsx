@@ -3,6 +3,7 @@ import { _, t } from '@/Components/Translator';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
 import useLazyLoad from '@/hooks/useLazyLoad';
+import usePageProps from '@/hooks/usePageProps';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
@@ -23,6 +24,11 @@ interface CardsProps {
 }
 function CardsDesktop(props: CardsProps) {
     const { portfolioValue } = props
+    const { auth } = usePageProps<{ auth: { user: User } }>();
+    let wishlistValue = 0
+    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
+    wishListValues.map((wV) => wishlistValue += parseFloat(wV))
+    console.log('wishlist values',auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value))
     return (
         <div className='flex border-b border-[#DEDFE5] px-24px mob:hidden'>
             <div className='w-full py-48px'>
@@ -38,10 +44,10 @@ function CardsDesktop(props: CardsProps) {
                 </div> */}
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
-                <div>{t('Hodnota portfolia')}</div>
+                <div>{t('Hodnota wishlistu')}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
+                    <div className='font-bold text-6xl'>{wishlistValue}</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
@@ -50,7 +56,7 @@ function CardsDesktop(props: CardsProps) {
                 </div> */}
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
-                <div>{t("Hodnota portfolia")}</div>
+                <div>{t("All time high portfolia")}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
                     <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
@@ -62,7 +68,7 @@ function CardsDesktop(props: CardsProps) {
                 </div> */}
             </div>
             <div className='pl-48px py-48px'>
-                <div className='bg-[#E9C784] flex flex-col justify-center items-center w-full p-52px'>
+                <div className='bg-[#FFD266] flex flex-col justify-center items-center w-full p-52px'>
                     <div className='font-bold text-xl mb-12px'>{t("Join signals community")}</div>
                     <Button icon={<TelegramLogo size={24} />} href={"#"}>{t('Join on Telegram')}</Button>
                 </div>
@@ -110,7 +116,7 @@ export default function Dashboard(props: DashBoardProps) {
     const { portfolioValue } = props
     let [topMovers, button] = useLazyLoad<{ product: Product }>('topMovers');
     let [trendingProducts, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trendingProducts');
-    // const [minifigs, button: _button, meta, setItems] = useLazyLoad<SetLego>('sets');
+    
     console.log('trendingProducts:', trendingProducts)
     return (
         <AuthenticatedLayout>

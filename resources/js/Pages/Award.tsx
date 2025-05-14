@@ -13,7 +13,7 @@ interface AwardCardProps extends Award {
 function AwardCard(props: AwardCardProps) {
     const { category, category_id, earned, category_name, condition_type, conditions, created_at, description, id, name, product_id, required_count, required_percentage, required_value, updated_at, icon } = props
     return (
-        <div className={`${earned ? "border-[#F7AA1A]" : "border-black"} border-2 bg-[#F5F5F5] w-full min-h-[250px] flex flex-col items-center justify-center px-24px`}>
+        <div className={`${earned ? "border-[#FFB400]" : "border-black"} border-2 bg-[#F5F5F5] w-full min-h-[250px] flex flex-col items-center justify-center px-24px`}>
             <div className='w-40px h-40px bg-white rounded-full flex items-center justify-center mb-8px'>
                 {
                     earned ?

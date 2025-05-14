@@ -175,4 +175,7 @@ return [
     'Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.'=>'Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.',
     'Vyber si, jak chceš stavět své portfolio'=>'Vyber si, jak chceš stavět své portfolio',
     'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.'=>'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.',
+
+    'Hodnota wishlistu'=>'Hodnota Wishlistu',
+    'All time high portfolia'=>'Nejvyšší hodnota'
 ];

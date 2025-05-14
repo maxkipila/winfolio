@@ -28,35 +28,35 @@ function ReviewLine(props: ReviewLineProps) {
                 <div className='grid'>
                     {
                         rating > 0 &&
-                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                     }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
                     {
                         rating > 1 &&
-                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                     }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
                     {
                         rating > 2 &&
-                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                     }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
                     {
                         rating > 3 &&
-                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                     }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
                 <div className='grid'>
                     {
                         rating > 4 &&
-                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                     }
                     <Star className='col-start-1 row-start-1' weight='bold' />
                 </div>
@@ -123,7 +123,7 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 0 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
@@ -131,7 +131,7 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 1 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
 
@@ -140,7 +140,7 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 2 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
@@ -148,7 +148,7 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 3 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
@@ -156,7 +156,7 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 4 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
                                     <Star className='col-start-1 row-start-1' weight='bold' />
                                 </div>
@@ -167,7 +167,7 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>5</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${five?.length > 0 ? (five?.length / product?.reviews?.length) * 100 : 0}%` }} className={`h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${five?.length > 0 ? (five?.length / product?.reviews?.length) * 100 : 0}%` }} className={`h-8px rounded-[4px] bg-[#FFB400] col-start-1 row-start-1`}></div>
                             </div>
                             <div className='font-nunito text-[#4D4D4D]'>{five?.length > 0 ? Math.floor((five?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
@@ -175,7 +175,7 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>4</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${four?.length > 0 ? (four?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${four?.length > 0 ? (four?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#FFB400] col-start-1 row-start-1`}></div>
                             </div>
                             <div className='font-nunito text-[#4D4D4D]'>{four?.length > 0 ? Math.floor((four?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
@@ -183,7 +183,7 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>3</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${three?.length > 0 ? (three?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${three?.length > 0 ? (three?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#FFB400] col-start-1 row-start-1`}></div>
                             </div>
                             <div className='font-nunito text-[#4D4D4D]'>{three?.length > 0 ? Math.floor((three?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
@@ -191,7 +191,7 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>2</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${two?.length > 0 ? (two?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${two?.length > 0 ? (two?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#FFB400] col-start-1 row-start-1`}></div>
                             </div>
                             <div className='font-nunito text-[#4D4D4D]'>{two?.length > 0 ? Math.floor(two?.length / product?.reviews?.length) * 100 : 0}%</div>
                         </div>
@@ -199,7 +199,7 @@ function ReviewsModal(props: Props) {
                             <div className='font-nunito text-[#4D4D4D]'>1</div>
                             <div className='grid w-full'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#F5F5F5] col-start-1 row-start-1'></div>
-                                <div style={{ width: `${one?.length > 0 ? (one?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#F7AA1A] col-start-1 row-start-1`}></div>
+                                <div style={{ width: `${one?.length > 0 ? (one?.length / product?.reviews?.length) * 100 : 0}%` }} className={` h-8px rounded-[4px] bg-[#FFB400] col-start-1 row-start-1`}></div>
                             </div>
                             <div className='font-nunito text-[#4D4D4D]'>{one?.length > 0 ? Math.floor((one?.length / product?.reviews?.length) * 100) : 0}%</div>
                         </div>
@@ -221,35 +221,35 @@ function ReviewsModal(props: Props) {
                                             <div onClick={() => { setData('rating', 1) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 0 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
                                                 <Star className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 2) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 1 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
                                                 <Star className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 3) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 2 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
                                                 <Star className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 4) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 3 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
                                                 <Star className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 5) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 4 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#F7AA1A' />
+                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
                                                 <Star className='col-start-1 row-start-1' weight='bold' />
                                             </div>

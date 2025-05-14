@@ -2,7 +2,7 @@ import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import { PortfolioContext } from '@/Components/contexts/PortfolioContext';
 import Img from '@/Components/Image';
 import usePageProps from '@/hooks/usePageProps';
-import { ArrowUpRight, HandPointing, MagnifyingGlass, X } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, HandPointing, MagnifyingGlass, X } from '@phosphor-icons/react';
 import React, { useContext, useState } from 'react'
 import { Button } from './UI/Button';
 import Form from './forms/Form';
@@ -30,22 +30,27 @@ function SearchCard({ name, type, image, href }) {
     );
 }
 
-function TextCard() {
+interface CardProps {
+    headline: string
+    text: string,
 
+}
+function TextCard(props: CardProps) {
+    const { headline, text } = props
     return (
         <div className='border-2 border-black max-w-[380px] min-w-[380px] grid'>
-            <Img className='object-cover row-start-1 col-start-1' src="/assets/img/brick-placeholder.png" />
+            <Img className='object-cover row-start-1 col-start-1 h-full' src="/assets/img/brick-placeholder.png" />
             <div className='row-start-1 col-start-1 p-[56px]'>
-                <div className='font-teko font-bold text-3xl text-white text-center'>Vzácný Harry Potter</div>
-                <div className='text-white font-nunito text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                <div className='font-teko font-bold text-3xl text-white text-center'>{text}</div>
+                <div className='text-white font-nunito text-center'>{headline}</div>
             </div>
         </div>
     )
 }
 
-interface Props { 
+interface Props {
     create_portfolio?: boolean
- }
+}
 
 function PortfolioModal(props: Props) {
     const { create_portfolio } = props
@@ -80,36 +85,101 @@ function PortfolioModal(props: Props) {
             onSuccess: () => { setProducts(_contextProducts.filter((cp) => cp?.product?.id != my_product.id)); }
         })
     }
-    console.log('processing: ', processing)
+
+    let [index, setIndex] = useState(2)
+    let [prev, setPrev] = useState(1)
+    let [next, setNext] = useState(3)
+    let carouselTexts = [
+        { text: 'Vzácný Harry Potter 1', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { text: 'Vzácný Harry Potter 2', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { text: 'Vzácný Harry Potter 3', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { text: 'Vzácný Harry Potter 4', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { text: 'Vzácný Harry Potter 5', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' }
+    ]
+
+    function nextCarousel() {
+        let length = carouselTexts.length
+
+        if (index + 1 > length - 1) {
+            setIndex(0)
+            setPrev(length - 1)
+            setNext(1)
+        } else if (next + 1 > length - 1) {
+            setIndex((p) => p + 1)
+            setNext(0)
+            setPrev((p) => p + 1)
+        }
+        else if (prev + 1 > length - 1) {
+            setIndex((p) => p + 1)
+            setNext((p) => p + 1)
+            setPrev(0)
+        } else {
+            setIndex((p) => p + 1)
+            setPrev((p) => p + 1)
+            setNext((p) => p + 1)
+        }
+    }
+
+    function prevCarousel() {
+        let length = carouselTexts.length
+
+        if (index - 1 < 0) {
+            setIndex(length - 1)
+            setPrev(length - 2)
+            setNext(0)
+        } else if (next - 1 < 0) {
+            setIndex((p) => p - 1)
+            setNext(length - 1)
+            setPrev((p) => p - 1)
+        }
+        else if (prev - 1 < 0) {
+            setIndex((p) => p - 1)
+            setNext((p) => p - 1)
+            setPrev(length - 1)
+        } else {
+            setIndex((p) => p - 1)
+            setPrev((p) => p - 1)
+            setNext((p) => p - 1)
+        }
+    }
+
     return (
         <div onClick={() => { close() }} className="bg-black bg-opacity-80 fixed top-0 left-0 w-full h-screen items-center justify-center mob:block mob:max-h-full flex z-max mob:pb-0">
-            <div onClick={(e) => { e.stopPropagation(); }} className='bg-white border-2 border-black w-full h-full overflow-y-auto'>
+            <div onClick={(e) => { e.stopPropagation(); }} className='bg-white w-full h-full overflow-y-auto'>
                 {/* <div className='flex items-end justify-end'>
                     <div onClick={() => { close() }} className='w-40px h-40px bg-black flex items-center justify-center'>
                         <X color='white' size={24} />
                     </div>
                 </div> */}
-                <div className=''>
+                <div className='h-full'>
                     {
                         (!createPortfolio && !hasProducts) ?
-                            <>
-                                <div className='mx-auto max-w-1/3 flex flex-col items-center justify-center'>
-                                    <Img className='w-[84px] h-[84px]' src="/assets/img/user.png" />
+                            <div className='h-full py-64px max-h-full flex flex-col'>
+                                <div className='w-full flex flex-col items-center justify-center'>
+                                    <Img className='w-[84px] h-[84px]' src="/assets/img/big-user.png" />
                                     <div className='py-16px'>{t('Vítej ve Winfolio')}</div>
-                                    <div className='font-bold text-6xl'>{auth?.user?.first_name}!</div>
+                                    <div className='font-bold text-6xl text-center'>{auth?.user?.first_name}!</div>
                                 </div>
-                                <div className='flex gap-32px overflow-x-auto mt-32px'>
-                                    <TextCard />
-                                    <TextCard />
-                                    <TextCard />
-                                    <TextCard />
-                                    <TextCard />
+                                <div className='mx-auto relative h-full px-80px overflow-hidden'>
+                                    <div onClick={() => { prevCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center left-0 top-1/2 transform translate-y-1/2'>
+                                        <ArrowLeft size={24} color='white' />
+                                    </div>
+                                    <div className='grid grid-cols-3 mx-auto gap-32px overflow-x-auto mt-32px h-full'>
+
+                                        <TextCard headline={carouselTexts[prev].headline} text={carouselTexts[prev].text} />
+                                        <TextCard headline={carouselTexts[index].headline} text={carouselTexts[index].text} />
+                                        <TextCard headline={carouselTexts[next].headline} text={carouselTexts[next].text} />
+
+                                    </div>
+                                    <div onClick={() => { nextCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center right-0 top-1/2 transform translate-y-1/2'>
+                                        <ArrowRight size={24} color='white' />
+                                    </div>
                                 </div>
                                 <div className='flex items-center justify-center gap-12px max-w-[200px] mx-auto mt-40px'>
                                     <div className='cursor-pointer' onClick={() => { close(); }}>{t('Přeskočit')}</div>
                                     <Button href="#" icon={<HandPointing size={24} weight='bold' />} onClick={(e) => { e.preventDefault(); setCreatePortfolio(true); }}>{t('Vytvořit portfolio')}</Button>
                                 </div>
-                            </>
+                            </div>
                             :
                             <Form form={form}>
 
@@ -295,7 +365,7 @@ function PortfolioModal(props: Props) {
                                                         })}
                                                     />
                                                 </div>
-                                                
+
                                                 {
                                                     data['q']?.length > 0 &&
                                                     <>

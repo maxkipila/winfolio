@@ -300,13 +300,13 @@ function Chest(props: Props) {
                         }
                     </div>
                     <div className='w-full flex items-center justify-end relative'>
-                        <div onClick={() => { setOpenCalendar((p) => !p) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px bg-[#F7AA1A] border-2 border-black`}>{range == 'week' ? t('Tento týden') : range == 'month' ? t('Tento měsíc') : t('Tento rok')}</div>
+                        <div onClick={() => { setOpenCalendar((p) => !p) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px bg-[#FFB400] border-2 border-black`}>{range == 'week' ? t('Tento týden') : range == 'month' ? t('Tento měsíc') : t('Tento rok')}</div>
                         {
                             openCalendar &&
                             <div className={`border-2 border-black absolute right-0 top-55px z-10`}>
-                                <div onClick={() => { router.post(route('chest', { range: 'week' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "week" ? " bg-[#F7AA1A] " : "bg-white "}`}>{t('Tento týden')}</div>
-                                <div onClick={() => { router.post(route('chest', { range: 'month' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black ${range == "month" ? " bg-[#F7AA1A] " : "bg-white "}`}>{t('Tento měsíc')}</div>
-                                <div onClick={() => { router.post(route('chest', { range: 'year' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "year" ? " bg-[#F7AA1A] " : "bg-white"} `}>{t('Tento rok')}</div>
+                                <div onClick={() => { router.post(route('chest', { range: 'week' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "week" ? " bg-[#FFB400] " : "bg-white "}`}>{t('Tento týden')}</div>
+                                <div onClick={() => { router.post(route('chest', { range: 'month' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px border-t-2 border-b-2 border-black ${range == "month" ? " bg-[#FFB400] " : "bg-white "}`}>{t('Tento měsíc')}</div>
+                                <div onClick={() => { router.post(route('chest', { range: 'year' })) }} className={`cursor-pointer font-bold text-lg text-center px-24px py-4px ${range == "year" ? " bg-[#FFB400] " : "bg-white"} `}>{t('Tento rok')}</div>
                             </div>
                         }
                     </div>

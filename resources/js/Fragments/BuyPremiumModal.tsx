@@ -33,13 +33,13 @@ function BuyPremiumModal(props: Props) {
                     </div>
                     <div className='mt-18px'>
                         <div className='flex items-center gap-8px'>
-                            <div className='bg-[#F7AA1A] h-24px w-24px flex items-center justify-center rounded-full'>
+                            <div className='bg-[#FFB400] h-24px w-24px flex items-center justify-center rounded-full'>
                                 <Check size={16} />
                             </div>
                             <div className='font-nunito font-semibold'>Název první výhody</div>
                         </div>
                         <div className='flex items-center gap-8px mt-8px'>
-                            <div className='bg-[#F7AA1A] h-24px w-24px flex items-center justify-center rounded-full'>
+                            <div className='bg-[#FFB400] h-24px w-24px flex items-center justify-center rounded-full'>
                                 <Check size={16} />
                             </div>
                             <div className='font-nunito font-semibold'>Název první výhody</div>
@@ -49,13 +49,13 @@ function BuyPremiumModal(props: Props) {
                     <div className='mt-18px mb-24px'>
                         <div className='flex items-center gap-8px'>
                             <div className=' h-24px w-24px flex items-center justify-center rounded-full'>
-                                <Check color='#F7AA1A' size={24} />
+                                <Check color='#FFB400' size={24} />
                             </div>
                             <div className='font-nunito font-semibold'>Název první výhody</div>
                         </div>
                         <div className='flex items-center gap-8px mt-8px'>
                             <div className=' h-24px w-24px flex items-center justify-center rounded-full'>
-                                <Check color='#F7AA1A' size={24} />
+                                <Check color='#FFB400' size={24} />
                             </div>
                             <div className='font-nunito font-semibold'>Název první výhody</div>
                         </div>

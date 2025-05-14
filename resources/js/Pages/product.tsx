@@ -58,7 +58,7 @@ function Product(props: Props) {
                         </div>
                         <div className='flex gap-16px'>
                             <Export size={24} />
-                            <Heart weight={product?.favourited ? "fill" : "regular"} color={product?.favourited ? "#F7AA1A" : "black"} className='cursor-pointer' onClick={() => {
+                            <Heart weight={product?.favourited ? "fill" : "regular"} color={product?.favourited ? "#FFB400" : "black"} className='cursor-pointer' onClick={() => {
                                 post(route('favourites.toggle', { type: encodeURI(encodeURIComponent("App\\Models\\Product")), favouritable: product.id }))
                             }} size={24} />
                         </div>
@@ -149,7 +149,7 @@ function Product(props: Props) {
 
                             <div className='flex gap-8px w-full mt-16px'>
                                 <div className='w-full h-8px rounded-[4px] bg-[#ED2E1B]'></div>
-                                <div className='w-full h-8px rounded-[4px] bg-[#F7AA1A] relative'>
+                                <div className='w-full h-8px rounded-[4px] bg-[#FFB400] relative'>
                                     <div className='absolute -top-5px left-[50%] transform -translate-x-1/2 h-18px w-18px border border-black rounded-[5px] bg-white'>
                                         <div className='w-12px h-12px bg-black mx-auto mt-2px rounded-[5px]'></div>
                                     </div>
@@ -283,7 +283,7 @@ function Product(props: Props) {
                                 <div className='text-[#4D4D4D] flex gap-8px items-center'>
                                     {
                                         product?.sets?.map((s) =>
-                                            <Link className='text-[#F7AA1A] underline' href={route('product.detail', { product: s.id })}>{s.id}</Link>
+                                            <Link className='text-[#FFB400] underline' href={route('product.detail', { product: s.id })}>{s.id}</Link>
                                         )
                                     }
                                 </div>
@@ -296,7 +296,7 @@ function Product(props: Props) {
                                 <div className='text-[#4D4D4D] flex gap-8px items-center'>
                                     {
                                         product?.minifigs?.map((s) =>
-                                            <Link className='text-[#F7AA1A] underline' href={route('product.detail', { product: s.id })}>{s.id}</Link>
+                                            <Link className='text-[#FFB400] underline' href={route('product.detail', { product: s.id })}>{s.id}</Link>
                                         )
                                     }
                                 </div>

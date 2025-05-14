@@ -19,7 +19,7 @@ function MenuLink(props: MenuLinkProps) {
 
 
     return (
-        <Link title={name} href={href} className={`p-12px max-h-[48px] ${route()?.current()?.startsWith(activeName) ? 'bg-[#F7AA1A] text-black rounded-sm border-2 border-black' : "text-[#667A7B]"}`}>
+        <Link title={name} href={href} className={`p-12px max-h-[48px] ${route()?.current()?.startsWith(activeName) ? 'bg-[#FFB400] text-black rounded-sm border-2 border-black' : "text-[#667A7B]"}`}>
             {icon}
         </Link>
     )
@@ -67,7 +67,7 @@ function Sidebar(props: Props) {
                     className="object-cover object-center rounded-full w-full h-full cursor-pointer"
                 />
                 {userOptions && (
-                    <div className="absolute left-[70px] bottom-0 o z-10 bg-[#F7AA1A] font-nunito shadow-lg border rounded-sm flex flex-col  min-w-[120px]">
+                    <div className="absolute left-[70px] bottom-0 o z-10 bg-[#FFB400] font-nunito shadow-lg border rounded-sm flex flex-col  min-w-[120px]">
                         <div className="" role="menuitem">
                             {auth?.user?.first_name} {auth?.user?.last_name}
                         </div>
