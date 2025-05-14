@@ -64,7 +64,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
             $this->info("Zpracovávám pouze produkt s ID: {$productId}");
         }
 
-        // Příprava produktů ke zpracování
         $query = Product::query();
 
         // Pokud je zadáno ID produktu, použijeme pouze tento produkt
@@ -110,12 +109,10 @@ class HistoricalPricesBrickEconomyCommand extends Command
         $bar = $this->output->createProgressBar($totalProducts);
         $bar->start();
 
-        // Zpracování produktů
         $products = $query->take($totalProducts)->get();
 
         foreach ($products as $product) {
             try {
-                // Získáme BrickEconomy ID
                 $brickEconomyId = $this->getBrickEconomyId($product);
 
                 if (!$brickEconomyId) {
@@ -124,7 +121,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                     continue;
                 }
 
-                // Stáhneme historická data
                 $historicalData = $this->scrapeHistoricalData($brickEconomyId, $days);
 
                 if (empty($historicalData)) {
@@ -133,7 +129,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                     continue;
                 }
 
-                // Uložíme data do DB
                 $saved = $this->saveHistoricalPrices($product, $historicalData);
 
                 if ($saved) {
@@ -149,14 +144,12 @@ class HistoricalPricesBrickEconomyCommand extends Command
 
             $bar->advance();
 
-            // Malé zpoždění mezi požadavky, abychom nepřetížili server
             usleep(500000); // 0.5 sekundy
         }
 
         $bar->finish();
         $this->newLine(2);
 
-        // Výpis statistik
         $this->info("Scraping dokončen za " . $this->startTime->diffForHumans(now()));
         $this->info("Úspěšně zpracováno produktů: {$this->totalSuccess}");
         $this->info("Celkem staženo datových bodů: {$this->totalPoints}");
@@ -183,12 +176,10 @@ class HistoricalPricesBrickEconomyCommand extends Command
     {
         static $mappingCache = [];
 
-        // Nejdřív zkontrolujeme cache
         if (isset($mappingCache[$product->id])) {
             return $mappingCache[$product->id];
         }
 
-        // Pak zkusíme najít v databázi
         $mapping = LegoIdMapping::where('product_id', $product->id)
             ->whereNotNull('brickeconomy_id')
             ->first();
@@ -198,7 +189,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
             return $mapping->brickeconomy_id;
         }
 
-        // Pro sety je formát často stejný
         if ($product->product_type === 'set') {
             $mappingCache[$product->id] = $product->product_num;
             return $product->product_num;
@@ -216,30 +206,22 @@ class HistoricalPricesBrickEconomyCommand extends Command
         $url = "https://www.brickeconomy.com/set/{$brickEconomyId}/";
 
         try {
-            // Stáhneme HTML stránky
             $response = $this->client->get($url);
             $html = $response->getBody()->getContents();
 
-            // Vytvoříme crawler
             $crawler = new Crawler($html);
 
-            // Extrahujeme skripty, které mohou obsahovat data o cenách
             $scripts = $crawler->filter('script')->extract(['_text']);
 
-            // Data pro historické ceny
             $historicalData = [];
 
-            // Hledáme graf s cenami
             foreach ($scripts as $script) {
-                // Hledáme JavaScript data pro graf
                 if (strpos($script, 'chartData') !== false || strpos($script, 'chart.data') !== false) {
-                    // Regulární výraz pro extrakci datových bodů grafu
                     preg_match_all('/data\s*:\s*(\[.*?\])/s', $script, $matches);
 
                     if (!empty($matches[1][0])) {
                         $dataPoints = $matches[1][0];
 
-                        // Vylepšený regex pro různé formáty bodů v grafu
                         preg_match_all(
                             '/{(?:\s*x\s*:\s*(?:new Date\(["\']?([^"\')]+)["\']?\)|"([^"]+)")(?:\s*,\s*|\s*)\s*y\s*:\s*([0-9.]+))/s',
                             $dataPoints,
@@ -254,7 +236,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                                 $price = (float) $match[3];
 
                                 try {
-                                    // Převést různé formáty data
                                     $pointDate = Carbon::parse($date);
                                     if ($pointDate->isAfter(now()->subDays($days))) {
                                         $historicalData[] = [
@@ -271,7 +252,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                         }
                     }
 
-                    // Hledáme data v jiném formátu
                     if (empty($historicalData)) {
                         preg_match_all('/data:\s*\[\s*\{\s*x:\s*"([^"]+)"\s*,\s*y:\s*(\d+(?:\.\d+)?)\s*\}/s', $script, $alternateMatches, PREG_SET_ORDER);
 
@@ -280,7 +260,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                                 $date = $match[1];
                                 $price = (float) $match[2];
 
-                                // Převést různé formáty data
                                 try {
                                     $pointDate = Carbon::parse($date);
                                     if ($pointDate->isAfter(now()->subDays($days))) {
@@ -305,24 +284,19 @@ class HistoricalPricesBrickEconomyCommand extends Command
                 }
             }
 
-            // Pokud jsme nenašli data v JavaScriptu, zkusíme extrahovat přímo z DOM
             if (empty($historicalData)) {
-                // Procházíme tabulky nebo jiné elementy s cenou
                 $crawler->filter('table.table tr')->each(function (Crawler $row) use (&$historicalData, $days) {
                     try {
-                        // Hledáme řádky s daty a cenou
                         $cells = $row->filter('td')->extract(['_text']);
 
                         if (count($cells) >= 2) {
                             $dateText = trim($cells[0]);
                             $priceText = trim($cells[1]);
 
-                            // Zkusíme extrahovat datum
                             $dateMatches = [];
                             if (preg_match('/(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\w+ \d{1,2}, \d{4})/', $dateText, $dateMatches)) {
                                 $date = Carbon::parse($dateMatches[1]);
 
-                                // Extrahujeme cenu
                                 $priceMatches = [];
                                 if (preg_match('/\$?(\d+(?:\.\d+)?)/', $priceText, $priceMatches)) {
                                     $price = (float) $priceMatches[1];
@@ -415,7 +389,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
                 }
             }
 
-            // Vložíme data najednou
             if (!empty($dataToInsert)) {
                 Price::insert($dataToInsert);
             }
@@ -427,9 +400,6 @@ class HistoricalPricesBrickEconomyCommand extends Command
         }
     }
 
-    /**
-     * Loguje chybu do statistik
-     */
     protected function logError($reason)
     {
         $this->totalFailed++;
