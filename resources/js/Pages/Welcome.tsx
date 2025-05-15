@@ -58,7 +58,7 @@ function Welcome(props: Props) {
                 <div className='font-nunito text-lg text-center'>{t('Sleduj hodnotu svých setů v reálném čase, analyzuj vývoj cen, získej predikce a tipy na nákup nebo prodej.')}</div>
 
                 <div className='mt-48px flex items-center gap-64px mob:flex-col'>
-                    <Img className='w-full' src="/assets/img/landing-heads.png" />
+                    <Img className='w-full' src="/assets/img/architect.png" />
                     <div className='w-full'>
                         <div className='font-bold text-3xl'>{t('Rozhoduj se na základě dat, ne pocitů')}</div>
                         <div className='font-nunito my-32px'>{t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.')}</div>
@@ -76,7 +76,7 @@ function Welcome(props: Props) {
                 </div>
 
                 <div className='mt-48px flex items-center gap-64px mob:flex-col'>
-                    <Img className='w-full' src="/assets/img/beatles-landing.png" />
+                    <Img className='w-full' src="/assets/img/friends.png" />
                     <div className='w-full'>
                         <div className='font-bold text-3xl'>{t('Komunita, která staví na stejných základech')}</div>
                         <div className='font-nunito my-32px'>{t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.')}</div>
@@ -172,16 +172,22 @@ function Welcome(props: Props) {
                             <div className='font-bold text-lg'>{t('Zdarma')}</div>
                         </div>
                         <div className='border-t-2 border-black p-24px'>
-                            <div className='flex gap-24px items-center mb-16px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-16px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Portfolio maximálně 5 setů')}</div>
                             </div>
-                            <div className='flex gap-24px items-center mb-16px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-16px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Přístup k základním datům o trzích')}</div>
                             </div>
-                            <div className='flex gap-24px items-center mb-[72px]'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-[72px]'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Mise a úkoly')}</div>
                             </div>
                             <Button className='max-w-[160px]' href={route('login')}>{t('Začít zdarma')}</Button>
@@ -194,20 +200,28 @@ function Welcome(props: Props) {
                             <div className='font-bold text-lg'>{t('249 Kč / měs')}</div>
                         </div>
                         <div className='border-t-2 border-black p-24px'>
-                            <div className='flex gap-24px items-center mb-16px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-16px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Neomezeně setů v portfoliu')}</div>
                             </div>
-                            <div className='flex gap-24px items-center mb-16px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-16px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Přístup k pokročilým statistikám')}</div>
                             </div>
-                            <div className='flex gap-24px items-center mb-16px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-16px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Mise a úkoly')}</div>
                             </div>
-                            <div className='flex gap-24px items-center mb-32px'>
-                                <Check size={24} />
+                            <div className='flex gap-13px items-center mb-32px'>
+                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
+                                    <Check color='white' weight='bold' size={12} />
+                                </div>
                                 <div className='font-nunito'>{t('Přístup do uzavřené komunity')}</div>
                             </div>
                             <Button className='max-w-[160px]' href={route('login')}>{t('Začít naplno')}</Button>
