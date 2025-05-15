@@ -5,7 +5,7 @@ import PublicHeader from '@/Fragments/PublicHeader'
 import { Button } from '@/Fragments/UI/Button'
 import useLazyLoad from '@/hooks/useLazyLoad'
 import { Link } from '@inertiajs/react'
-import { Check, Ranking } from '@phosphor-icons/react'
+import { Check, CheckCircle, Ranking } from '@phosphor-icons/react'
 import React from 'react'
 
 interface Props {
@@ -24,7 +24,7 @@ function Welcome(props: Props) {
             <div className='w-full'>
                 <div className='grid'>
                     <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
-                    <div className='w-full col-start-1 row-start-1 p-24px flex items-center'>
+                    <div className='w-full col-start-1 row-start-1 p-24px flex items-center z-10'>
                         <div className='text-white z-max'>
                             <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
                             <div className='font-bold text-6xl'>{t('Zlepšuj se a vyhrávej.')}</div>
@@ -173,22 +173,16 @@ function Welcome(props: Props) {
                         </div>
                         <div className='border-t-2 border-black p-24px'>
                             <div className='flex gap-13px items-center mb-16px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Portfolio maximálně 5 setů')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Portfolio maximálně 5 setů')}</div>
                             </div>
                             <div className='flex gap-13px items-center mb-16px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Přístup k základním datům o trzích')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Přístup k základním datům o trzích')}</div>
                             </div>
                             <div className='flex gap-13px items-center mb-[72px]'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Mise a úkoly')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Mise a úkoly')}</div>
                             </div>
                             <Button className='max-w-[160px]' href={route('login')}>{t('Začít zdarma')}</Button>
                         </div>
@@ -201,28 +195,20 @@ function Welcome(props: Props) {
                         </div>
                         <div className='border-t-2 border-black p-24px'>
                             <div className='flex gap-13px items-center mb-16px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Neomezeně setů v portfoliu')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Neomezeně setů v portfoliu')}</div>
                             </div>
                             <div className='flex gap-13px items-center mb-16px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Přístup k pokročilým statistikám')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Přístup k pokročilým statistikám')}</div>
                             </div>
                             <div className='flex gap-13px items-center mb-16px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Mise a úkoly')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Mise a úkoly')}</div>
                             </div>
                             <div className='flex gap-13px items-center mb-32px'>
-                                <div className='flex items-center justify-center w-18px h-18px bg-[#46BD0F] rounded-full'>
-                                    <Check color='white' weight='bold' size={12} />
-                                </div>
-                                <div className='font-nunito'>{t('Přístup do uzavřené komunity')}</div>
+                                <CheckCircle color='#46BD0F' weight='fill' size={24} />
+                                <div className='font-nunito text-lg'>{t('Přístup do uzavřené komunity')}</div>
                             </div>
                             <Button className='max-w-[160px]' href={route('login')}>{t('Začít naplno')}</Button>
                         </div>

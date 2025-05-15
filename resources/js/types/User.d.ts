@@ -23,4 +23,5 @@ interface User extends Resource {
     updated_at: string;
     products: Array<Product>
     favourites: Array<Favourite>
+    highest_portfolio: number
 }

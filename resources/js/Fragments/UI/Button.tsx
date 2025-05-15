@@ -58,5 +58,5 @@ function getButtonStyles({ disabled, primary, className, outlined = false, mini,
      flex whitespace-nowrap justify-center items-center ${disabled ? `${disabledWhite ? "bg-app-yellow border border-app-yellow text-black opacity-40" : "bg-app-lighter/20"}
       pointer-events-none text-app-lighter cursor-not-allowed ` :
             (primary ? (outlined ? " hover:bg-app-lighter text-app hover:text-white border-app border cursor-pointer" : " bg-[#539648]  hover:bg-app-lighter text-white cursor-pointer") :
-                `${color ? ` bg-[#1A1A1A] text-black border-[#539648] border-app- bg-[${color}] hover:[#539648] border border-[${color}] hover:bg-opacity-80` : "text-[#664800] font-bold bg-[#FFB400] border-2 border-[#664800] w-full text-black hover:border-app-gray-999999"} cursor-pointer`)} gap-x-8px font-bold ${className}`
+                `${color ? ` bg-[#1A1A1A] text-black border-[#539648] border-app- bg-[${color}] hover:[#539648] border border-[${color}] hover:bg-opacity-80` : "text-[#4D3600] font-bold bg-[#FFB400] border-2 border-[#664800] w-full text-black hover:border-app-gray-999999"} cursor-pointer`)} gap-x-8px font-bold ${className}`
 }
