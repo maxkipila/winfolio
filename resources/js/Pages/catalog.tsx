@@ -41,6 +41,7 @@ function Catalog(props: Props) {
     let [selected, setSelected] = useState<Theme>(null)
     let [themeChildren, setThemeChildren] = useState<Array<number>>([])
     let [type, setType] = useState(null)
+    let [showTrending, setShowTrending] = useState(false)
     const search = useDebouncedCallback(() => {
         router.post(route('catalog', { parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type }))
     }, 700);
@@ -53,7 +54,7 @@ function Catalog(props: Props) {
         setThemeChildren([])
     }, [selected])
 
-
+    let [trendingProducts, trendButton, TrendMeta, TrendsetItems] = useLazyLoad<{ product: Product }>('trending_products');
 
     return (
         <AuthenticatedLayout>
@@ -63,6 +64,12 @@ function Catalog(props: Props) {
                     <TextField placeholder={t("Vyhledat položku")} name="search" icon={<MagnifyingGlass size={24} />} />
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
+                    <div onClick={() => { setShowTrending((p) => !p) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${showTrending ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
+                        <div className='w-40px h-40px bg-white flex items-center justify-center rounded-full  '>
+                            <TrendUp size={24} />
+                        </div>
+                        <div className='font-bold text-center font-nunito'>Trending</div>
+                    </div>
                     {
                         themes?.map((t) =>
                             <ThemeCard setSelected={setSelected} selected={selected} {...t} />
@@ -91,19 +98,42 @@ function Catalog(props: Props) {
                         <SlidersHorizontal className='flex-shrink-0' size={24} />
                     </div>
                 </div>
-                <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
 
-                    {
-                        products?.map((s) =>
-                            <ProductCard wide {...s} />
-                        )
-                    }
-                </div>
-                <div className='flex items-center justify-center w-full mt-24px'>
-                    <div>
-                        <Button {...button}>{t('Zobrazit další')}</Button>
-                    </div>
-                </div>
+                {
+                    showTrending ?
+                        <>
+                            <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-24px mob:px-24px'>
+                                {
+                                    trendingProducts?.map((s) =>
+                                        <ProductCard {...s.product} />
+                                    )
+                                }
+
+                            </div>
+                            <div className='flex items-center justify-center w-full mt-24px'>
+                                <div>
+                                    <Button {...trendButton}>{t('Zobrazit další')}</Button>
+                                </div>
+                            </div>
+                        </>
+                        :
+                        <>
+                            <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
+
+                                {
+                                    products?.map((s) =>
+                                        <ProductCard wide {...s} />
+                                    )
+                                }
+                            </div>
+                            <div className='flex items-center justify-center w-full mt-24px'>
+                                <div>
+                                    <Button {...button}>{t('Zobrazit další')}</Button>
+                                </div>
+                            </div>
+                        </>
+                }
+
             </div>
         </AuthenticatedLayout>
     )

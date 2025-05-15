@@ -52,6 +52,7 @@ class _User extends JsonResource
             'model' => (new \ReflectionClass($this->resource))->getShortName(),
             'products' => _Product::collection($this->whenLoaded('products')),
             'favourites' => _Favourite::collection($this->favourites),
+            'highest_portfolio' => $this->records()->with('product')->get()->keyBy('record_type')->get('highest_portfolio_value')->value ?? 0
         ];
     }
 }

@@ -47,7 +47,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t('Hodnota wishlistu')}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{wishlistValue}</div>
+                    <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
@@ -59,7 +59,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t("All time high portfolia")}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
+                    <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100 }</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>

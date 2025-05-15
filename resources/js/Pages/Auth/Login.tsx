@@ -126,62 +126,69 @@ function Login(props: Props) {
                             <>
                                 <TextField name="first_name" placeholder={t('Jméno')} />
                                 <TextField name="last_name" placeholder={t('Příjmení')} />
-                                <TextField name="nickname" placeholder={t('@username')} />
+                                <TextField prefix='@' name="nickname" placeholder={t('@username')} />
                                 <div className='mt-24px'>{t('Telefonní číslo')}</div>
                                 <div className='flex gap-8px'>
-                                    <Select name="prefix" placeholder={t('Prefix')} options={[
-                                        { text: '+420', value: '+420' }
-                                    ]} />
+                                    <div className='flex-shrink-0'>
+                                        <Select name="prefix" placeholder={t('Prefix')} options={[
+                                            { text: '+420', value: '+420' }
+                                        ]} />
+                                    </div>
                                     <TextField name="phone" placeholder={t('Telefon')} />
                                 </div>
+                                <div className='mt-24px'>{t('Datum narození')}</div>
                                 <div className='flex gap-8px'>
-                                    <Select name="day" placeholder='DD' options={[
-                                        { text: '01', value: '1' },
-                                        { text: '02', value: '2' },
-                                        { text: '03', value: '3' },
-                                        { text: '04', value: '4' },
-                                        { text: '05', value: '5' },
-                                        { text: '06', value: '6' },
-                                        { text: '07', value: '7' },
-                                        { text: '08', value: '8' },
-                                        { text: '09', value: '9' },
-                                        { text: '10', value: '10' },
-                                        { text: '11', value: '11' },
-                                        { text: '12', value: '12' },
-                                        { text: '13', value: '13' },
-                                        { text: '14', value: '14' },
-                                        { text: '15', value: '15' },
-                                        { text: '16', value: '16' },
-                                        { text: '17', value: '17' },
-                                        { text: '18', value: '18' },
-                                        { text: '19', value: '19' },
-                                        { text: '20', value: '20' },
-                                        { text: '21', value: '21' },
-                                        { text: '22', value: '22' },
-                                        { text: '23', value: '23' },
-                                        { text: '24', value: '24' },
-                                        { text: '25', value: '25' },
-                                        { text: '26', value: '26' },
-                                        { text: '27', value: '27' },
-                                        { text: '28', value: '28' },
-                                        { text: '29', value: '29' },
-                                        { text: '30', value: '30' },
-                                        { text: '31', value: '31' },
-                                    ]} />
-                                    <Select name="month" placeholder='MM' options={[
-                                        { text: '01', value: '1' },
-                                        { text: '02', value: '2' },
-                                        { text: '03', value: '3' },
-                                        { text: '04', value: '4' },
-                                        { text: '05', value: '5' },
-                                        { text: '06', value: '6' },
-                                        { text: '07', value: '7' },
-                                        { text: '08', value: '8' },
-                                        { text: '09', value: '9' },
-                                        { text: '10', value: '10' },
-                                        { text: '11', value: '11' },
-                                        { text: '12', value: '12' },
-                                    ]} />
+                                    <div className='flex-shrink-0'>
+                                        <Select name="day" placeholder='DD' options={[
+                                            { text: '01', value: '1' },
+                                            { text: '02', value: '2' },
+                                            { text: '03', value: '3' },
+                                            { text: '04', value: '4' },
+                                            { text: '05', value: '5' },
+                                            { text: '06', value: '6' },
+                                            { text: '07', value: '7' },
+                                            { text: '08', value: '8' },
+                                            { text: '09', value: '9' },
+                                            { text: '10', value: '10' },
+                                            { text: '11', value: '11' },
+                                            { text: '12', value: '12' },
+                                            { text: '13', value: '13' },
+                                            { text: '14', value: '14' },
+                                            { text: '15', value: '15' },
+                                            { text: '16', value: '16' },
+                                            { text: '17', value: '17' },
+                                            { text: '18', value: '18' },
+                                            { text: '19', value: '19' },
+                                            { text: '20', value: '20' },
+                                            { text: '21', value: '21' },
+                                            { text: '22', value: '22' },
+                                            { text: '23', value: '23' },
+                                            { text: '24', value: '24' },
+                                            { text: '25', value: '25' },
+                                            { text: '26', value: '26' },
+                                            { text: '27', value: '27' },
+                                            { text: '28', value: '28' },
+                                            { text: '29', value: '29' },
+                                            { text: '30', value: '30' },
+                                            { text: '31', value: '31' },
+                                        ]} />
+                                    </div>
+                                    <div className='flex-shrink-0'>
+                                        <Select name="month" placeholder='MM' options={[
+                                            { text: '01', value: '1' },
+                                            { text: '02', value: '2' },
+                                            { text: '03', value: '3' },
+                                            { text: '04', value: '4' },
+                                            { text: '05', value: '5' },
+                                            { text: '06', value: '6' },
+                                            { text: '07', value: '7' },
+                                            { text: '08', value: '8' },
+                                            { text: '09', value: '9' },
+                                            { text: '10', value: '10' },
+                                            { text: '11', value: '11' },
+                                            { text: '12', value: '12' },
+                                        ]} />
+                                    </div>
                                     <Select name="year" placeholder='YYYY' options={[
                                         { text: '1960', value: '1960' },
                                         { text: '1961', value: '1961' },
@@ -258,11 +265,13 @@ function Login(props: Props) {
                                 </div>
                                 <TextField name="street" placeholder={t('Ulice a č. popisné')} />
                                 <div className='flex gap-8px'>
-                                    <TextField name="postal_code" placeholder={t('PSČ')} />
+                                    <div className='flex-shrink-0'>
+                                        <TextField name="postal_code" placeholder={t('PSČ')} />
+                                    </div>
                                     <TextField name="city" placeholder={t('Město')} />
                                 </div>
                                 <Select name="country" placeholder={t('Stát')} options={[
-                                    { text: 'CZE', value: 'CZE' }
+                                    { text: 'Česká Republika', value: 'CZE' }
                                 ]} />
                                 <div className='mt-24px flex gap-8px'>
                                     <Lock size={24} />
@@ -270,6 +279,9 @@ function Login(props: Props) {
                                 </div>
                                 <PasswordField name="password" placeholder={t('Heslo')} />
                                 <PasswordField name="password_confirmation" placeholder={t('Heslo (znova)')} />
+                                <div className='flex gap-8px items-center font-nunito justify-between w-full mb-32px'>
+                                    <Checkbox name="newsletter" label={t("Newsletter")} />
+                                </div>
                                 <Button href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
                             </>
                         }

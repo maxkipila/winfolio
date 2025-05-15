@@ -165,10 +165,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function catalog(Request $request)
+    public function catalog(Request $request, TrendService $trendService)
     {
         $query = $request->search;
         $column = 'name';
+
+        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'trending')
+            ->where('calculated_at', $latestDate)
+            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+
+        if ($trendingQuery->count() === 0) {
+            $trendService->calculateTrendingProducts(8, 30);
+            $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+
+            $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+                ->where('type', 'trending')
+                ->where('calculated_at', $latestDate)
+                ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+        }
+
+        $trending_products = _Trend::collection(
+            $trendingQuery->paginate($request->paginate ?? 4)
+        );
 
         $products = _Product::collection(
             Product::with('media')
@@ -195,7 +215,7 @@ class UserController extends Controller
                 ->paginate($request->paginate ?? 10)
         );
 
-        return Inertia::render('catalog', compact('products', 'themes'));
+        return Inertia::render('catalog', compact('products', 'themes','trending_products'));
         /* $query = $request->search;
         $column = 'name';
         $products = _Product::collection(Product::when($request->type, fn($k) => $k->where('product_type', $request->type))->when($request->parent_theme || $request->theme_children, fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])]))->where($column, 'LIKE', '%' . $query . '%')
