@@ -178,4 +178,5 @@ return [
 
     'Hodnota wishlistu'=>'Hodnota Wishlistu',
     'All time high portfolia'=>'Nejvyšší hodnota'
+    'Datum narození'=>'Datum narození'
 ];

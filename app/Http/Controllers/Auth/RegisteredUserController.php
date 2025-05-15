@@ -84,7 +84,7 @@ class RegisteredUserController extends Controller
             'year' => $request->year ?? NULL,
             'street' => $request->street ?? NULL,
             'street_2' => $request->street_2 ?? NULL,
-
+            'newsletter' => $request->newsletter ?? false,
             'psc' => $request->psc ?? NULL,
             'city' => $request->city ?? NULL,
             'country' => $request->country ?? NULL,
