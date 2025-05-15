@@ -69,6 +69,47 @@ class ImportLegoData extends Command
                 $this->importDataset($dataType);
             }
         } else if (!$dataType) {
+            // 1. Themes
+            $this->importDataset('themes');
+
+            // 2. Produkty
+            $this->importDataset('sets');
+            $this->importDataset('minifigs');
+
+            // Nakonec importujeme vazby
+            $this->importRelationships();
+        } else {
+            $this->error("Neznámý typ dat: $dataType");
+            return 1;
+        }
+        //pokud selze import temat, nespusti se import produktu
+        try {
+            $this->importDataset('themes');
+            $this->info("Témata úspěšně importována");
+        } catch (\Exception $e) {
+            $this->error("Chyba při importu témat: " . $e->getMessage());
+            return 1;
+        }
+        return 0;
+    }
+    /* 
+    public function handle()
+    {
+        DB::disableQueryLog();
+
+        if (!Storage::exists('temp')) {
+            Storage::makeDirectory('temp');
+        }
+
+        $dataType = $this->argument('dataType');
+
+        if ($dataType && isset($this->datasets[$dataType])) {
+            if ($dataType === 'relationships') {
+                $this->importRelationships();
+            } else {
+                $this->importDataset($dataType);
+            }
+        } else if (!$dataType) {
             // Nejprve importujeme základní datové sady
             foreach (['themes', 'sets', 'minifigs'] as $type) {
                 $this->importDataset($type);
@@ -78,11 +119,11 @@ class ImportLegoData extends Command
             $this->importRelationships();
         } else {
             $this->error("Neznámý typ dat: $dataType");
-            return 1;
+            return 1; 
         }
 
         return 0;
-    }
+    } */
 
     protected function importRelationships()
     {

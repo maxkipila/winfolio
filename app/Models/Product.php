@@ -14,10 +14,10 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Product extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasResource;
-    protected $guarded = [];
+    use InteractsWithMedia, HasResource, HasFactory;
 
-    use HasFactory;
+
+    protected $guarded = [];
 
     public function theme()
     {
@@ -54,16 +54,22 @@ class Product extends Model implements HasMedia
             ->withTimestamps();
     }
 
-
-    /*  public function getImgUrlAttribute($value): string
+    // zpetna kompatibilita v pripade, ze se stale ocekava img_uel
+    public function getImgUrlAttribute()
     {
-        $first = $this->getFirstMediaUrl('images');
+        $media = $this->getFirstMedia('images');
+        if ($media) {
+            return $media->getUrl();
+        }
 
-        return $first !== ''
-            ? $first
-            : $value;
-    } */
+        if ($this->product_type === 'set') {
+            return "https://cdn.rebrickable.com/media/sets/{$this->product_num}.jpg";
+        } elseif ($this->product_type === 'minifig') {
+            return "https://cdn.rebrickable.com/media/minifigs/{$this->product_num}.jpg";
+        }
 
+        return null;
+    }
 
     public function prices()
     {
@@ -118,8 +124,6 @@ class Product extends Model implements HasMedia
             ->withTimestamps();
     }
 
-    // Pro sety - získání minifigurek v setu
-    // V modelu Product
     public function minifigs()
     {
         return $this->belongsToMany(Product::class, 'set_minifigs', 'parent_id', 'minifig_id')

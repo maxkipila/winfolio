@@ -65,11 +65,17 @@ class ImportCommand extends Command
 
     private function importImages(): void
     {
-        $this->info('Import obrázků...');
-        Artisan::call('import:lego-images', ['--skip-existing' => true]);
-        $this->info(Artisan::output());
-    }
-
+        // 15min delay
+        Artisan::call('import:lego-images');
+        /*   private function importImages(): void
+   private function importImages(): void
+{
+    // Naplánování importu obrázků s 15min zpožděním
+    Artisan::call('import:lego-images', [
+        '--delay' => 15,
+        '--batch-size' => 500
+    ]);
+}
     private function importThemes(): void
     {
         $this->info('Přiřazování témat minifigurkám...');

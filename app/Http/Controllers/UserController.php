@@ -46,7 +46,7 @@ class UserController extends Controller
     {
         $star_wars_theme = _Theme::init(Theme::where('name', 'Star Wars')->first());
 
-        $products = _Product::collection(Product::where('theme_id', $star_wars_theme->id)->inRandomOrder()->take(4)->get());
+        $products = _Product::collection(Product::where('theme_id', $star_wars_theme?->id)->inRandomOrder()->take(4)->get());
 
         // $latestDate = Trend::where('type', 'trending')->max('calculated_at');
         // $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
@@ -88,7 +88,6 @@ class UserController extends Controller
         // $top_movers = _Trend::collection(
         //     $topMoversQuery->paginate($request->paginate ?? 4)
         // );
-
 
         return Inertia::render('Welcome', compact('products'));
     }
