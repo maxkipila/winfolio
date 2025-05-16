@@ -10,60 +10,50 @@ use Illuminate\Support\Facades\DB;
 
 class AggregateProductPrices extends Command
 {
-    protected $signature = 'prices:aggregate {--force} {--date=} {--days=31}';
+    protected $signature = 'prices:aggregate {--force}';
     protected $description = 'Agregace cen produktu';
 
     public function handle()
     {
-        // Vypnout telescope pro lepší výkon
+        // Vypnutí Telescope pro optimalizaci
         if (class_exists(\Laravel\Telescope\Telescope::class)) {
             \Laravel\Telescope\Telescope::stopRecording();
         }
 
+        // Zvýšení limitu paměti pro zpracování většího počtu dat
         ini_set('memory_limit', '2G');
         DB::disableQueryLog();
+        $this->info('Start agregace...');
 
-        $date = $this->option('date')
-            ? Carbon::parse($this->option('date'))
-            : Carbon::today()->subDay();
-
-        $days = $this->option('days');
+        // Vždy používáme včerejší datum jako výchozí
+        $date = Carbon::today()->subDay();
+        $days = 31; // Standardně agregujeme za posledních 31 dní
         $force = $this->option('force');
 
-        // Kontrola, zda již existují agregovaná data pro tento den
+        // Kontrola, zda již existují agregovaná data pro tento den 
         if (
-            !$force && Price::where('type', 'aggregated')
-            ->whereDate('created_at', $date)
+            !$force && Price::where('date', $date->toDateString())
+            ->where('type', 'aggregated')
+            ->where('value', '>', 0)
             ->exists()
         ) {
             $this->info("Pro datum {$date->toDateString()} již agregovaná data existují. Použijte --force pro přepsání.");
             return 0;
         }
 
-        $this->info('Začínám agregaci cen...');
-
-        // Počítáme celkový počet produktů pro progress bar
-        $totalProducts = Product::count();
-        $bar = $this->output->createProgressBar($totalProducts);
-        $bar->start();
-
-        // Získáme všechny produkty po částech a agregujeme ceny
-        Product::chunk(100, function ($products) use ($date, $days, $bar) {
+        // Získáme všechny produkty
+        Product::chunk(100, function ($products) use ($date, $days) {
             foreach ($products as $product) {
                 $this->aggregateProductPrice($product, $date, $days);
-                $bar->advance();
             }
         });
-
-        $bar->finish();
-        $this->newLine();
 
         // Měsíční agregace
         $this->info('Počítám měsíční průměry...');
         $month = $date->copy()->startOfMonth();
         $trendService = app(\App\Services\TrendService::class);
 
-        $bar = $this->output->createProgressBar($totalProducts);
+        $bar = $this->output->createProgressBar(Product::count());
         $bar->start();
 
         Product::chunk(100, function ($products) use ($trendService, $month, $bar) {
@@ -72,13 +62,14 @@ class AggregateProductPrices extends Command
                 if (!is_null($value)) {
                     Price::updateOrCreate([
                         'product_id' => $product->id,
+                        'date' => $month->toDateString(),
                         'type' => 'aggregated',
-                        'condition' => null,
-                        'created_at' => $month,
                     ], [
                         'value' => $value,
-                        /*   'retail' => round($value * 1.3, 2),
-                        'wholesale' => round($value * 0.7, 2), */
+                        'retail' => round($value * 1.3, 2),
+                        /* 'condition' => 'New', */
+                        'currency' => 'EUR',
+                        'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                 }
@@ -101,80 +92,56 @@ class AggregateProductPrices extends Command
         $startDate = $date->copy()->subDays($days);
         $endDate = $date;
 
-        // Všechny ceny produktu za období
+        // Všechny ceny produktu za období - pouze "Scraped" typ
         $prices = Price::where('product_id', $product->id)
-            ->where('type', '!=', 'aggregated')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            /* ->get(['value', 'retail', 'wholesale', 'condition', 'created_at']); */
-            ->get(['value', 'condition', 'created_at']);
+            ->where('type', 'Scraped')
+            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->get(['value', 'date']);
 
-        $groupedByCondition = $prices->groupBy('condition');
-
-        foreach ($groupedByCondition as $condition => $conditionPrices) {
-            if ($conditionPrices->isEmpty()) {
-                continue;
-            }
-
-            // Rozdělit ceny podle dne
-            $dailyGroups = $conditionPrices->groupBy(function ($price) {
-                return Carbon::parse($price->created_at)->toDateString();
-            });
-
-            $dailyMedians = [];
-            $dailyRetailMedians = [];
-            $dailyWholesaleMedians = [];
-
-            foreach ($dailyGroups as $day => $prices) {
-                // Value
-                $values = $prices->pluck('value')->sort()->values()->toArray();
-                $count = count($values);
-                $middle = floor($count / 2);
-                $median = $count % 2 === 0
-                    ? ($values[$middle - 1] + $values[$middle]) / 2
-                    : $values[$middle];
-                $dailyMedians[] = $median;
-
-                /*    // Retail
-                $retailValues = $prices->pluck('retail')->sort()->values()->toArray();
-                $retailCount = count($retailValues);
-                $retailMiddle = floor($retailCount / 2);
-                $retailMedian = $retailCount % 2 === 0
-                    ? ($retailValues[$retailMiddle - 1] + $retailValues[$retailMiddle]) / 2
-                    : $retailValues[$retailMiddle];
-                $dailyRetailMedians[] = $retailMedian;
-
-                // Wholesale
-                $wholesaleValues = $prices->pluck('wholesale')->sort()->values()->toArray();
-                $wholesaleCount = count($wholesaleValues);
-                $wholesaleMiddle = floor($wholesaleCount / 2);
-                $wholesaleMedian = $wholesaleCount % 2 === 0
-                    ? ($wholesaleValues[$wholesaleMiddle - 1] + $wholesaleValues[$wholesaleMiddle]) / 2
-                    : $wholesaleValues[$wholesaleMiddle];
-                $dailyWholesaleMedians[] = $wholesaleMedian; */
-            }
-
-            if (empty($dailyMedians)) {
-                return;
-            }
-
-            $medianValue = round(array_sum($dailyMedians) / count($dailyMedians), 2);
-            /*             $retailMedian = round(array_sum($dailyRetailMedians) / count($dailyRetailMedians), 2);
-            $wholesaleMedian = round(array_sum($dailyWholesaleMedians) / count($dailyWholesaleMedians), 2);
- */
-            Price::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'type' => 'aggregated',
-                    'condition' => $condition,
-                    'created_at' => $date->copy()->startOfDay(),
-                ],
-                [
-                    'value' => $medianValue,
-                    /* 'retail' => $retailMedian,
-                    'wholesale' => $wholesaleMedian, */
-                    'updated_at' => now(),
-                ]
-            );
+        if ($prices->isEmpty()) {
+            return;
         }
+
+        // Rozdělit ceny podle dne
+        $dailyGroups = $prices->groupBy(function ($price) {
+            return Carbon::parse($price->date)->toDateString();
+        });
+
+        $dailyMedians = [];
+
+        foreach ($dailyGroups as $day => $dayPrices) {
+            // Value
+            $values = $dayPrices->pluck('value')->sort()->values()->toArray();
+            if (empty($values)) continue;
+
+            $count = count($values);
+            $middle = floor($count / 2);
+            $median = $count % 2 === 0
+                ? ($values[$middle - 1] + $values[$middle]) / 2
+                : $values[$middle];
+            $dailyMedians[] = $median;
+        }
+
+        if (empty($dailyMedians)) {
+            return;
+        }
+
+        $medianValue = round(array_sum($dailyMedians) / count($dailyMedians), 2);
+
+        Price::updateOrCreate(
+            [
+                'product_id' => $product->id,
+                'date' => $date->toDateString(),
+                'type' => 'aggregated',
+            ],
+            [
+                'value' => $medianValue,
+                'retail' => round($medianValue * 1.3, 2),
+                /* 'condition' => 'New', */
+                'currency' => 'EUR',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
     }
 }

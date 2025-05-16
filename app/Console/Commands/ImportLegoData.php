@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ImportLegoData extends Command
 {
-    protected $signature = 'import:lego-data {dataType?} {--truncate : Vyprázdní tabulky před importem}';
+    protected $signature = 'import:lego-data {--truncate : Vyprázdní tabulky před importem}';
     protected $description = 'Stáhne a importuje LEGO data (themes, sets, minifigs, relationships). Standardně aktualizuje existující záznamy.';
 
     protected $baseUrl = 'https://cdn.rebrickable.com/media/downloads/';
@@ -44,54 +44,63 @@ class ImportLegoData extends Command
             'file'   => 'inventory_minifigs.csv.gz',
             'import' => null,
             'model'  => null
-        ],
-        'relationships' => [
-            'file'   => null,
-            'import' => SetMinifigImport::class,
-            'model'  => null
         ]
     ];
 
     public function handle()
     {
         DB::disableQueryLog();
+        ini_set('memory_limit', '1024M');
 
         if (!Storage::exists('temp')) {
             Storage::makeDirectory('temp');
         }
 
-        $dataType = $this->argument('dataType');
+        try {
+            $this->info("Začínám import LEGO dat...");
 
-        if ($dataType && isset($this->datasets[$dataType])) {
-            if ($dataType === 'relationships') {
-                $this->importRelationships();
-            } else {
-                $this->importDataset($dataType);
-            }
-        } else if (!$dataType) {
-            // 1. Themes
+            // 1. Témata
             $this->importDataset('themes');
 
-            // 2. Produkty
+            // 2. Produkty - sety a minifigurky
             $this->importDataset('sets');
             $this->importDataset('minifigs');
 
-            // Nakonec importujeme vazby
+            // 3. Vazby mezi sety a minifigurkami
             $this->importRelationships();
-        } else {
-            $this->error("Neznámý typ dat: $dataType");
-            return 1;
-        }
-        //pokud selze import temat, nespusti se import produktu
-        try {
-            $this->importDataset('themes');
-            $this->info("Témata úspěšně importována");
+
+            $this->info("Import LEGO dat dokončen");
+            return 0;
         } catch (\Exception $e) {
-            $this->error("Chyba při importu témat: " . $e->getMessage());
+            $this->error("Chyba při importu: " . $e->getMessage());
             return 1;
         }
-        return 0;
     }
+
+    /* protected function importRelationships()
+    {
+        $this->info("Import vazeb mezi sety a minifigurkami...");
+
+        $inventoriesPath = $this->downloadAndExtractFile('inventories');
+        $inventoryMinifigsPath = $this->downloadAndExtractFile('inventory_minifigs');
+
+        if (!$inventoriesPath || !$inventoryMinifigsPath) {
+            $this->error("Nelze importovat vazby - chybí soubory");
+            return;
+        }
+
+        try {
+            $importer = new SetMinifigImport();
+            $importer->import($inventoriesPath, $inventoryMinifigsPath);
+            $this->info("Vazby byly úspěšně importovány");
+        } catch (\Exception $e) {
+            $this->error("Chyba při importu vazeb: " . $e->getMessage());
+        }
+
+        // Úklid souborů
+        if (file_exists($inventoriesPath)) unlink($inventoriesPath);
+        if (file_exists($inventoryMinifigsPath)) unlink($inventoryMinifigsPath);
+    } */
     /* 
     public function handle()
     {
@@ -127,36 +136,27 @@ class ImportLegoData extends Command
 
     protected function importRelationships()
     {
-        $this->info("Začínám import vazeb mezi sety a minifigurkami...");
+        $this->info("Import vazeb mezi sety a minifigurkami...");
 
-        // Zvýšení limitu paměti na 1GB
-        ini_set('memory_limit', '1024M');
-
-        // Stáhneme potřebné soubory
         $inventoriesPath = $this->downloadAndExtractFile('inventories');
         $inventoryMinifigsPath = $this->downloadAndExtractFile('inventory_minifigs');
 
         if (!$inventoriesPath || !$inventoryMinifigsPath) {
-            $this->error("Nelze importovat vazby - některé soubory se nepodařilo stáhnout");
+            $this->error("Nelze importovat vazby - chybí soubory");
             return;
         }
 
-        // Provedeme import vazeb
-        $importer = new SetMinifigImport();
         try {
+            $importer = new SetMinifigImport();
             $importer->import($inventoriesPath, $inventoryMinifigsPath);
-            $this->info("Vazby mezi sety a minifigurkami byly úspěšně importovány");
+            $this->info("Vazby byly úspěšně importovány");
         } catch (\Exception $e) {
             $this->error("Chyba při importu vazeb: " . $e->getMessage());
         }
 
-        // Odstraníme dočasné soubory
-        if (file_exists($inventoriesPath)) {
-            unlink($inventoriesPath);
-        }
-        if (file_exists($inventoryMinifigsPath)) {
-            unlink($inventoryMinifigsPath);
-        }
+        // Úklid souborů
+        if (file_exists($inventoriesPath)) unlink($inventoriesPath);
+        if (file_exists($inventoryMinifigsPath)) unlink($inventoryMinifigsPath);
     }
 
     protected function downloadAndExtractFile($type)
@@ -165,46 +165,36 @@ class ImportLegoData extends Command
             return null;
         }
 
-        $dataset = $this->datasets[$type];
-        $url = $this->baseUrl . $dataset['file'];
-
-        $this->info("Zkouším zjistit aktuální URL pro {$type}");
-        $checkResponse = Http::head($url);
-        if ($checkResponse->successful() && $checkResponse->header('Location')) {
-            $url = $checkResponse->header('Location');
-            $this->info("Přesměrováno na: $url");
-        }
-
+        $url = $this->baseUrl . $this->datasets[$type]['file'];
         $resourcePath = resource_path('imports');
         $gzFilePath = "{$resourcePath}/{$type}.csv.gz";
         $csvFilePath = "{$resourcePath}/{$type}.csv";
 
-        $this->info("Stahuji {$type} data z: $url");
-
+        // Vytvoření adresáře
         if (!file_exists($resourcePath)) {
             mkdir($resourcePath, 0755, true);
         }
 
+        // Stažení souboru
         $response = Http::get($url);
         if ($response->failed()) {
-            $this->error("Nepodařilo se stáhnout soubor {$type}: " . $response->status());
+            $this->error("Nepodařilo se stáhnout {$type}: " . $response->status());
             return null;
         }
 
         file_put_contents($gzFilePath, $response->body());
-        $this->info("Soubor {$type} stažen a uložen do: {$gzFilePath}");
 
+        // Rozbalení souboru
         $gzipContent = file_get_contents($gzFilePath);
         $csvContent = gzdecode($gzipContent);
 
         if ($csvContent === false) {
-            $this->error("Nepodařilo se rozbalit gzip soubor pro {$type}");
+            $this->error("Nepodařilo se rozbalit {$type}");
+            unlink($gzFilePath);
             return null;
         }
 
         file_put_contents($csvFilePath, $csvContent);
-        $this->info("Soubor {$type} rozbalen do: {$csvFilePath}");
-
         unlink($gzFilePath);
 
         return $csvFilePath;
@@ -212,82 +202,37 @@ class ImportLegoData extends Command
 
     protected function importDataset($type)
     {
-        ini_set('memory_limit', '1024M');
+        $this->info("Import {$type}...");
 
         if ($this->option('truncate')) {
-            $this->info("Vyprazdňuji tabulku {$type} před importem");
             $modelClass = $this->datasets[$type]['model'];
             if ($modelClass) {
                 $modelClass::truncate();
+                $this->info("Tabulka {$type} vyprázdněna");
             }
-        } else {
-            $this->info("Režim aktualizace: Existující záznamy budou aktualizovány, nové přidány");
         }
 
         $dataset = $this->datasets[$type];
-
-        // Pokud tento typ nemá importér, přeskočíme ho
         if (!$dataset['import']) {
-            $this->info("Přeskakuji import pro {$type} - nemá definovaný importér");
+            $this->info("Přeskakuji import {$type} - nemá importér");
             return;
         }
 
-        $url = $this->baseUrl . $dataset['file'];
-
-        $this->info("Zkouším zjistit aktuální URL pro {$type}");
-        $checkResponse = Http::head($url);
-        if ($checkResponse->successful() && $checkResponse->header('Location')) {
-            $url = $checkResponse->header('Location');
-            $this->info("Přesměrováno na: $url");
-        }
-
-        $resourcePath = resource_path('imports');
-        $gzFilePath = "{$resourcePath}/{$type}.csv.gz";
-        $csvFilePath = "{$resourcePath}/{$type}.csv";
-
-        $this->info("Stahuji {$type} data z: $url");
-
-        if (!file_exists($resourcePath)) {
-            mkdir($resourcePath, 0755, true);
-        }
-
-        $response = Http::get($url);
-        if ($response->failed()) {
-            $this->error("Nepodařilo se stáhnout soubor {$type}: " . $response->status());
+        $csvFilePath = $this->downloadAndExtractFile($type);
+        if (!$csvFilePath) {
+            $this->error("Soubor pro {$type} se nepodařilo stáhnout");
             return;
         }
 
-        file_put_contents($gzFilePath, $response->body());
-        $this->info("Soubor {$type} stažen a uložen do: {$gzFilePath}");
-
-        $gzipContent = file_get_contents($gzFilePath);
-        $csvContent = gzdecode($gzipContent);
-
-        if ($csvContent === false) {
-            $this->error("Nepodařilo se rozbalit gzip soubor pro {$type}");
-            return;
-        }
-
-        file_put_contents($csvFilePath, $csvContent);
-        $this->info("Soubor {$type} rozbalen do: {$csvFilePath}");
-
-        if (!file_exists($csvFilePath)) {
-            $this->error("Soubor {$csvFilePath} neexistuje!");
-            return;
-        }
-        $this->info("Soubor existuje na cestě: {$csvFilePath}");
-
-        // Process the CSV file in chunks
         $this->processCsvInChunks($csvFilePath, $dataset['import']);
 
-        unlink($gzFilePath);
+        // Úklid
         unlink($csvFilePath);
-        $this->info("Dočasné soubory pro {$type} byly smazány");
     }
 
     protected function processCsvInChunks($filePath, $importClass)
     {
-        $chunkSize = 1000; // Adjust the chunk size as needed
+        $chunkSize = 1000;
         $header = null;
         $rowCount = 0;
         $rows = [];
@@ -319,12 +264,11 @@ class ImportLegoData extends Command
                     unlink($tempFilePath);
 
                     $rows = [];
-                    $this->info("Processed {$rowCount} rows");
+                    /* $this->info("Processed {$rowCount} rows"); */
                 }
             }
 
             if (!empty($rows)) {
-                // Create a temporary CSV file for the final chunk
                 $tempFilePath = tempnam(sys_get_temp_dir(), 'chunk') . '.csv';
                 $tempHandle = fopen($tempFilePath, 'w');
                 fputcsv($tempHandle, $header);
@@ -332,11 +276,7 @@ class ImportLegoData extends Command
                     fputcsv($tempHandle, $row);
                 }
                 fclose($tempHandle);
-
-                // Import the temporary CSV file
                 Excel::import(new $importClass, $tempFilePath);
-
-                // Clean up the temporary file
                 unlink($tempFilePath);
 
                 $this->info("Processed final batch of rows");

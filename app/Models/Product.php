@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Paradigma\Pictura\Traits\HasWebp;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,7 +15,7 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Product extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasResource, HasFactory;
+    use HasWebp, HasResource, HasFactory;
 
 
     protected $guarded = [];
@@ -75,7 +76,7 @@ class Product extends Model implements HasMedia
     {
         return $this->hasMany(Price::class);
     }
-    public function latest_price()
+    public function latest_price(): HasOne
     {
         return $this->hasOne(Price::class)->latestOfMany();
     }

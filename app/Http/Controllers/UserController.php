@@ -128,7 +128,7 @@ class UserController extends Controller
             ->where('calculated_at', $latestDateMovers)
             ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
-        if ($topMoversQuery->count() === 0) {
+        /*  if ($topMoversQuery->count() === 0) {
             $this->trendService->calculateTopMovers();
             $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
@@ -136,11 +136,12 @@ class UserController extends Controller
                 ->where('type', 'top_mover')
                 ->where('calculated_at', $latestDateMovers)
                 ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
-        }
+        } */
 
         $top_movers = _Trend::collection(
             $topMoversQuery->paginate($request->paginate ?? 4)
         );
+
 
         $portfolioValue = $this->dashboardPortfolioValue();
 
@@ -190,23 +191,32 @@ class UserController extends Controller
             $trendingQuery->paginate($request->paginate ?? 4)
         );
 
-        $products = _Product::collection(
-            Product::with('media')
-                ->when($request->type, fn($k) => $k->where('product_type', $request->type))
-                ->when(
-                    $request->parent_theme || $request->theme_children,
-                    fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
-                )
-                ->where($column, 'LIKE', '%' . $query . '%')
+        $productsQuery = Product::with(['media', 'latest_price', 'theme'])
+            ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
+            ->when(
+                $request->parent_theme || $request->theme_children,
+                fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+            );
+
+        if ($query) {
+            $productsQuery->where($column, 'LIKE', "%{$query}%")
                 ->orderByRaw("
-            CASE WHEN $column LIKE '" . e($query) . "' THEN 1
-                WHEN $column LIKE '" . e($query) . "%' THEN 2
-                WHEN $column LIKE '%" . e($query) . "%' THEN 3
-                WHEN $column LIKE '%" . e($query) . "' THEN 4
-                ELSE 5
-            END")
-                ->latest()
-                ->paginate($request->paginate ?? 10)
+                CASE WHEN $column LIKE '" . e($query) . "' THEN 1
+                    WHEN $column LIKE '" . e($query) . "%' THEN 2
+                    WHEN $column LIKE '%" . e($query) . "%' THEN 3
+                    WHEN $column LIKE '%" . e($query) . "' THEN 4
+                    ELSE 5
+                END");
+        } else {
+
+            $productsQuery->selectRaw('products.*, 
+            (SELECT COUNT(*) FROM media WHERE model_id = products.id AND model_type = "App\\\\Models\\\\Product" AND collection_name = "images") as has_images,
+            (SELECT COUNT(*) FROM prices WHERE product_id = products.id) as has_prices')
+                ->orderByRaw('has_images DESC, has_prices DESC');
+        }
+
+        $products = _Product::collection(
+            $productsQuery->latest()->paginate($request->paginate ?? 10)
         );
 
         $themes = _Theme::collection(
@@ -215,8 +225,61 @@ class UserController extends Controller
                 ->paginate($request->paginate ?? 10)
         );
 
-        return Inertia::render('catalog', compact('products', 'themes','trending_products'));
-        /* $query = $request->search;
+        return Inertia::render('catalog', compact('products', 'themes', 'trending_products'));
+    }
+    /*   public function catalog(Request $request, TrendService $trendService)
+    {
+        $query = $request->search;
+        $column = 'name';
+
+        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+            ->where('type', 'trending')
+            ->where('calculated_at', $latestDate)
+            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+
+        if ($trendingQuery->count() === 0) {
+            $trendService->calculateTrendingProducts(8, 30);
+            $latestDate = Trend::where('type', 'trending')->max('calculated_at');
+
+            $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+                ->where('type', 'trending')
+                ->where('calculated_at', $latestDate)
+                ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+        }
+
+        $trending_products = _Trend::collection(
+            $trendingQuery->paginate($request->paginate ?? 4)
+        );
+
+
+        $products = _Product::collection(
+            Product::with(['media', 'latest_price', 'theme'])
+                ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
+                ->when(
+                    $request->parent_theme || $request->theme_children,
+                    fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+                )
+                ->where($column, 'LIKE', '%' . $query . '%')
+                ->orderByRaw("
+        CASE WHEN $column LIKE '" . e($query) . "' THEN 1
+            WHEN $column LIKE '" . e($query) . "%' THEN 2
+            WHEN $column LIKE '%" . e($query) . "%' THEN 3
+            WHEN $column LIKE '%" . e($query) . "' THEN 4
+            ELSE 5
+        END")
+                ->latest()
+                ->paginate($request->paginate ?? 10)
+        );
+        $themes = _Theme::collection(
+            Theme::with('children')
+                ->where('parent_id', NULL)
+                ->paginate($request->paginate ?? 10)
+        );
+
+        return Inertia::render('catalog', compact('products', 'themes', 'trending_products'));
+    } */
+    /* $query = $request->search;
         $column = 'name';
         $products = _Product::collection(Product::when($request->type, fn($k) => $k->where('product_type', $request->type))->when($request->parent_theme || $request->theme_children, fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])]))->where($column, 'LIKE', '%' . $query . '%')
             ->orderByRaw("
@@ -234,7 +297,6 @@ class UserController extends Controller
         $themes = _Theme::collection(Theme::with('children')->where('parent_id', NULL)->paginate($request->paginate ?? 100));
         // dd($themes);
         return Inertia::render('catalog', compact('products', 'themes')); */
-    }
 
     public function chest(Request $request, TrendService $trendService)
     {

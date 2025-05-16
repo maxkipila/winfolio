@@ -33,10 +33,16 @@ class _Product extends JsonResource
         $annualGrowth = $this->calculateAnnualGrowth();
         $isAdminContext = Gate::allows('admin');
 
+
         $userOwns = [];
         $favourited = false;
 
-        // Pro běžné uživatele ověřit vlastnictví a získat záznamy z pivot tabulky
+        $imageUrl = $this->getFirstMediaUrl('images');
+        if (empty($imageUrl)) {
+            $imageUrl = asset('assets/img/big-user.png'); //fallback image
+        }
+
+
         if (Auth::check() && Auth::user() instanceof User && !Gate::allows('admin')) {
             $user = Auth::user();
 
@@ -123,15 +129,15 @@ class _Product extends JsonResource
     {
         $trendService = app(TrendService::class);
 
-        // Pokusíme se získat standardní roční růst
+        // Standartni rust
         $annualGrowth = $trendService->getProductGrowth($this->id, 365);
 
         if ($annualGrowth !== null) {
-            // Omezíme extrémní hodnoty - přísnější limity
+
             if ($annualGrowth > 100) {
-                return 100.0; // Maximálně 100% růst
+                return 100.0;
             } elseif ($annualGrowth < -75) {
-                return -75.0; // Minimálně -75% pokles
+                return -75.0;
             }
             return $annualGrowth;
         }

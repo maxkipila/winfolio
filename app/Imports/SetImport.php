@@ -39,7 +39,7 @@ class SetImport implements ToModel, WithHeadingRow, WithChunkReading
                 'year'         => $row['year'] ?? null,
                 'theme_id'     => $themeId,
                 'num_parts'    => $row['num_parts'] ?? null,
-                'img_url'      => $row['img_url'] ?? null,
+                /* 'img_url'      => $row['img_url'] ?? null, */
             ]
         );
     }

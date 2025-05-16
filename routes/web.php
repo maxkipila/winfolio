@@ -87,14 +87,19 @@ Route::match(['POST', 'GET'], '/', function (Request $request, TrendService $tre
 
 Route::match(['POST', 'GET'], '/', [UserController::class, 'welcome'])->name('welcome');
 
+Route::get('/dashboard-two', function () {
+    return 'xxx';
+})->name('dashboard-two');
+
 
 Route::middleware('auth:web')->group(function () {
-
     Route::match(['POST', 'GET'], '/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
     /*  Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data'); */
     Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');
     Route::match(['POST', 'GET'], '/add_product_to_user/{product}', [UserController::class, 'add_product_to_user'])->name('add_product_to_user');
-    Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
+    /*     Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
+ */
     Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');

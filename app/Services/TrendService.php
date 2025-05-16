@@ -18,8 +18,50 @@ use Illuminate\Support\Facades\Schema;
 class TrendService
 {
 
-
     public function calculateTrendingProducts(int $limit = 8, int $days = 30): array
+    {
+        // datum před X dny
+        $startDate = Carbon::now()->subDays($days);
+        $today = Carbon::today();
+
+        $trendingProductIds = DB::table('product_user')
+            ->select('product_id', DB::raw('COUNT(*) as favorites_count'))
+            ->where('created_at', '>=', $startDate)
+            ->groupBy('product_id')
+            ->orderBy('favorites_count', 'desc')
+            ->limit($limit)
+            ->get();
+
+        $trends = [];
+
+        foreach ($trendingProductIds as $item) {
+            // Růst za poslední týden a rok - výpočet před vytvořením Trend
+            $weeklyGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 7);
+            $monthlyGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 30);
+            $annualGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 365);
+
+            $trend = Trend::updateOrCreate(
+                [
+                    'product_id' => $item->product_id,
+                    'type' => 'trending',
+                    'calculated_at' => $today,
+                ],
+                [
+                    'weekly_growth' => $weeklyGrowth,
+                    'monthly_growth' => $monthlyGrowth,
+                    'annual_growth' => $annualGrowth,
+                    'favorites_count' => $item->favorites_count,
+                ]
+            );
+
+            $trend->load('product.latest_price', 'product.theme');
+            $trends[] = $trend;
+        }
+
+        return $trends;
+    }
+
+    /* public function calculateTrendingProducts(int $limit = 8, int $days = 30): array
     {
 
         $startDate = Carbon::now()->subDays($days);
@@ -63,7 +105,7 @@ class TrendService
         }
 
         return $trends;
-    }
+    } */
 
 
     public function getTrendingProducts(Request $request, int $days = 7)
@@ -100,24 +142,10 @@ class TrendService
         return $products;
     }
 
-    public function calculateGrowth($productIds, string $fromDate, ?string $toDate = null, ?string $condition = null): array
+    public function calculateGrowth($productIds, string $fromDate, ?string $toDate = null): array
     {
-
         if (!is_array($productIds)) {
             $productIds = [$productIds];
-        }
-
-
-        if (empty($productIds)) {
-            return [
-                'products' => [],
-                'total' => [
-                    'initial_value' => 0,
-                    'current_value' => 0,
-                    'growth_percentage' => 0,
-                    'growth_value' => 0
-                ]
-            ];
         }
 
         $toDate = $toDate ? Carbon::parse($toDate) : now();
@@ -128,9 +156,8 @@ class TrendService
         $totalCurrentValue = 0;
 
         foreach ($productIds as $productId) {
-            $initialPrice = $this->getMedianPriceForProduct($productId, $fromDate, $condition);
-
-            $currentPrice = $this->getMedianPriceForProduct($productId, $toDate, $condition);
+            $initialPrice = $this->getMedianPriceForProduct($productId, $fromDate);
+            $currentPrice = $this->getMedianPriceForProduct($productId, $toDate);
 
             if ($initialPrice === null || $currentPrice === null) {
                 $results[$productId] = [
@@ -183,14 +210,99 @@ class TrendService
      * @param int $limit Počet produktů, které chceme vrátit
      * @return array
      */
+
+
     public function calculateTopMovers(int $limit = 8): array
     {
         $today = Carbon::today();
-        /* $weekAgo = Carbon::today()->subDays(7); */
         $monthAgo = Carbon::today()->subDays(30);
 
-        // Vytvoření indexů pro lepší výkon
-        $this->ensureIndexesForPriceQueries();
+        // Jednoduchý přímý SQL dotaz pro nalezení produktů s největšími cenovými změnami
+        $query = "
+        SELECT 
+            p1.product_id,
+            p1.value as current_value,
+            p2.value as past_value,
+            ROUND(((p1.value - p2.value) / p2.value) * 100, 1) as growth_percentage
+        FROM 
+            (SELECT product_id, value FROM prices WHERE (product_id, created_at) IN 
+                (SELECT product_id, MAX(created_at) FROM prices GROUP BY product_id)
+            ) p1
+        JOIN 
+            (SELECT product_id, value FROM prices WHERE (product_id, created_at) IN 
+                (SELECT product_id, MAX(created_at) FROM prices 
+                 WHERE created_at <= ? GROUP BY product_id)
+            ) p2 ON p1.product_id = p2.product_id
+        WHERE 
+            p2.value > 0
+        ORDER BY 
+            ABS(growth_percentage) DESC
+        LIMIT ?
+    ";
+
+        $topMovers = DB::select($query, [$monthAgo, $limit]);
+
+        $results = [];
+
+        foreach ($topMovers as $mover) {
+            // Vytvořit nebo aktualizovat záznam o trendu
+            $trend = Trend::updateOrCreate(
+                [
+                    'product_id' => $mover->product_id,
+                    'type' => 'top_mover',
+                    'calculated_at' => $today,
+                ],
+                [
+                    'weekly_growth' => $this->getSimpleGrowth($mover->product_id, 7),
+                    'monthly_growth' => $mover->growth_percentage,
+                    'annual_growth' => $this->getSimpleGrowth($mover->product_id, 365),
+                ]
+            );
+
+            // Načíst související data a přidat do výsledků
+            $trend->load('product.latest_price', 'product.theme');
+            $results[] = $trend;
+        }
+
+        return $results;
+    }
+    protected function getSimpleGrowth(int $productId, int $days): ?float
+    {
+        $today = Carbon::today();
+        $pastDate = Carbon::today()->subDays($days);
+
+        // Aktuální cena
+        $currentPrice = Price::where('product_id', $productId)
+            ->latest('created_at')
+            ->value('value');
+
+        // Historická cena
+        $pastPrice = Price::where('product_id', $productId)
+            ->where('created_at', '<=', $pastDate)
+            ->latest('created_at')
+            ->value('value');
+
+        // Pokud nemáme obě hodnoty, nemůžeme spočítat růst
+        if (!$currentPrice || !$pastPrice || $pastPrice <= 0) {
+            return null;
+        }
+
+        // Výpočet růstu v procentech
+        $growth = (($currentPrice - $pastPrice) / $pastPrice) * 100;
+
+        // Omezení na rozumné hodnoty
+        if ($days <= 7) {
+            return min(50, max(-30, round($growth, 1)));
+        } elseif ($days <= 30) {
+            return min(75, max(-50, round($growth, 1)));
+        } else {
+            return min(100, max(-75, round($growth, 1)));
+        }
+    }
+    /*    public function calculateTopMovers(int $limit = 8): array
+    {
+        $today = Carbon::today();
+        $monthAgo = Carbon::today()->subDays(30);
 
         // Optimalizovaný SQL dotaz
         $topMovers = DB::select("
@@ -246,10 +358,9 @@ class TrendService
             $results[] = $trend;
         }
 
-        Cache::put('top_movers', $results, Carbon::now()->addDay());
         return $results;
-    }
-    private function ensureIndexesForPriceQueries(): void
+    } */
+    /*   private function ensureIndexesForPriceQueries(): void
     {
 
         $schemaBuilder = DB::getSchemaBuilder();
@@ -276,7 +387,7 @@ class TrendService
                 $table->index(['type', 'created_at'], 'prices_type_created_at_index');
             });
         }
-    }
+    } */
     public function calculateGrowthForProductOptimized(int $productId, int $days): ?float
     {
         $fromDate = Carbon::now()->subDays($days);
@@ -332,7 +443,7 @@ class TrendService
     }
 
 
-    public function getMonthlyAverageOfDailyMedians(int $productId, Carbon $month, ?string $condition = null): ?float
+    public function getMonthlyAverageOfDailyMedians(int $productId, Carbon $month): ?float
     {
         $startDate = $month->copy()->startOfMonth();
         $endDate = $month->copy()->endOfMonth();
@@ -341,7 +452,7 @@ class TrendService
         $dailyMedians = [];
 
         while ($currentDate->lte($endDate)) {
-            $median = $this->getDailyMedianPrice($productId, $currentDate->toDateString(), $condition);
+            $median = $this->getDailyMedianPrice($productId, $currentDate->toDateString());
             if (!is_null($median)) {
                 $dailyMedians[] = $median;
             }
@@ -355,60 +466,42 @@ class TrendService
         return round(array_sum($dailyMedians) / count($dailyMedians), 2);
     }
 
-    public function getMedianPriceForProduct(int $productId, ?string $date = null, ?string $condition = null): ?float
+    public function getMedianPriceForProduct(int $productId, ?string $date = null): ?float
     {
         $queryDate = $date ? Carbon::parse($date) : now();
 
-        // Zkusíme získat agregovanou cenu
-        $aggregatedPrice = Price::where('product_id', $productId)
-            ->where('type', 'aggregated')
-            ->when($condition, fn($q) => $q->where('condition', $condition))
+        // Získání ceny k danému datu nebo před ním
+        $price = Price::where('product_id', $productId)
             ->where('created_at', '<=', $queryDate)
             ->orderByDesc('created_at')
             ->first();
 
-        if ($aggregatedPrice) {
-            return $aggregatedPrice->value;
+        if ($price) {
+            return $price->value;
         }
 
-        // Pokud nemáme agregovanou cenu, zkusíme získat běžnou cenu
-        $regularPrice = Price::where('product_id', $productId)
-            ->when($condition, fn($q) => $q->where('condition', $condition))
-            ->where('created_at', '<=', $queryDate)
-            ->orderByDesc('created_at')
-            ->first();
-
-        if ($regularPrice) {
-            return $regularPrice->value;
-        }
-
-        // Zkusíme najít nejbližší cenu (i když je v budoucnosti)
-        $closestPrice = Price::where('product_id', $productId)
-            ->when($condition, fn($q) => $q->where('condition', $condition))
+        $futurePrice = Price::where('product_id', $productId)
+            ->where('created_at', '>', $queryDate)
             ->orderBy('created_at')
             ->first();
 
-        return $closestPrice ? $closestPrice->value : null;
+        return $futurePrice ? $futurePrice->value : null;
     }
 
     /**
      * Vrací čistý medián z cen pro konkrétní den (bez agregovaných hodnot)
      */
-    public function getDailyMedianPrice(int $productId, string $date, ?string $condition = null): ?float
+    public function getDailyMedianPrice(int $productId, string $date): ?float
     {
         $queryDate = Carbon::parse($date);
 
         $dayStart = $queryDate->copy()->startOfDay();
         $dayEnd = $queryDate->copy()->endOfDay();
 
-        $dailyPricesQuery = Price::where('product_id', $productId)
-            ->whereBetween('created_at', [$dayStart, $dayEnd]);
-
-        if ($condition) {
-            $dailyPricesQuery->where('condition', $condition);
-        }
-
-        $dailyPrices = $dailyPricesQuery->pluck('value')->toArray();
+        $dailyPrices = Price::where('product_id', $productId)
+            ->whereBetween('created_at', [$dayStart, $dayEnd])
+            ->pluck('value')
+            ->toArray();
 
         if (empty($dailyPrices)) {
             return null;
@@ -505,78 +598,76 @@ class TrendService
      * @param int $months Počet měsíců zpět pro generování dat
      * @return array Data pro graf
      */
-    public function getPriceHistoryWithMedian(int $productId, int $months = 24, ?string $condition = null): array
+
+    //validni kod
+
+    /*   public function getPriceHistoryWithMedian(int $productId, int $months = 24): array 
     {
         $endDate = now();
         $startDate = $endDate->copy()->subMonths($months);
 
-
-        $chartPoints = Price::where('product_id', $productId)
-            ->where('type', 'aggregated')
+        // Filtrujeme pouze záznamy typu "aggregated"
+        $pricePoints = Price::where('product_id', $productId)
+            ->where('type', 'aggregated')  // Zde je klíčový filtr
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($condition, function ($query) use ($condition) {
-                return $query->where('condition', $condition);
-            })
             ->orderBy('created_at')
-            ->get(['value', 'created_at', 'condition']);
+            ->get(['value', 'created_at']);
 
-        if ($chartPoints->count() < 5) {
-
-            $individualPrices = Price::where('product_id', $productId)
-                ->where('type', '!=', 'aggregated')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->when($condition, function ($query) use ($condition) {
-                    return $query->where('condition', $condition);
-                })
-                ->orderBy('created_at')
-                ->get(['value', 'created_at', 'condition']);
-        }
-
-        $formattedPoints = $chartPoints->map(function ($point) {
+        $formattedPoints = $pricePoints->map(function ($point) {
             return [
                 'date' => $point->created_at->format('Y-m-d'),
-                'value' => (float)$point->value,
-                'condition' => $point->condition
+                'value' => (float)$point->value
             ];
         })->toArray();
 
-
-        $historyPoints = $chartPoints->map(function ($point) {
-            return [
-                'date' => $point->created_at->format('Y-m-d'),
-                'value' => (float)$point->value,
-                'condition' => $point->condition
-            ];
-        })->groupBy('date')->toArray();
-
-        $forecast = $this->calculateForecast($formattedPoints, 90); // Předpověď na 90 dní
-
-        $currentPrice = $this->getMedianPriceForProduct($productId, null, $condition);
-
         return [
-            'history' => $historyPoints,
-            'forecast' => $forecast,
-            'current_price' => $currentPrice,
+            'history' => $formattedPoints,
+            'current_price' => !empty($formattedPoints) ? end($formattedPoints)['value'] : null,
             'min_price' => !empty($formattedPoints) ? min(array_column($formattedPoints, 'value')) : null,
             'max_price' => !empty($formattedPoints) ? max(array_column($formattedPoints, 'value')) : null,
             'avg_price' => !empty($formattedPoints) ? array_sum(array_column($formattedPoints, 'value')) / count($formattedPoints) : null,
         ];
-    }
+    } */
+    public function getPriceHistoryWithMedian(int $productId, int $months = 24): array
+    {
+        $endDate = now();
+        $startDate = $endDate->copy()->subMonths($months);
 
+        // všechny cenové body 
+        $pricePoints = Price::where('product_id', $productId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at')
+            ->get(['value', 'created_at']);
+
+        $formattedPoints = $pricePoints->map(function ($point) {
+            return [
+                'date' => $point->created_at->format('Y-m-d'),
+                'value' => (float)$point->value
+            ];
+        })->toArray();
+
+        // Kalkulace základních statistických údajů
+        $values = array_column($formattedPoints, 'value');
+        $currentPrice = !empty($values) ? end($values) : $this->getMedianPriceForProduct($productId);
+
+        return [
+            'history' => $formattedPoints,
+            'current_price' => $currentPrice,
+            'min_price' => !empty($values) ? min($values) : null,
+            'max_price' => !empty($values) ? max($values) : null,
+            'avg_price' => !empty($values) ? array_sum($values) / count($values) : null,
+        ];
+    }
     public function getProductGrowth(int $productId, int $days): ?float
     {
         return $this->calculateGrowthForProductOptimized($productId, $days);
     }
 
 
-    public function createAggregatedData(int $productId, ?string $condition = null): bool
+    public function createAggregatedData(int $productId): bool
     {
         // Najdeme nejstarší a nejnovější cenu
         $priceRange = Price::where('product_id', $productId)
-            ->where('type', '!=', 'aggregated')
-            ->when($condition, function ($query) use ($condition) {
-                return $query->where('condition', $condition);
-            })
             ->selectRaw('MIN(created_at) as min_date, MAX(created_at) as max_date')
             ->first();
 
@@ -595,11 +686,7 @@ class TrendService
             $monthEnd = $current->copy()->endOfMonth();
 
             $prices = Price::where('product_id', $productId)
-                ->where('type', '!=', 'aggregated')
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->when($condition, function ($query) use ($condition) {
-                    return $query->where('condition', $condition);
-                })
                 ->pluck('value')
                 ->toArray();
 
@@ -612,12 +699,11 @@ class TrendService
                     ? ($prices[$middle - 1] + $prices[$middle]) / 2
                     : $prices[$middle];
 
-                // Uložíme agregovaná data
+
                 $aggregatedData[] = [
                     'product_id' => $productId,
                     'value' => $medianValue,
-                    'condition' => $condition,
-                    'type' => 'aggregated',
+                    'condition' => 'New',
                     'created_at' => $monthStart,
                     'updated_at' => now()
                 ];
@@ -639,7 +725,7 @@ class TrendService
     /**
      * Vypočítá interpolovanou hodnotu pro dny, kde nemáme přímá data
      */
-    private function calculateInterpolatedValue($priceData, Carbon $date): ?float
+    /*    private function calculateInterpolatedValue($priceData, Carbon $date): ?float
     {
 
         $prevPrice = $priceData->filter(function ($price) use ($date) {
@@ -665,12 +751,12 @@ class TrendService
         }
 
         return null;
-    }
+    } */
 
     /**
      * Vypočítá předpověď cen do budoucna
      */
-    private function calculateForecast(array $history, int $days): array
+    /* private function calculateForecast(array $history, int $days): array
     {
         if (count($history) < 7) {
             return [];
@@ -716,39 +802,30 @@ class TrendService
         }
 
         return $forecast;
-    }
+    } */
 
     /**
      * Získá statistické údaje o cenách produktu
      */
-    public function getPriceStatistics(int $productId, ?string $condition = null): array
+    // Upraveno:
+    public function getPriceStatistics(int $productId): array
     {
         $query = Price::where('product_id', $productId);
 
-        if ($condition) {
-            $query->where('condition', $condition);
-        }
-
         $stats = $query->selectRaw('
-            MIN(value) as min_value,
-            MAX(value) as max_value,
-            AVG(value) as avg_value,
-            COUNT(*) as count
-        ')->first();
+        MIN(value) as min_value,
+        MAX(value) as max_value,
+        AVG(value) as avg_value,
+        COUNT(*) as count
+    ')->first();
 
         // Získání aktuální ceny
         $latestPrice = Price::where('product_id', $productId)
-            ->when($condition, function ($query) use ($condition) {
-                return $query->where('condition', $condition);
-            })
             ->latest('created_at')
             ->first();
 
         // Získání ceny před rokem
         $yearAgoPrice = Price::where('product_id', $productId)
-            ->when($condition, function ($query) use ($condition) {
-                return $query->where('condition', $condition);
-            })
             ->where('created_at', '<=', now()->subYear())
             ->latest('created_at')
             ->first();
@@ -763,11 +840,10 @@ class TrendService
             'min' => $stats->min_value,
             'max' => $stats->max_value,
             'avg' => $stats->avg_value,
-            'median' => $this->getMedianPriceForProduct($productId, null, $condition),
+            'median' => $this->getMedianPriceForProduct($productId),
             'count' => $stats->count,
             'latest' => $latestPrice ? $latestPrice->value : null,
-            'annual_growth' => $annualGrowth,
-            'condition' => $condition ?: 'All'
+            'annual_growth' => $annualGrowth
         ];
     }
     /**
@@ -787,65 +863,48 @@ class TrendService
         $points = [];
         $now = Carbon::now();
 
-        $baseValue = 0;
-        $latestPrices = Price::whereIn('product_id', $productIds)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->groupBy('product_id');
-
-        foreach ($productIds as $productId) {
-            if (isset($latestPrices[$productId]) && $latestPrices[$productId]->isNotEmpty()) {
-                $baseValue += $latestPrices[$productId]->first()->value;
+        // Vytvoření datových bodů podle intervalu
+        $dates = [];
+        for ($i = $period - 1; $i >= 0; $i--) {
+            switch ($interval) {
+                case 'day':
+                    $dates[] = $now->copy()->subDays($i)->startOfDay();
+                    break;
+                case 'week':
+                    $dates[] = $now->copy()->subWeeks($i)->startOfWeek();
+                    break;
+                case 'month':
+                default:
+                    $dates[] = $now->copy()->subMonths($i)->startOfMonth();
+                    break;
             }
         }
 
-        // For daily view, generate more detailed points
-        if ($interval === 'day') {
-            // Generate daily points with realistic variations
-            for ($i = $period - 1; $i >= 0; $i--) {
-                $date = $now->copy()->subDays($i)->startOfDay();
-
-                // Small random variations to show a realistic trend
-                $variation = $i == 0 ? 0 : mt_rand(-30, 30) / 10; // -3% to +3%
-                $value = $baseValue * (1 + ($variation / 100));
-
-                $points[] = [
-                    'date' => $date->toDateString(),
-                    'value' => round($value, 2)
-                ];
-            }
-        } else {
-            // For weekly or monthly, generate points with a trend
-            for ($i = $period - 1; $i >= 0; $i--) {
-                switch ($interval) {
-                    case 'week':
-                        $date = $now->copy()->subWeeks($i)->startOfWeek();
-                        break;
-                    case 'month':
-                    default:
-                        $date = $now->copy()->subMonths($i)->startOfMonth();
-                        break;
+        // Pro každé datum spočítáme hodnotu portfolia
+        foreach ($dates as $date) {
+            $total = 0;
+            foreach ($productIds as $productId) {
+                $price = $this->getMedianPriceForProduct($productId, $date->toDateString());
+                if ($price !== null) {
+                    $total += $price;
                 }
-
-                // Create a trend over time
-                $trendFactor = 1 - ($i / $period) * 0.15; // 15% growth over the period
-                $value = $baseValue * $trendFactor;
-
-                // Add some randomness
-                $randomVariation = mt_rand(-20, 20) / 1000; // ±2%
-                $value = $value * (1 + $randomVariation);
-
-                $points[] = [
-                    'date' => $date->toDateString(),
-                    'value' => round($value, 2)
-                ];
             }
+
+            $points[] = [
+                'date' => $date->toDateString(),
+                'value' => round($total, 2)
+            ];
+        }
+
+        // Pokud nemáme žádné body, vrátíme prázdné pole
+        if (empty($points)) {
+            return [];
         }
 
         return $points;
     }
 
-    private function calculatePortfolioValueForDate(array $productIds, Carbon $date): float
+    /*  private function calculatePortfolioValueForDate(array $productIds, Carbon $date): float
     {
         $total = 0;
 
@@ -857,10 +916,10 @@ class TrendService
         }
 
         return $total;
-    }
+    } */
 
     // Najde nejbližší datum, pro které máme data, v daném směru
-    private function findNearestDateWithData(array $productIds, Carbon $date, int $direction): ?Carbon
+    /*    private function findNearestDateWithData(array $productIds, Carbon $date, int $direction): ?Carbon
     {
         $currentDate = $date->copy();
         $maxDays = 15; // Maximální počet dní, které budeme hledat
@@ -886,9 +945,9 @@ class TrendService
         }
 
         return null;
-    }
+    } */
 
-    private function interpolateValue(array $productIds, Carbon $targetDate, Carbon $pastDate, Carbon $futureDate): float
+    /*  private function interpolateValue(array $productIds, Carbon $targetDate, Carbon $pastDate, Carbon $futureDate): float
     {
         $pastValue = $this->calculatePortfolioValueForDate($productIds, $pastDate);
         $futureValue = $this->calculatePortfolioValueForDate($productIds, $futureDate);
@@ -902,5 +961,5 @@ class TrendService
 
         $ratio = $daysFromPast / $totalDays;
         return $pastValue + ($futureValue - $pastValue) * $ratio;
-    }
+    } */
 }

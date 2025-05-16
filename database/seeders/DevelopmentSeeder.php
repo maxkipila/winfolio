@@ -8,27 +8,21 @@ use App\Models\Theme;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
-class EssentialsSeeder extends Seeder
+class DevelopmentSeeder extends Seeder
 {
 
     public function run(): void
     {
 
-        if (!Admin::where('email', 'admin@admin.com')->exists()) {
-            Admin::create([
-                'first_name' => 'Admin',
-                'last_name' => 'Admin',
-                'email' => 'admin@admin.com',
-                'password' => '$2y$12$om7tnIs/OfsjdMBln3bVwec/4HOHEC159cceb1mP572BtEdXjeLKe',
-            ]);
+        Admin::updateOrCreate([
+            'email' => 'admin@admin.com',
 
-            $this->command->info('Admin uživatel vytvořen: admin@admin.com');
-        } else {
-            $this->command->info('Admin uživatel již existuje');
-        }
+        ], [
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'password' => '$2y$12$om7tnIs/OfsjdMBln3bVwec/4HOHEC159cceb1mP572BtEdXjeLKe',
+        ]);
 
-
-        // Vytvoření testovacího uživatele pro produkci (volitelné)
         if (!User::where('email', 'tester@tester.com')->exists()) {
             User::factory()->create([
                 'first_name' => 'Test',
@@ -48,8 +42,9 @@ class EssentialsSeeder extends Seeder
                 'password' => '$2y$12$om7tnIs/OfsjdMBln3bVwec/4HOHEC159cceb1mP572BtEdXjeLKe',
                 'is_admin' => 0,
             ]);
-
-            $this->command->info('Testovací uživatel vytvořen: tester@tester.com');
         }
+        Artisan::call('import:lego-data');
+        Artisan::call('app:assign-themes-to-minifigs');
+        Artisan::call('db:seed', ['--class' => 'PriceSeeder']);
     }
 }
