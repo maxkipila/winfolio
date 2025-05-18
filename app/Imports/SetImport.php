@@ -25,19 +25,24 @@ class SetImport implements ToModel, WithHeadingRow, WithChunkReading
                 'img_url'   => $row['img_url'] ?? null,
             ]
         ); */
+        $themeId = null;
+        if (!empty($row['theme_id'])) {
+            $themeExists = \App\Models\Theme::find($row['theme_id']);
+            $themeId = $themeExists ? $row['theme_id'] : null;
+        }
+        // temata budou importovany pred produkty
         return Product::updateOrCreate(
             ['product_num' => $row['set_num']],
             [
                 'product_type' => 'set',
                 'name'         => $row['name'],
                 'year'         => $row['year'] ?? null,
-                'theme_id'     => $row['theme_id'] ?? null,
+                'theme_id'     => $themeId,
                 'num_parts'    => $row['num_parts'] ?? null,
-                'img_url'      => $row['img_url'] ?? null,
+                /* 'img_url'      => $row['img_url'] ?? null, */
             ]
         );
     }
-
     /**
      * Define the chunk size for reading the file.
      */

@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Jobs\DownloadProductImage;
+use App\Jobs\DownloadProductImageJob;
 use App\Models\Product;
+use Illuminate\Console\Command;
 
 class ImportLegoImages extends Command
 {
@@ -12,40 +14,56 @@ class ImportLegoImages extends Command
      *
      * @var string
      */
-    protected $signature = 'import:lego-images {--skip-existing : Skip products that already have images}';
-
+    protected $signature = 'import:lego-images {--force : Prepise existujici images}';
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Import Lego product images from URLs';
+    protected $description = 'Stahovani images pro LEGO produkty z CSV souboru';
 
     public function handle()
     {
-        $this->info("Start importing");
-        ini_set('memory_limit', '1536M');
-        Product::whereNotNull('img_url')
-            ->when($this->option('skip-existing'), function ($query) {
-                $query->whereDoesntHave('media', function ($q) {
-                    $q->where('collection_name', 'images');
-                });
-            })
-            ->chunk(200, function ($products) {
-                foreach ($products as $product) {
-                    try {
-                        $product->addMediaFromUrl($product->img_url)
-                            ->withResponsiveImages()
-                            ->toMediaCollection('images');
-                        $this->info("Image add for product {$product->product_num}");
-                    } catch (\Exception $e) {
-                        $this->error("Error {$product->product_num}: " . $e->getMessage());
-                    }
-                }
-                gc_collect_cycles();
-            });
+        $force = $this->option('force');
 
-        $this->info("Import done");
+        $batchSize = 200;
+
+        $this->info("Začínám import obrázků");
+        ini_set('memory_limit', '1536M');
+
+        $query = Product::query();
+
+        if (!$force) {
+            $query->whereDoesntHave('media', function ($q) {
+                $q->where('collection_name', 'images');
+            });
+        }
+
+        $totalProducts = $query->count();
+        $this->info("Nalezeno {$totalProducts} produktů ke zpracování");
+
+        if ($totalProducts === 0) {
+            $this->info("Žádné produkty ke zpracování");
+            return 0;
+        }
+
+        $progress = $this->output->createProgressBar($totalProducts);
+        $progress->start();
+
+        // Davkovani
+        $query->chunk($batchSize, function ($products) use ($progress, $force) {
+            foreach ($products as $product) {
+
+                DownloadProductImageJob::dispatch($product->id, null, $force);
+                $progress->advance();
+            }
+            gc_collect_cycles();
+        });
+
+        $progress->finish();
+        $this->newLine();
+        $this->info("Import dokončen, joby byly zařazeny do fronty");
+
         return 0;
     }
 }

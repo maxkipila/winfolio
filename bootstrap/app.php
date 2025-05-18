@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\LocaleMiddleware;
 use App\Http\Middleware\RedirectIfInertia;
 use App\Providers\RouteServiceProvider;
@@ -31,8 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
         $middleware->redirectUsersTo(function (Request $request) {
-            /*  dd(Auth::guard('admins')->user(), Auth::getDefaultDriver()); */
-            $guard = Auth::guard('admins')->check() ? 'admins' : 'web';
+            $guard = Auth::guard('web')->check() ? 'web' : 'admins';
             return Auth::guard($guard)->user() instanceof \App\Models\Admin ? RouteServiceProvider::ADMIN_HOME : RouteServiceProvider::HOME;
         });
 

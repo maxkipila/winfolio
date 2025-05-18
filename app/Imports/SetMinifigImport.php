@@ -28,7 +28,19 @@ class SetMinifigImport
             ->toArray();
         echo "Načteno " . count($minifigsMap) . " minifigurek.\n";
 
-        $this->processInventoryMinifigs($inventoryMinifigsPath, $inventoryToSetMap, $minifigsMap);
+        // Načtení existujících vazeb pro kontrolu duplikátů
+        echo "Načítám existující vazby mezi sety a minifigurkami...\n";
+        $existingRelations = DB::table('set_minifigs')
+            ->select('parent_id', 'minifig_id')
+            ->get()
+            ->map(function ($relation) {
+                return $relation->parent_id . '-' . $relation->minifig_id;
+            })
+            ->flip()
+            ->toArray();
+        echo "Načteno " . count($existingRelations) . " existujících vazeb.\n";
+
+        $this->processInventoryMinifigs($inventoryMinifigsPath, $inventoryToSetMap, $minifigsMap, $existingRelations);
 
         return true;
     }
@@ -65,54 +77,73 @@ class SetMinifigImport
         return $mapping;
     }
 
-    private function processInventoryMinifigs($path, $inventoryToSetMap, $minifigsMap)
+    private function processInventoryMinifigs($path, $inventoryToSetMap, $minifigsMap, $existingRelations)
     {
         $batchSize = 1000;
         $batch = [];
         $count = 0;
         $totalCount = 0;
+        $skippedCount = 0;
+        $invalidCount = 0;
+        $missingSetCount = 0;
+        $missingFigCount = 0;
 
         if (($handle = fopen($path, 'r')) !== false) {
-            fgetcsv($handle);
+            fgetcsv($handle); // Přeskočení hlavičky
 
             echo "Zpracovávám vazby mezi sety a minifigurkami...\n";
+            $totalLines = 0;
 
             while (($data = fgetcsv($handle)) !== false) {
-                if (count($data) >= 3) {
-                    $inventoryId = $data[0];
-                    $figNum = $data[1];
-                    $quantity = intval($data[2]);
+                $totalLines++;
 
-                    if (!isset($inventoryToSetMap[$inventoryId])) {
-                        continue;
-                    }
+                if (count($data) < 3) {
+                    $invalidCount++;
+                    continue;
+                }
 
-                    $setId = $inventoryToSetMap[$inventoryId];
+                $inventoryId = $data[0];
+                $figNum = $data[1];
+                $quantity = intval($data[2]);
 
-                    if (!isset($minifigsMap[$figNum])) {
-                        continue;
-                    }
+                if (!isset($inventoryToSetMap[$inventoryId])) {
+                    $missingSetCount++;
+                    continue;
+                }
 
-                    $minifigId = $minifigsMap[$figNum];
+                $setId = $inventoryToSetMap[$inventoryId];
 
-                    $batch[] = [
-                        'parent_id' => $setId,
-                        'minifig_id' => $minifigId,
-                        'quantity' => $quantity,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                if (!isset($minifigsMap[$figNum])) {
+                    $missingFigCount++;
+                    continue;
+                }
 
-                    $count++;
+                $minifigId = $minifigsMap[$figNum];
 
-                    if (count($batch) >= $batchSize) {
-                        $this->insertBatch($batch);
-                        $totalCount += count($batch);
-                        echo "Importováno $totalCount vazeb...\n";
-                        $batch = [];
+                // Kontrola, zda už vazba existuje
+                $relationKey = $setId . '-' . $minifigId;
+                if (isset($existingRelations[$relationKey])) {
+                    $skippedCount++;
+                    continue; // Přeskočení, protože vazba už existuje
+                }
 
-                        gc_collect_cycles();
-                    }
+                $batch[] = [
+                    'parent_id' => $setId,
+                    'minifig_id' => $minifigId,
+                    'quantity' => $quantity,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $count++;
+
+                if (count($batch) >= $batchSize) {
+                    $this->insertBatch($batch);
+                    $totalCount += count($batch);
+                    echo "Importováno $totalCount nových vazeb...\n";
+                    $batch = [];
+
+                    gc_collect_cycles();
                 }
             }
 
@@ -121,7 +152,14 @@ class SetMinifigImport
                 $totalCount += count($batch);
             }
 
-            echo "Import dokončen. Celkem importováno $totalCount vazeb.\n";
+            echo "Import dokončen. Statistiky:\n";
+            echo "- Celkem řádků v CSV: $totalLines\n";
+            echo "- Importováno nových vazeb: $totalCount\n";
+            echo "- Přeskočeno existujících vazeb: $skippedCount\n";
+            echo "- Neplatné řádky: $invalidCount\n";
+            echo "- Chybějící set pro inventory: $missingSetCount\n";
+            echo "- Chybějící minifigurka: $missingFigCount\n";
+            echo "- Součet zpracovaných: " . ($totalCount + $skippedCount + $invalidCount + $missingSetCount + $missingFigCount) . "\n";
 
             fclose($handle);
         }

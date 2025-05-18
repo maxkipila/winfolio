@@ -91,11 +91,23 @@ interface Props {
 function PointsGraph(props: Props) {
     const { product, priceHistory } = props
 
+    if (!priceHistory || !priceHistory.history) {
+        return <div className='mt-32px'>Není dostatek dat pro zobrazení grafu</div>;
+    }
+
+
     let prevDates = Object.keys(priceHistory.history)
     let prevValues = Object.values(priceHistory.history)
     let historicValues = prevValues.flatMap((h) => h[0])
-    let dates = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.date)
-    let values = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.value) as Array<number>
+    /*    let dates = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.date)
+       let values = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.value) as Array<number> */
+
+    let historicData = Array.isArray(priceHistory.history)
+        ? priceHistory.history
+        : Object.values(priceHistory.history).flat();
+
+    let dates = historicData.map(item => item.date);
+    let values = historicData.map(item => Number(item.value)) as Array<number>;
 
     let avarageValue = values.reduce((p, c) => c + p, 0) / values?.length
     let max = Math.max(...values)
@@ -199,7 +211,7 @@ function PointsGraph(props: Props) {
                 //@ts-expect-error
                 <Line height={180} options={options} data={dummyData} />
             }
-            
+
         </div>
     )
 }

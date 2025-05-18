@@ -38,7 +38,7 @@ class BrickEconomyScraper
             // Sestavíme URL
             $url = $this->buildProductUrl($productId);
 
-            // Získáme HTML pomocí Puppeteeru
+            // puppeteer
             $data = $this->fetchDataWithPuppeteer($url);
 
             if (!$data) {
@@ -118,7 +118,7 @@ class BrickEconomyScraper
 
             // Spuštění Puppeteer skriptu
             $process = new Process(['node', $this->puppeteerScript, $url]);
-            $process->setTimeout(60); // Zvýšený timeout
+            $process->setTimeout(60);
             $process->run();
 
             if (!$process->isSuccessful()) {

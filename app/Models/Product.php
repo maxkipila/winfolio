@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Paradigma\Pictura\Traits\HasWebp;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,10 +15,10 @@ use Spatie\MediaLibrary\HasMedia;
 
 class Product extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasResource;
-    protected $guarded = [];
+    use HasWebp, HasResource, HasFactory;
 
-    use HasFactory;
+
+    protected $guarded = [];
 
     public function theme()
     {
@@ -54,22 +55,28 @@ class Product extends Model implements HasMedia
             ->withTimestamps();
     }
 
-
-    /*  public function getImgUrlAttribute($value): string
+    // zpetna kompatibilita v pripade, ze se stale ocekava img_uel
+    public function getImgUrlAttribute()
     {
-        $first = $this->getFirstMediaUrl('images');
+        $media = $this->getFirstMedia('images');
+        if ($media) {
+            return $media->getUrl();
+        }
 
-        return $first !== ''
-            ? $first
-            : $value;
-    } */
+        if ($this->product_type === 'set') {
+            return "https://cdn.rebrickable.com/media/sets/{$this->product_num}.jpg";
+        } elseif ($this->product_type === 'minifig') {
+            return "https://cdn.rebrickable.com/media/minifigs/{$this->product_num}.jpg";
+        }
 
+        return null;
+    }
 
     public function prices()
     {
         return $this->hasMany(Price::class);
     }
-    public function latest_price()
+    public function latest_price(): HasOne
     {
         return $this->hasOne(Price::class)->latestOfMany();
     }
@@ -118,8 +125,6 @@ class Product extends Model implements HasMedia
             ->withTimestamps();
     }
 
-    // Pro sety - získání minifigurek v setu
-    // V modelu Product
     public function minifigs()
     {
         return $this->belongsToMany(Product::class, 'set_minifigs', 'parent_id', 'minifig_id')
