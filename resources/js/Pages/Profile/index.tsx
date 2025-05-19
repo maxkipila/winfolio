@@ -1,3 +1,4 @@
+import Img from '@/Components/Image';
 import { t } from '@/Components/Translator';
 import Form from '@/Fragments/forms/Form';
 import CSelect from '@/Fragments/forms/inputs/CSelect';
