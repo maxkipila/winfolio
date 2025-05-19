@@ -123,11 +123,11 @@ function Login(props: Props) {
                         }
                         {
                             emailConfirmed &&
-                            <>
+                            <div className='overflow-y-auto flex-col flex gap-12px max-h-[80vh]'>
                                 <TextField name="first_name" placeholder={t('Jméno')} />
                                 <TextField name="last_name" placeholder={t('Příjmení')} />
                                 <TextField prefix='@' name="nickname" placeholder={t('@username')} />
-                                <div className='mt-24px'>{t('Telefonní číslo')}</div>
+                                <div className=''>{t('Telefonní číslo')}</div>
                                 <div className='flex gap-8px'>
                                     <div className='flex-shrink-0'>
                                         <Select name="prefix" placeholder={t('Prefix')} options={[
@@ -136,7 +136,7 @@ function Login(props: Props) {
                                     </div>
                                     <TextField name="phone" placeholder={t('Telefon')} />
                                 </div>
-                                <div className='mt-24px'>{t('Datum narození')}</div>
+                                <div className=''>{t('Datum narození')}</div>
                                 <div className='flex gap-8px'>
                                     <div className='flex-shrink-0'>
                                         <Select name="day" placeholder='DD' options={[
@@ -273,17 +273,17 @@ function Login(props: Props) {
                                 <Select name="country" placeholder={t('Stát')} options={[
                                     { text: 'Česká Republika', value: 'CZE' }
                                 ]} />
-                                <div className='mt-24px flex gap-8px'>
+                                <div className='mt-12px flex gap-8px'>
                                     <Lock size={24} />
                                     <div>{t('Zabezpečení')}</div>
                                 </div>
                                 <PasswordField name="password" placeholder={t('Heslo')} />
                                 <PasswordField name="password_confirmation" placeholder={t('Heslo (znova)')} />
-                                <div className='flex gap-8px items-center font-nunito justify-between w-full mb-32px'>
+                                <div className='flex gap-8px items-center font-nunito justify-between w-full '>
                                     <Checkbox name="newsletter" label={t("Newsletter")} />
                                 </div>
-                                <Button href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
-                            </>
+                                <Button className='flex-shrink-0' href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
+                            </div>
                         }
                     </Form>
                 </div>
