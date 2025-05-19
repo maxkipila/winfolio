@@ -4,6 +4,7 @@ import ChangingCarousel from '@/Fragments/ChangingCarousel';
 import Form from '@/Fragments/forms/Form'
 import Checkbox from '@/Fragments/forms/inputs/Checkbox';
 import CodeField from '@/Fragments/forms/inputs/CodeField';
+import CSelect from '@/Fragments/forms/inputs/CSelect';
 import PasswordField from '@/Fragments/forms/inputs/PasswordField';
 import Select from '@/Fragments/forms/inputs/Select';
 import TextField from '@/Fragments/forms/inputs/TextField';
@@ -21,7 +22,8 @@ interface Props { }
 function Login(props: Props) {
     const { } = props
     const form = useForm({
-        email: ''
+        email: '',
+        prefix: '+420'
     });
     const { data, post, clearErrors } = form;
     let [inDB, setInDB] = useState(null)
@@ -92,7 +94,8 @@ function Login(props: Props) {
                         {
                             (inDB === true && !preRegistered) &&
                             <>
-                                <PasswordField label={t('Heslo')} className='w-full' type='password' name="password" placeholder={t('Heslo')} />
+                                {/* <PasswordField label={t('Heslo')} className='w-full' type='password' name="password" placeholder={t('Heslo')} /> */}
+                                <PasswordField name="password" placeholder={t('Heslo')} />
                                 <div className='flex gap-8px items-center justify-between w-full mb-32px'>
                                     <Checkbox name="agree" label={t("Zapamatuj si mě")} />
                                 </div>
@@ -129,9 +132,10 @@ function Login(props: Props) {
                                 <TextField prefix='@' name="nickname" placeholder={t('@username')} />
                                 <div className=''>{t('Telefonní číslo')}</div>
                                 <div className='flex gap-8px'>
-                                    <div className='flex-shrink-0'>
-                                        <Select name="prefix" placeholder={t('Prefix')} options={[
-                                            { text: '+420', value: '+420' }
+                                    <div className='flex-shrink-0 min-w-[100px]'>
+                                        <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={[
+                                            { value: "+420", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/cz.png" />} +420</div> },
+                                            { value: "+421", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/sk.png" />} +421</div> }
                                         ]} />
                                     </div>
                                     <TextField name="phone" placeholder={t('Telefon')} />
