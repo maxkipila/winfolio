@@ -72,7 +72,7 @@ function Welcome(props: Props) {
                         <div className='font-nunito my-32px'>{t('Investování může být i zábava. Winfolio je nejen analytický nástroj, ale i herní platforma – s výzvami, misemi a odměnami, které tě provedou světem LEGO investic. Získej odznaky, postupuj úrovněmi a buduj si reputaci investora, kterého bude komunita sledovat.')}</div>
                         <Button className='max-w-[140px]' href={route('login')}>{t('Vytvořit účet')}</Button>
                     </div>
-                    <Img className='w-full' src="/assets/img/lone-landing.png" />
+                    <Img className='w-full' src="/assets/img/harry-potter-welcome.png" />
                 </div>
 
                 <div className='mt-48px flex items-center gap-64px mob:flex-col'>

@@ -10,6 +10,7 @@ interface Props { }
 function PublicHeader(props: Props) {
     const { } = props
     let [picker, setPicker] = useState(false)
+    let [mobile, setMobile] = useState(false)
     return (
         <div className='py-16px flex justify-between items-center px-24px border-b-2 bg-white border-black font-teko fixed top-0 w-full z-max mob:min-h-[82px]'>
             <Img src="/assets/img/logo.png" />
@@ -23,7 +24,7 @@ function PublicHeader(props: Props) {
                     <Globe onClick={() => { setPicker((p) => !p) }} className='flex-shrink-0 cursor-pointer' size={24} />
                     {
                         picker &&
-                        <div className='absolute bottom-0 bg-white transform translate-y-full w-64px'>
+                        <div className='absolute bottom-0 bg-white transform translate-y-full w-64px mob:-translate-x-1/2'>
                             <Link className='flex items-center gap-12px p-8px' href={route('welcome', { locale: 'cs' })}>
                                 <Img src="/assets/img/cz.svg" />
                                 <div>CZ</div>

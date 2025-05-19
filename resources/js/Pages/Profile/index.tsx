@@ -1,5 +1,6 @@
 import { t } from '@/Components/Translator';
 import Form from '@/Fragments/forms/Form';
+import CSelect from '@/Fragments/forms/inputs/CSelect';
 import PasswordField from '@/Fragments/forms/inputs/PasswordField';
 import Select from '@/Fragments/forms/inputs/Select';
 import TextField from '@/Fragments/forms/inputs/TextField';
@@ -44,9 +45,10 @@ function Index(props: Props) {
                         <TextField prefix="@" name="username" placeholder={t('@username')} />
                         <div className='mt-24px'>{t('Telefonní číslo')}</div>
                         <div className='flex gap-8px'>
-                            <div className='flex-shrink-0'>
-                                <Select name="prefix" options={[
-                                    { text: '+420', value: '+420' }
+                            <div className='flex-shrink-0 min-w-[100px]'>
+                                <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={[
+                                    { value: "+420", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/cz.png" />} +420</div> },
+                                    { value: "+421", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/sk.png" />} +421</div> }
                                 ]} />
                             </div>
                             <TextField name="phone" placeholder={t('Telefon')} />
