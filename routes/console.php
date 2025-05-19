@@ -13,12 +13,13 @@ Artisan::command('inspire', function () {
 
 Schedule::command('telescope:prune --hours=48')->daily();
 
-Schedule::command('app:check-awards')->dailyAt('23:30')->timezone('Europe/Prague'); //kontrola odznaku
-Schedule::command('app:update-user-records')->dailyAt('23:40')->timezone('Europe/Prague'); //aktualizace uzivatelskych recordu
+Schedule::command('app:check-awards')->everyFiveMinutes()->timezone('Europe/Prague'); //kontrola odznaku
+Schedule::command('awards:notify')->everyFiveMinutes()->timezone('Europe/Prague');
+
+Schedule::command('app:update-user-records')->daily()->timezone('Europe/Prague'); //aktualizace uzivatelskych recordu
 Schedule::command('import:lego-data')->dailyAt('23:50')->timezone('Europe/Prague'); //import dat
-Schedule::command('import:lego-images --skip-existing')->dailyAt('23:53')->timezone('Europe/Prague'); //import obrazku
-Schedule::command('prices:aggregate --all')->dailyAt('03:00')->timezone('Europe/Prague');
-Schedule::command('awards:notify')->hourly();
+Schedule::command('import:lego-images')->dailyAt('23:53')->timezone('Europe/Prague'); //import obrazku
+Schedule::command('prices:aggregate ')->dailyAt('03:00')->timezone('Europe/Prague');
 Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague'); //vypocet trendu
 
 

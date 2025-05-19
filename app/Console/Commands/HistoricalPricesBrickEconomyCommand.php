@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\PriceType;
 use App\Models\LegoIdMapping;
 use App\Models\Price;
 use App\Models\Product;
@@ -11,19 +12,12 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\DomCrawler\Crawler;
 
 class HistoricalPricesBrickEconomyCommand extends Command
 {
-    protected $signature = 'historical:prices-brickeconomy
-                        {--type=all : Type of products to scrape (all, set, minifig)}
-                        {--limit=20 : Maximum number of products to process}
-                        {--days=365 : How many days back to import}
-                        {--concurrency=3 : Number of processes to use simultaneously}
-                        {--product_id= : Specific product ID to process}';
-
-    protected $description = 'Scrape historical price data from BrickEconomy using DOM Crawler';
+    protected $signature = 'historical:prices-brickeconomy {--force : Přepsat existující záznamy}';
+    protected $description = 'Scrape historical price data from BrickEconomy';
 
     protected $client;
     protected $startTime;
@@ -47,69 +41,38 @@ class HistoricalPricesBrickEconomyCommand extends Command
 
     public function handle()
     {
-
         ini_set('memory_limit', '512M');
         DB::disableQueryLog();
 
         $this->startTime = now();
-        $type = $this->option('type');
-        $limit = (int) $this->option('limit');
-        $days = (int) $this->option('days');
-        $productId = $this->option('product_id'); // Získání ID produktu z parametrů
+        $this->info("Scraping historických cen z BrickEconomy");
 
-        $this->info("Začínám scraping historických cen z BrickEconomy pomocí DOM Crawler");
-        $this->info("Typ produktů: {$type}, Limit: {$limit}, Dny zpět: {$days}");
+        $force = $this->option('force');
+        $lastProcessedId = 0;
 
-        if ($productId) {
-            $this->info("Zpracovávám pouze produkt s ID: {$productId}");
+        if (!$force) {
+            $lastProcessedId = DB::table('prices')
+                ->where('type', PriceType::SCRAPED->value)
+                ->join('products', 'prices.product_id', '=', 'products.id')
+                ->max('products.id') ?? 0;
+
+            $this->info("Pokračuji od ID > {$lastProcessedId}");
         }
 
-        $query = Product::query();
-
-        // Pokud je zadáno ID produktu, použijeme pouze tento produkt
-        if ($productId) {
-            $query->where('id', $productId);
-        } else {
-            // Jinak filtrujeme podle původních kritérií
-            $query->when($type !== 'all', fn($q) => $q->where('product_type', $type))
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('lego_id_mappings')
-                        ->whereNotNull('brickeconomy_id')
-                        ->whereRaw('products.id = lego_id_mappings.product_id');
-                });
-        }
-        ini_set('memory_limit', '512M');
-        DB::disableQueryLog();
-
-        $this->startTime = now();
-        $type = $this->option('type');
-        $limit = (int) $this->option('limit');
-        $days = (int) $this->option('days');
-
-        $this->info("Začínám scraping historických cen z BrickEconomy pomocí DOM Crawler");
-        $this->info("Typ produktů: {$type}, Limit: {$limit}, Dny zpět: {$days}");
-
-        // Příprava produktů ke zpracování
-        $query = Product::query()
-            ->when($type !== 'all', fn($q) => $q->where('product_type', $type))
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('lego_id_mappings')
-                    ->whereNotNull('brickeconomy_id')
-                    ->whereRaw('products.id = lego_id_mappings.product_id');
-            });
-
+        $query = Product::where('id', '>', $lastProcessedId)->orderBy('id', 'asc');
         $totalProducts = $query->count();
         $this->info("Nalezeno {$totalProducts} produktů ke zpracování");
 
-        $totalProducts = $limit > 0 && $limit < $totalProducts ? $limit : $totalProducts;
-
-        // Progress bar
-        $bar = $this->output->createProgressBar($totalProducts);
+        $limit = 100;
+        $bar = $this->output->createProgressBar(min($limit, $totalProducts));
         $bar->start();
 
-        $products = $query->take($totalProducts)->get();
+        $products = $query->limit($limit)->get();
+
+        if ($products->isEmpty()) {
+            $this->info("Žádné nové produkty k zpracování.");
+            return 0;
+        }
 
         foreach ($products as $product) {
             try {
@@ -117,14 +80,17 @@ class HistoricalPricesBrickEconomyCommand extends Command
 
                 if (!$brickEconomyId) {
                     $this->logError('No BrickEconomy ID');
+                    $this->saveEmptyRecord($product);
                     $bar->advance();
                     continue;
                 }
 
-                $historicalData = $this->scrapeHistoricalData($brickEconomyId, $days);
+                $url = $this->getProductUrl($product, $brickEconomyId);
+                $historicalData = $this->scrapeHistoricalData($url);
 
                 if (empty($historicalData)) {
                     $this->logError('No historical data found');
+                    $this->saveEmptyRecord($product);
                     $bar->advance();
                     continue;
                 }
@@ -136,15 +102,16 @@ class HistoricalPricesBrickEconomyCommand extends Command
                     $this->totalPoints += count($historicalData);
                 } else {
                     $this->logError('Failed to save data');
+                    $this->saveEmptyRecord($product);
                 }
             } catch (Exception $e) {
                 $this->logError('Exception: ' . $e->getMessage());
                 Log::error("Scraping error for product {$product->id}: " . $e->getMessage());
+                $this->saveEmptyRecord($product);
             }
 
             $bar->advance();
-
-            usleep(500000); // 0.5 sekundy
+            sleep(3);
         }
 
         $bar->finish();
@@ -158,201 +125,211 @@ class HistoricalPricesBrickEconomyCommand extends Command
         if (!empty($this->errorReasons)) {
             $this->info("Nejčastější chyby:");
             arsort($this->errorReasons);
-            $i = 0;
             foreach ($this->errorReasons as $reason => $count) {
                 $this->info(" - {$reason}: {$count}x");
-                $i++;
-                if ($i >= 5) break;
             }
+        }
+
+        if ($products->count() > 0) {
+            $lastId = $products->last()->id;
+            $this->info("Poslední zpracovaný produkt ID: {$lastId}");
         }
 
         return 0;
     }
 
-    /**
-     * Získá BrickEconomy ID pro produkt
-     */
+    protected function logError(string $reason): void
+    {
+        $this->totalFailed++;
+        $this->errorReasons[$reason] = ($this->errorReasons[$reason] ?? 0) + 1;
+    }
+
+    protected function saveEmptyRecord(Product $product): void
+    {
+        try {
+            Price::create([
+                'product_id' => $product->id,
+                'value' => 0,
+                'type' => PriceType::SCRAPED->value,
+                'date' => now()->format('Y-m-d'),
+                'currency' => 'EUR',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        } catch (Exception $e) {
+            Log::error("Chyba při vytváření prázdného záznamu pro produkt {$product->id}: " . $e->getMessage());
+        }
+    }
+
+    protected function getProductUrl(Product $product, string $brickEconomyId): string
+    {
+        return $product->product_type === 'minifig'
+            ? "https://www.brickeconomy.com/minifig/{$brickEconomyId}/"
+            : "https://www.brickeconomy.com/set/{$brickEconomyId}/";
+    }
+
     protected function getBrickEconomyId(Product $product): ?string
     {
-        static $mappingCache = [];
-
-        if (isset($mappingCache[$product->id])) {
-            return $mappingCache[$product->id];
-        }
-
         $mapping = LegoIdMapping::where('product_id', $product->id)
             ->whereNotNull('brickeconomy_id')
             ->first();
 
-        if ($mapping) {
-            $mappingCache[$product->id] = $mapping->brickeconomy_id;
+        if ($mapping && $mapping->brickeconomy_id) {
             return $mapping->brickeconomy_id;
         }
 
-        if ($product->product_type === 'set') {
-            $mappingCache[$product->id] = $product->product_num;
-            return $product->product_num;
+        $mapping = LegoIdMapping::where('rebrickable_id', $product->product_num)
+            ->whereNotNull('brickeconomy_id')
+            ->first();
+
+        if ($mapping && $mapping->brickeconomy_id) {
+            return $mapping->brickeconomy_id;
         }
 
-        $mappingCache[$product->id] = null;
-        return null;
+        return $product->product_type === 'set' ? $product->product_num : null;
     }
 
-    /**
-     * Stáhne historická data z BrickEconomy pomocí DOM Crawler
-     */
-    protected function scrapeHistoricalData(string $brickEconomyId, int $days): array
+    protected function scrapeHistoricalData(string $url): array
     {
-        $url = "https://www.brickeconomy.com/set/{$brickEconomyId}/";
-
         try {
             $response = $this->client->get($url);
             $html = $response->getBody()->getContents();
-
             $crawler = new Crawler($html);
 
-            $scripts = $crawler->filter('script')->extract(['_text']);
+            $historicalData = $this->extractDataFromJavaScript($crawler, $html);
 
-            $historicalData = [];
-
-            foreach ($scripts as $script) {
-                if (strpos($script, 'chartData') !== false || strpos($script, 'chart.data') !== false) {
-                    preg_match_all('/data\s*:\s*(\[.*?\])/s', $script, $matches);
-
-                    if (!empty($matches[1][0])) {
-                        $dataPoints = $matches[1][0];
-
-                        preg_match_all(
-                            '/{(?:\s*x\s*:\s*(?:new Date\(["\']?([^"\')]+)["\']?\)|"([^"]+)")(?:\s*,\s*|\s*)\s*y\s*:\s*([0-9.]+))/s',
-                            $dataPoints,
-                            $pointMatches,
-                            PREG_SET_ORDER
-                        );
-
-                        if (!empty($pointMatches)) {
-                            foreach ($pointMatches as $match) {
-                                // Datum může být v indexu 1 nebo 2 podle použitého formátu
-                                $date = !empty($match[1]) ? $match[1] : $match[2];
-                                $price = (float) $match[3];
-
-                                try {
-                                    $pointDate = Carbon::parse($date);
-                                    if ($pointDate->isAfter(now()->subDays($days))) {
-                                        $historicalData[] = [
-                                            'date' => $pointDate->format('Y-m-d'),
-                                            'price' => $price,
-                                            'condition' => 'New'
-                                        ];
-                                    }
-                                } catch (Exception $e) {
-                                    Log::warning("Nepodařilo se zpracovat datum: {$date}");
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-                    if (empty($historicalData)) {
-                        preg_match_all('/data:\s*\[\s*\{\s*x:\s*"([^"]+)"\s*,\s*y:\s*(\d+(?:\.\d+)?)\s*\}/s', $script, $alternateMatches, PREG_SET_ORDER);
-
-                        if (!empty($alternateMatches)) {
-                            foreach ($alternateMatches as $match) {
-                                $date = $match[1];
-                                $price = (float) $match[2];
-
-                                try {
-                                    $pointDate = Carbon::parse($date);
-                                    if ($pointDate->isAfter(now()->subDays($days))) {
-                                        $historicalData[] = [
-                                            'date' => $pointDate->format('Y-m-d'),
-                                            'price' => $price,
-                                            'condition' => 'New'
-                                        ];
-                                    }
-                                } catch (Exception $e) {
-                                    Log::warning("Nepodařilo se zpracovat datum: {$date}");
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-                    // Pokud jsme našli data, již nepokračujeme
-                    if (!empty($historicalData)) {
-                        break;
-                    }
-                }
+            if (empty($historicalData)) {
+                $historicalData = $this->extractDataFromTable($crawler);
             }
 
             if (empty($historicalData)) {
-                $crawler->filter('table.table tr')->each(function (Crawler $row) use (&$historicalData, $days) {
-                    try {
-                        $cells = $row->filter('td')->extract(['_text']);
-
-                        if (count($cells) >= 2) {
-                            $dateText = trim($cells[0]);
-                            $priceText = trim($cells[1]);
-
-                            $dateMatches = [];
-                            if (preg_match('/(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\w+ \d{1,2}, \d{4})/', $dateText, $dateMatches)) {
-                                $date = Carbon::parse($dateMatches[1]);
-
-                                $priceMatches = [];
-                                if (preg_match('/\$?(\d+(?:\.\d+)?)/', $priceText, $priceMatches)) {
-                                    $price = (float) $priceMatches[1];
-
-                                    // Filtrujeme podle požadovaného rozsahu dnů
-                                    if ($date->isAfter(now()->subDays($days))) {
-                                        $historicalData[] = [
-                                            'date' => $date->format('Y-m-d'),
-                                            'price' => $price,
-                                            'condition' => 'New'
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception $e) {
-                        // Ignorujeme chyby při procházení řádků
-                    }
-                });
-            }
-
-            // Extrahujeme aktuální cenu pro dnešní datum, pokud jsme ji ještě nemáme
-            if (empty($historicalData)) {
-                $valueElement = $crawler->filter('.side-box-body b, .side-box-body strong')->first();
-                if ($valueElement->count() > 0) {
-                    $valueText = $valueElement->text();
-                    $priceMatches = [];
-                    if (preg_match('/\$?(\d+(?:\.\d+)?)/', $valueText, $priceMatches)) {
-                        $price = (float) $priceMatches[1];
-                        $historicalData[] = [
-                            'date' => now()->format('Y-m-d'),
-                            'price' => $price,
-                            'condition' => 'New'
-                        ];
-                    }
+                $currentPrice = $this->extractCurrentPrice($crawler);
+                if ($currentPrice > 0) {
+                    $historicalData[] = [
+                        'date' => now()->format('Y-m-d'),
+                        'price' => $currentPrice,
+                    ];
                 }
             }
-
-            // Seřadíme data podle data
-            usort($historicalData, function ($a, $b) {
-                return strtotime($a['date']) - strtotime($b['date']);
-            });
 
             return $historicalData;
-        } catch (GuzzleException $e) {
-            Log::error("HTTP error for {$brickEconomyId}: " . $e->getMessage());
-            return [];
         } catch (Exception $e) {
-            Log::error("Error scraping {$brickEconomyId}: " . $e->getMessage());
+            Log::error("Error scraping URL {$url}: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Uloží historická data do databáze
-     */
+    protected function extractDataFromJavaScript(Crawler $crawler, string $html): array
+    {
+        $historicalData = [];
+
+        preg_match_all('/data\.addRows\(\[\s*(.*?)\s*\]\);/s', $html, $rowsMatches, PREG_SET_ORDER);
+        $dataRows = '';
+        foreach ($rowsMatches as $match) {
+            $rowsContent = $match[1];
+            if (strpos($rowsContent, "'Released'") !== false) {
+                $dataRows = $rowsContent;
+                break;
+            }
+        }
+
+        if (!$dataRows && !empty($rowsMatches)) {
+            $dataRows = $rowsMatches[0][1] ?? '';
+        }
+
+        if ($dataRows && preg_match_all('/\[new Date\((\d+),\s*(\d+),\s*(\d+)\),\s*([\d.]+)/s', $dataRows, $matches, PREG_SET_ORDER)) {
+            $minYear = 1970;
+            $maxYear = now()->year;
+
+            foreach ($matches as $match) {
+                $year = (int)$match[1];
+                $month = (int)$match[2];
+                $day = (int)$match[3];
+                $price = (float)$match[4];
+
+                if ($year >= $minYear && $year <= $maxYear) {
+                    $date = Carbon::create($year, $month + 1, $day)->format('Y-m-d');
+                    $historicalData[] = [
+                        'date' => $date,
+                        'price' => $price,
+                    ];
+                }
+            }
+        }
+
+        return $historicalData;
+    }
+
+    protected function extractDataFromTable(Crawler $crawler): array
+    {
+        $historicalData = [];
+
+        try {
+            $crawler->filter('table.table tr')->each(function (Crawler $row) use (&$historicalData) {
+                $cells = $row->filter('td')->each(fn(Crawler $cell) => trim($cell->text()));
+                if (count($cells) >= 2) {
+                    $dateText = $cells[0];
+                    $priceText = $cells[1];
+
+                    if (
+                        preg_match('/(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\w+ \d{1,2},? \d{4})/', $dateText, $dateMatches) &&
+                        preg_match('/\$?(\d+(?:\.\d+)?)/', $priceText, $priceMatches)
+                    ) {
+                        try {
+                            $date = Carbon::parse($dateMatches[1]);
+                            $year = (int)$date->format('Y');
+                            $minYear = 1970;
+                            $maxYear = now()->year;
+
+                            if ($year >= $minYear && $year <= $maxYear) {
+                                $formattedDate = $date->format('Y-m-d');
+                                $price = (float)$priceMatches[1];
+                                $historicalData[] = ['date' => $formattedDate, 'price' => $price];
+                            }
+                        } catch (Exception $e) {
+                            // Skip parsing errors
+                        }
+                    }
+                }
+            });
+        } catch (Exception $e) {
+            Log::error("Table parsing error: " . $e->getMessage());
+        }
+
+        return $historicalData;
+    }
+
+    protected function extractCurrentPrice(Crawler $crawler): ?float
+    {
+        try {
+            if (preg_match('/Today\s+€([\d.]+)/', $crawler->html(), $matches)) {
+                return (float)$matches[1];
+            }
+
+            $selectors = [
+                '.side-box-body b',
+                '.side-box-body strong',
+                '.price-box .value',
+                '.set-value',
+                '#ContentPlaceHolder1_PanelSetPricing .side-box-body strong'
+            ];
+
+            foreach ($selectors as $selector) {
+                $elements = $crawler->filter($selector);
+                if ($elements->count() > 0) {
+                    $valueText = $elements->first()->text();
+                    if (strpos($valueText, ' - ') === false && preg_match('/€?([\d.,]+)/', $valueText, $priceMatches)) {
+                        return (float)str_replace(',', '.', $priceMatches[1]);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            Log::error("Current price extraction error: " . $e->getMessage());
+        }
+
+        return null;
+    }
+
     protected function saveHistoricalPrices(Product $product, array $historicalData): bool
     {
         if (empty($historicalData)) {
@@ -360,54 +337,40 @@ class HistoricalPricesBrickEconomyCommand extends Command
         }
 
         try {
-            // Zjistíme, která data už máme v DB
             $existingDates = Price::where('product_id', $product->id)
-                ->where('condition', 'New')
-                ->where('type', 'aggregated') // Změněno z 'historical' na 'aggregated'
-                ->whereIn('created_at', array_column($historicalData, 'date'))
-                ->pluck('created_at')
-                ->map(function ($date) {
-                    return $date->format('Y-m-d');
-                })
+                ->where('type', PriceType::SCRAPED->value)
+                ->pluck('date')
+                ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
                 ->toArray();
 
-            // Připravíme data pro bulk insert
-            $dataToInsert = [];
+            $recordsToInsert = [];
+            $now = now();
 
             foreach ($historicalData as $data) {
-                if (!in_array($data['date'], $existingDates)) {
-                    $dataToInsert[] = [
+                $formattedDate = $data['date'];
+                $price = (float)$data['price'];
+
+                if (!in_array($formattedDate, $existingDates) && $price > 0) {
+                    $recordsToInsert[] = [
                         'product_id' => $product->id,
-                        'value' => $data['price'],
-                        'retail' => round($data['price'] * 0.8, 2),
-                        'wholesale' => round($data['price'] * 0.6, 2),
-                        'condition' => $data['condition'],
-                        'type' => 'aggregated',
-                        'created_at' => $data['date'],
-                        'updated_at' => now()
+                        'value' => $price,
+                        'type' => PriceType::SCRAPED->value,
+                        'date' => $formattedDate,
+                        'currency' => 'EUR',
+                        'created_at' => $now,
+                        'updated_at' => $now
                     ];
                 }
             }
 
-            if (!empty($dataToInsert)) {
-                Price::insert($dataToInsert);
+            if (!empty($recordsToInsert)) {
+                DB::table('prices')->insert($recordsToInsert);
             }
 
-            return true;
+            return !empty($recordsToInsert) || count($existingDates) > 0;
         } catch (Exception $e) {
-            Log::error("Error saving data for product {$product->id}: " . $e->getMessage());
+            Log::error("Error saving prices for product {$product->id}: " . $e->getMessage());
             return false;
         }
-    }
-
-    protected function logError($reason)
-    {
-        $this->totalFailed++;
-
-        if (!isset($this->errorReasons[$reason])) {
-            $this->errorReasons[$reason] = 0;
-        }
-
-        $this->errorReasons[$reason]++;
     }
 }

@@ -32,9 +32,7 @@ class InitialProductImport extends Command
     {
         $this->info('Import images...');
 
-        Artisan::call('import:lego-images', [
-            '--delay' => 0
-        ]);
+        Artisan::call('import:lego-images');
     }
 
     private function importMappings(): void

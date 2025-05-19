@@ -95,19 +95,19 @@ function PointsGraph(props: Props) {
         return <div className='mt-32px'>Není dostatek dat pro zobrazení grafu</div>;
     }
 
-
-    let prevDates = Object.keys(priceHistory.history)
-    let prevValues = Object.values(priceHistory.history)
-    let historicValues = prevValues.flatMap((h) => h[0])
-    /*    let dates = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.date)
-       let values = prevValues.flatMap((h) => h[0]).flatMap((pV) => pV.value) as Array<number> */
+    console.log(priceHistory, 'priceHistory')
+    /* let prevDates = Object.keys(priceHistory.history).sort() */
+    let prevValues = (priceHistory.history.sort((a, b) => a.date > b.date ? 1 : -1)) as any
+    /* let historicValues = prevValues.flatMap((h) => h[0]) */
+    let dates = prevValues.flatMap((pV) => pV.date)
+    let values = prevValues.flatMap((pV) => pV.value) as Array<number>
 
     let historicData = Array.isArray(priceHistory.history)
         ? priceHistory.history
         : Object.values(priceHistory.history).flat();
 
-    let dates = historicData.map(item => item.date);
-    let values = historicData.map(item => Number(item.value)) as Array<number>;
+    /*  let dates = historicData.map(item => item.date);
+     let values = historicData.map(item => Number(item.value)) as Array<number>; */
 
     let avarageValue = values.reduce((p, c) => c + p, 0) / values?.length
     let max = Math.max(...values)

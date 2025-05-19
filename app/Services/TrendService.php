@@ -637,11 +637,12 @@ class TrendService
         $pricePoints = Price::where('product_id', $productId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at')
-            ->get(['value', 'created_at']);
+            ->get(['value', 'date']);
 
         $formattedPoints = $pricePoints->map(function ($point) {
+            /*  dd($point); */
             return [
-                'date' => $point->created_at->format('Y-m-d'),
+                'date' => $point->date,
                 'value' => (float)$point->value
             ];
         })->toArray();
