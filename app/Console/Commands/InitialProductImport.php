@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class InitialProductImport extends Command
 {
-    protected $signature = 'app:import';
+    protected $signature = 'import:initial';
 
     protected $description = 'Import dat';
 
@@ -16,9 +16,10 @@ class InitialProductImport extends Command
     {
 
         $this->importProducts();
-        $this->importImages();
-        /*  $this->importThemes(); */
         $this->importMappings();
+        $this->importImages();
+        Artisan::call('import:historical');
+        /*  $this->importThemes(); */
         return self::SUCCESS;
     }
 
@@ -37,8 +38,8 @@ class InitialProductImport extends Command
 
     private function importMappings(): void
     {
-        $this->info('Generování mapování pro sety a minifigurky...');
-        Artisan::call('lego:generate-mappings');
+        // $this->info('Generování mapování pro sety a minifigurky...');
+        // Artisan::call('lego:generate-mappings');
 
         $this->info('Scraping Bricklink...');
         Artisan::call('lego:scrape-bricklink');

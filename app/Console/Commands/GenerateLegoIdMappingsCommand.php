@@ -77,19 +77,23 @@ class GenerateLegoIdMappingsCommand extends Command
                     $productId = $product->id;
                     $productNum = $product->product_num;
 
+                    $brickeconomyId = null;
 
-                    $existingMapping = LegoIdMapping::where('product_id', $productId)->first();
+                    if ($type === 'set') {
+                        $brickeconomyId = $productNum;
+                    }
+
+
+                    $existingMapping = Product::where('brickeconomy_id', $brickeconomyId)->first();
 
                     if ($existingMapping && !$force) {
                         $skipped++;
                     } else {
-                        $brickeconomyId = null;
+                      
+                        $product->update([
+                            'brickeconomy_id' => $brickeconomyId,
+                        ]);
 
-                        if ($type === 'set') {
-                            $brickeconomyId = $productNum;
-                        }
-
-                        LegoIdMapping::addMapping($productId, $brickeconomyId);
                         $created++;
                     }
                 } catch (\Exception $e) {

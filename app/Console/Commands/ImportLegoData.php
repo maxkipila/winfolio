@@ -77,63 +77,6 @@ class ImportLegoData extends Command
         }
     }
 
-    /* protected function importRelationships()
-    {
-        $this->info("Import vazeb mezi sety a minifigurkami...");
-
-        $inventoriesPath = $this->downloadAndExtractFile('inventories');
-        $inventoryMinifigsPath = $this->downloadAndExtractFile('inventory_minifigs');
-
-        if (!$inventoriesPath || !$inventoryMinifigsPath) {
-            $this->error("Nelze importovat vazby - chybí soubory");
-            return;
-        }
-
-        try {
-            $importer = new SetMinifigImport();
-            $importer->import($inventoriesPath, $inventoryMinifigsPath);
-            $this->info("Vazby byly úspěšně importovány");
-        } catch (\Exception $e) {
-            $this->error("Chyba při importu vazeb: " . $e->getMessage());
-        }
-
-        // Úklid souborů
-        if (file_exists($inventoriesPath)) unlink($inventoriesPath);
-        if (file_exists($inventoryMinifigsPath)) unlink($inventoryMinifigsPath);
-    } */
-    /* 
-    public function handle()
-    {
-        DB::disableQueryLog();
-
-        if (!Storage::exists('temp')) {
-            Storage::makeDirectory('temp');
-        }
-
-        $dataType = $this->argument('dataType');
-
-        if ($dataType && isset($this->datasets[$dataType])) {
-            if ($dataType === 'relationships') {
-                $this->importRelationships();
-            } else {
-                $this->importDataset($dataType);
-            }
-        } else if (!$dataType) {
-            // Nejprve importujeme základní datové sady
-            foreach (['themes', 'sets', 'minifigs'] as $type) {
-                $this->importDataset($type);
-            }
-
-            // Nakonec importujeme vazby
-            $this->importRelationships();
-        } else {
-            $this->error("Neznámý typ dat: $dataType");
-            return 1; 
-        }
-
-        return 0;
-    } */
-
     protected function importRelationships()
     {
         $this->info("Import vazeb mezi sety a minifigurkami...");
@@ -213,6 +156,7 @@ class ImportLegoData extends Command
         }
 
         $dataset = $this->datasets[$type];
+        
         if (!$dataset['import']) {
             $this->info("Přeskakuji import {$type} - nemá importér");
             return;

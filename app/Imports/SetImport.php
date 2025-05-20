@@ -35,6 +35,7 @@ class SetImport implements ToModel, WithHeadingRow, WithChunkReading
             ['product_num' => $row['set_num']],
             [
                 'product_type' => 'set',
+                'brickeconomy_id' => $row['set_num'] ?? null,
                 'name'         => $row['name'],
                 'year'         => $row['year'] ?? null,
                 'theme_id'     => $themeId,

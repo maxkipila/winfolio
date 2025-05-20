@@ -8,6 +8,7 @@
 /public/robots.txt
 /bootstrap/robots.txt
 /storage/pail
+/storage/media-library/temp
 /vendor
 .env
 .env.backup
@@ -27,3 +28,4 @@ yarn-error.log
 /.zed
 /public/assets
 .DS_Store
+

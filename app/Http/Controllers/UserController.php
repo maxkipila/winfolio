@@ -440,7 +440,7 @@ class UserController extends Controller
 
     private function dashboardPortfolioValue()
     {
-        if (!auth()->check()) return 0;
+        if (!auth()->check()) return 0; 
 
         $portfolioValue = auth()->user()->products()
             ->with('latest_price')

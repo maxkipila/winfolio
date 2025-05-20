@@ -36,11 +36,8 @@ class ScrapeBrickLinkIdsFromRebricklable extends Command
         $retries = (int) $this->option('retries');
 
         // Najde minifigurky bez BrickEconomy ID a s product_id
-        $query = LegoIdMapping::whereNull('brickeconomy_id')
-            ->whereNotNull('product_id')
-            ->whereHas('product', function ($q) {
-                $q->where('product_type', 'minifig');
-            })
+        $query = Product::whereNull('brickeconomy_id')
+            ->where('product_type', 'minifig')
             ->orderBy('id');
 
         // Aplikace offsetu a limitu
@@ -60,64 +57,22 @@ class ScrapeBrickLinkIdsFromRebricklable extends Command
             return 0;
         }
 
-        // Progress bar
-        $bar = $this->output->createProgressBar($totalToProcess);
-        $bar->start();
-
-        $updated = 0;
-        $failed = 0;
-
-        // Získáme všechny záznamy najednou pro malé dávky
-        if ($totalToProcess <= $batch) {
-            $mappings = $query->get();
-            $this->processItems($mappings, $updated, $failed, $bar, $delay, $timeout, $retries);
-        } else {
-            // Klasický přístup pro větší počet záznamů - zpracování v dávkách
-            for ($i = 0; $i < $totalToProcess; $i += $batch) {
-                $mappings = $query->skip($i)->take($batch)->get();
-                $this->processItems($mappings, $updated, $failed, $bar, $delay, $timeout, $retries);
-
-                gc_collect_cycles();
-
-                if ($delay > 0) {
-                    sleep($delay);
-                }
-            }
-        }
-
-        $bar->finish();
-        $this->newLine(2);
-
-
-        // Zobrazit kolik zbývá nezpracovaných
-        $remaining = LegoIdMapping::whereNull('brickeconomy_id')
-            ->whereNotNull('product_id')
-            ->whereHas('product', function ($q) {
-                $q->where('product_type', 'minifig');
-            })
-            ->count();
-
-        $this->info("Zbývá zpracovat: {$remaining} minifigurek");
+        $this->processItems($query->pluck('id'));
 
         // Aktualizace product_id v existujících mapováních
-        $this->info("Aktualizuji product_id v existujících mapováních...");
-        $this->updateProductIds();
-        $this->info("Aktualizace product_id dokončena");
+        // $this->info("Aktualizuji product_id v existujících mapováních...");
+        // $this->updateProductIds();
+        // $this->info("Aktualizace product_id dokončena");
 
         return 0;
     }
 
     // Metoda pro zpracování položek
-    private function processItems($mappings, &$updated, &$failed, $bar, $delay, $timeout, $retries)
+    private function processItems($products)
     {
-        foreach ($mappings as $mapping) {
+        $this->withProgressBar($products, function ($product_id) {
             // Přístup k product_num pouze přes vztah product
-            $product = $mapping->product;
-            if (!$product) {
-                $failed++;
-                $bar->advance();
-                continue;
-            }
+            $product = Product::find($product_id);
             $rebrickableId = $product->product_num;
 
             try {
@@ -127,31 +82,16 @@ class ScrapeBrickLinkIdsFromRebricklable extends Command
                 if (isset($this->requestCache[$url])) {
                     $html = $this->requestCache[$url];
                 } else {
-                    $attempt = 0;
-                    $success = false;
-                    $response = null;
 
-                    while (!$success && $attempt < $retries) {
-                        try {
-                            $response = Http::timeout($timeout)
-                                ->withHeaders([
-                                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-                                    'Accept' => 'text/html,application/xhtml+xml,application/xml',
-                                    'Accept-Language' => 'en-US,en;q=0.9',
-                                ])
-                                ->get($url);
-
-                            $success = $response->successful();
-                        } catch (\Exception $e) {
-                            $attempt++;
-                            if (!$success && $attempt < $retries) {
-                                sleep(1);
-                            }
-                        }
-                    }
-
-                    if (!$success || !$response) {
-                        throw new \Exception("Vyčerpány všechny pokusy");
+                    try {
+                        $response = Http::withHeaders([
+                            'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+                            'Accept' => 'text/html,application/xhtml+xml,application/xml',
+                            'Accept-Language' => 'en-US,en;q=0.9',
+                        ])
+                            ->get($url);
+                    } catch (\Exception $e) {
+                        $this->error($e->getMessage());
                     }
 
                     $html = $response->body();
@@ -169,31 +109,19 @@ class ScrapeBrickLinkIdsFromRebricklable extends Command
 
                 if ($brickLinkId) {
                     // prevod na malá písmena
-                    $brickEconomyId = strtolower($brickLinkId);
-
-                    $mapping->brickeconomy_id = $brickEconomyId;
-                    $mapping->updated_at = now();
-                    $savedResult = $mapping->save();
-
-                    if ($savedResult) {
-                        $updated++;
-                    } else {
-                        $failed++;
-                    }
+                    $product->brickeconomy_id = strtolower($brickLinkId);
+                    $product->save();
+                    $this->info("Updated brickLinkId for {$product->id}");
                 } else {
-                    $failed++;
+                    $this->info("Didn't find brickLinkId for {$product->id}");
                 }
             } catch (\Exception $e) {
-                $failed++;
+                $this->error($e->getMessage());
             }
-
-            $bar->advance();
 
             // Zpoždění mezi požadavky
-            if ($delay > 0) {
-                usleep($delay * 500000);
-            }
-        }
+            usleep(0.5 * 1000000);
+        });
     }
 
     private function extractBrickLinkId(Crawler $crawler): ?string

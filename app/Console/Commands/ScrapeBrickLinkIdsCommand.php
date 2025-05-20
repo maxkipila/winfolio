@@ -11,7 +11,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapeBrickLinkIdsCommand extends Command
 {
-    protected $signature = 'lego:scrape-bricklink
+    protected $signature = 'lego:scrape-bricklinkold
                            {--batch=10 : Počet minifigurek zpracovávaných v jedné dávce}
                            {--delay=2 : Zpoždění mezi požadavky v sekundách}
                            {--limit=1000 : Maximální počet minifigurek ke zpracování}
