@@ -138,12 +138,14 @@ class HistoricalPricesBrickEconomyCommand extends Command
         return 0;
     }
 
+
     protected function logError(string $reason): void
     {
         $this->totalFailed++;
         $this->errorReasons[$reason] = ($this->errorReasons[$reason] ?? 0) + 1;
     }
 
+    // pokud není nalezeno žádné historické data, vytvoříme prázdný záznam
     protected function saveEmptyRecord(Product $product): void
     {
         try {
@@ -196,23 +198,7 @@ class HistoricalPricesBrickEconomyCommand extends Command
             $html = $response->getBody()->getContents();
             $crawler = new Crawler($html);
 
-            $historicalData = $this->extractDataFromJavaScript($crawler, $html);
-
-            if (empty($historicalData)) {
-                $historicalData = $this->extractDataFromTable($crawler);
-            }
-
-            if (empty($historicalData)) {
-                $currentPrice = $this->extractCurrentPrice($crawler);
-                if ($currentPrice > 0) {
-                    $historicalData[] = [
-                        'date' => now()->format('Y-m-d'),
-                        'price' => $currentPrice,
-                    ];
-                }
-            }
-
-            return $historicalData;
+            return $this->extractDataFromJavaScript($crawler, $html);
         } catch (Exception $e) {
             Log::error("Error scraping URL {$url}: " . $e->getMessage());
             return [];
@@ -260,7 +246,7 @@ class HistoricalPricesBrickEconomyCommand extends Command
         return $historicalData;
     }
 
-    protected function extractDataFromTable(Crawler $crawler): array
+    /*  protected function extractDataFromTable(Crawler $crawler): array
     {
         $historicalData = [];
 
@@ -297,9 +283,9 @@ class HistoricalPricesBrickEconomyCommand extends Command
         }
 
         return $historicalData;
-    }
+    } */
 
-    protected function extractCurrentPrice(Crawler $crawler): ?float
+    /* protected function extractCurrentPrice(Crawler $crawler): ?float
     {
         try {
             if (preg_match('/Today\s+€([\d.]+)/', $crawler->html(), $matches)) {
@@ -328,7 +314,7 @@ class HistoricalPricesBrickEconomyCommand extends Command
         }
 
         return null;
-    }
+    } */
 
     protected function saveHistoricalPrices(Product $product, array $historicalData): bool
     {

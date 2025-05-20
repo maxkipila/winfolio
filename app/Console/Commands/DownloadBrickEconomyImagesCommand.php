@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\LegoIdMapping;
 use App\Models\Product;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 class DownloadBrickEconomyImagesCommand extends Command
 {
     protected $signature = 'app:download-images {--force : Přepsat existující obrázky}';
-    protected $description = 'Stáhne obrázkyz BrickEconomy';
+    protected $description = 'Stáhne obrázky z galerie BrickEconomy';
 
     protected $client;
     protected $startTime;
@@ -29,8 +28,8 @@ class DownloadBrickEconomyImagesCommand extends Command
         $this->client = new Client([
             'timeout' => 30,
             'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/*;q=0.8',
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'en-US,en;q=0.9',
             ],
         ]);
@@ -45,10 +44,9 @@ class DownloadBrickEconomyImagesCommand extends Command
         $this->info("Začínám stahování obrázků z BrickEconomy");
 
         $force = $this->option('force');
-
         $query = Product::query()->orderBy('id', 'asc');
 
-        // Pokud není force, přeskočíme produkty, které již mají obrázky
+        // Přeskočíme produkty, které již mají obrázky (pokud není force)
         if (!$force) {
             $query->whereDoesntHave('media', function ($q) {
                 $q->where('collection_name', 'images');
@@ -71,34 +69,45 @@ class DownloadBrickEconomyImagesCommand extends Command
 
         foreach ($products as $product) {
             try {
+                // Získat ID produktu na BrickEconomy
                 $brickEconomyId = $this->getBrickEconomyId($product);
-
                 if (!$brickEconomyId) {
                     $this->logError('No BrickEconomy ID');
                     $bar->advance();
                     continue;
                 }
 
-                $url = $this->getProductUrl($product, $brickEconomyId);
-                $imageUrl = $this->scrapeImageUrl($url);
-
-                if (empty($imageUrl)) {
-                    $this->logError('No image URL found');
-                    $bar->advance();
-                    continue;
-                }
-
+                // Smazat existující obrázky pokud je force
                 if ($force) {
                     $product->clearMediaCollection('images');
                 }
 
-                // Stáhneme a uložíme obrázek
-                $success = $this->downloadAndSaveImage($product, $imageUrl);
+                // Sestavit URL stránky produktu
+                $productUrl = $this->getProductUrl($product, $brickEconomyId);
 
-                if ($success) {
+                // Získat všechny URL obrázků z galerie
+                $imageUrls = $this->scrapeGalleryImages($productUrl);
+
+                if (empty($imageUrls)) {
+                    $this->logError('No images found in gallery');
+                    $bar->advance();
+                    continue;
+                }
+
+                // Stáhnout a uložit každý obrázek z galerie
+                $downloadedCount = 0;
+                foreach ($imageUrls as $index => $imageUrl) {
+                    $success = $this->downloadImage($product, $imageUrl, $index);
+                    if ($success) {
+                        $downloadedCount++;
+                    }
+                }
+
+                if ($downloadedCount > 0) {
                     $this->totalSuccess++;
+                    $this->info("  Staženo {$downloadedCount} obrázků pro {$product->product_num}");
                 } else {
-                    $this->logError('Failed to save image');
+                    $this->logError('Failed to save any images');
                 }
             } catch (Exception $e) {
                 $this->logError('Exception: ' . $e->getMessage());
@@ -106,14 +115,14 @@ class DownloadBrickEconomyImagesCommand extends Command
             }
 
             $bar->advance();
-            sleep(3);
+            sleep(2);
         }
 
         $bar->finish();
         $this->newLine(2);
 
         $this->info("Stahování dokončeno za " . $this->startTime->diffForHumans(now()));
-        $this->info("Úspěšně staženo obrázků: {$this->totalSuccess}");
+        $this->info("Úspěšně staženo obrázků pro {$this->totalSuccess} produktů");
         $this->info("Selhalo: {$this->totalFailed}");
 
         if (!empty($this->errorReasons)) {
@@ -127,21 +136,21 @@ class DownloadBrickEconomyImagesCommand extends Command
         return 0;
     }
 
+    /**
+     * Zaznamenává chyby při stahování 
+     */
     protected function logError(string $reason): void
     {
         $this->totalFailed++;
         $this->errorReasons[$reason] = ($this->errorReasons[$reason] ?? 0) + 1;
     }
 
-    protected function getProductUrl(Product $product, string $brickEconomyId): string
-    {
-        return $product->product_type === 'minifig'
-            ? "https://www.brickeconomy.com/minifig/{$brickEconomyId}/"
-            : "https://www.brickeconomy.com/set/{$brickEconomyId}/";
-    }
-
+    /**
+     * Získá ID produktu používané na BrickEconomy
+     */
     protected function getBrickEconomyId(Product $product): ?string
     {
+        // Nejprve zkusíme přímé mapování podle product_id
         $mapping = LegoIdMapping::where('product_id', $product->id)
             ->whereNotNull('brickeconomy_id')
             ->first();
@@ -150,6 +159,7 @@ class DownloadBrickEconomyImagesCommand extends Command
             return $mapping->brickeconomy_id;
         }
 
+        // Pak zkusíme mapování podle product_num
         $mapping = LegoIdMapping::where('rebrickable_id', $product->product_num)
             ->whereNotNull('brickeconomy_id')
             ->first();
@@ -158,95 +168,127 @@ class DownloadBrickEconomyImagesCommand extends Command
             return $mapping->brickeconomy_id;
         }
 
+        // Pro set je product_num často stejné jako BrickEconomy ID
         return $product->product_type === 'set' ? $product->product_num : null;
     }
 
-    protected function scrapeImageUrl(string $url): ?string
+    /**
+     * Sestaví URL stránky produktu
+     */
+    protected function getProductUrl(Product $product, string $brickEconomyId): string
+    {
+        return $product->product_type === 'minifig'
+            ? "https://www.brickeconomy.com/minifig/{$brickEconomyId}/"
+            : "https://www.brickeconomy.com/set/{$brickEconomyId}/";
+    }
+
+    /**
+     * Scrapuje všechny URL obrázků z galerie na stránce produktu
+     */
+    protected function scrapeGalleryImages(string $url): array
     {
         try {
             $response = $this->client->get($url);
             $html = $response->getBody()->getContents();
-
-            // Metoda 1: Extrakce z JSON-LD dat
-            if (preg_match('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches)) {
-                $jsonData = json_decode($matches[1], true);
-                if (isset($jsonData['image']) && is_array($jsonData['image']) && !empty($jsonData['image'][0])) {
-                    return $jsonData['image'][0];
-                }
-            }
-
-            // Metoda 2: Použití Crawler pro hledání obrázků
             $crawler = new Crawler($html);
+            $imageUrls = [];
 
-            // Hledání v hlavním img elementu
-            $imgElement = $crawler->filter('#setimagesimage')->first();
-            if ($imgElement->count() > 0 && $imgElement->attr('src')) {
-                return $imgElement->attr('src');
+            $gallery = $crawler->filter('#setmediagallery');
+            if ($gallery->count() > 0) {
+
+                $gallery->filter('li img')->each(function (Crawler $img) use (&$imageUrls) {
+
+                    if ($img->attr('onclick')) {
+                        preg_match("/\$\('#setimagesimage'\).attr\('src', '([^']+)'\)/", $img->attr('onclick'), $matches);
+                        if (isset($matches[1])) {
+                            $imageUrls[] = 'https://www.brickeconomy.com' . $matches[1];
+                        }
+                    } elseif ($img->attr('src')) {
+
+                        $src = $img->attr('src');
+                        if (strpos($src, '_thumb') !== false) {
+                            $largeUrl = str_replace('_thumb', '', $src);
+                            $imageUrls[] = 'https://www.brickeconomy.com' . $largeUrl;
+                        } else {
+                            $imageUrls[] = 'https://www.brickeconomy.com' . $src;
+                        }
+                    }
+                });
             }
 
-            // Zkoušíme další možné selektory pro obrázky
-            $imgSelectors = [
-                '.setmediagallery-images img',
-                '.set-image img',
-                '.minifig-image img',
-                '.product-image img',
-                '.side-box img',
-                'img.img-thumbnail'
-            ];
-
-            foreach ($imgSelectors as $selector) {
-                $imgElements = $crawler->filter($selector);
-                if ($imgElements->count() > 0) {
-                    return $imgElements->first()->attr('src');
+            if (empty($imageUrls)) {
+                $mainImage = $crawler->filter('#setimagesimage');
+                if ($mainImage->count() > 0 && $mainImage->attr('src')) {
+                    $imageUrls[] = 'https://www.brickeconomy.com' . $mainImage->attr('src');
                 }
             }
 
-            return null;
+
+            if (empty($imageUrls)) {
+                $crawler->filter('img')->each(function (Crawler $img) use (&$imageUrls) {
+                    if ($img->attr('src') && !str_contains($img->attr('src'), 'logo') && !str_contains($img->attr('src'), 'icon')) {
+                        $src = $img->attr('src');
+                        if (strpos($src, 'http') === 0) {
+                            $imageUrls[] = $src;
+                        } else {
+                            $imageUrls[] = 'https://www.brickeconomy.com' . $src;
+                        }
+                    }
+                });
+            }
+
+            return array_unique($imageUrls);
         } catch (Exception $e) {
-            Log::error("Error scraping image URL from {$url}: " . $e->getMessage());
-            return null;
+            Log::error("Error scraping gallery from {$url}: " . $e->getMessage());
+            return [];
         }
     }
 
-    protected function downloadAndSaveImage(Product $product, string $imageUrl): bool
+    /**
+     * Stáhne obrázek a uloží ho do media kolekce produktu
+     */
+    protected function downloadImage(Product $product, string $imageUrl, int $index = 0): bool
     {
         try {
-            // Vytvoříme dočasný soubor 
+
             $tempFile = tempnam(sys_get_temp_dir(), 'brickeconomy_img_');
 
-            // Stáhneme obrázek 
-            $imageResponse = $this->client->get($imageUrl, ['sink' => $tempFile]);
 
-            // Zkontrolujeme, že jsme dostali obrázek
-            $contentType = $imageResponse->getHeaderLine('Content-Type');
-            if (!str_starts_with($contentType, 'image/')) {
+            $response = $this->client->get($imageUrl, [
+                'sink' => $tempFile,
+                'http_errors' => false,
+            ]);
 
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_file($finfo, $tempFile);
-                finfo_close($finfo);
-
-                if (!str_starts_with($mimeType, 'image/')) {
-                    unlink($tempFile);
-                    throw new Exception("Stažený soubor není obrázek: {$mimeType}");
-                }
+            if ($response->getStatusCode() !== 200) {
+                unlink($tempFile);
+                return false;
             }
 
-            // Získáme příponu souboru
-            $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-            if (!$extension) {
-                $extension = match ($contentType) {
-                    'image/jpeg', 'image/jpg' => 'jpg',
-                    'image/png' => 'png',
-                    'image/gif' => 'gif',
-                    'image/webp' => 'webp',
-                    default => 'jpg'
-                };
-            }
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $tempFile);
+            finfo_close($finfo);
 
-            // media library
-            $media = $product->addMedia($tempFile)
-                ->usingName($product->product_num)
-                ->usingFileName("{$product->product_num}.{$extension}")
+            if (!str_starts_with($mimeType, 'image/')) {
+                unlink($tempFile);
+                $this->warn("Stažený soubor není obrázek: {$mimeType}");
+                return false;
+            }
+            $extension = match ($mimeType) {
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                default => 'jpg'
+            };
+
+            $fileName = $index === 0
+                ? "{$product->product_num}.{$extension}"
+                : "{$product->product_num}_{$index}.{$extension}";
+
+
+            $product->addMedia($tempFile)
+                ->usingName($product->product_num . ($index > 0 ? "_$index" : ""))
+                ->usingFileName($fileName)
                 ->withResponsiveImages()
                 ->toMediaCollection('images');
 
