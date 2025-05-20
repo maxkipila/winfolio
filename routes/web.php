@@ -109,6 +109,8 @@ Route::middleware('auth:web')->group(function () {
     Route::match(['GET', 'POST'], '/chest', [UserController::class, 'chest'])->name('chest');
 
     Route::match(['GET', 'POST'], '/profile', [UserController::class, 'profile'])->name('profile.index');
+    Route::match(['GET', 'POST'], '/notifications', [UserController::class, 'notifications'])->name('profile.notifications');
+
 
     Route::match(['GET', 'POST'], '/catalog', [UserController::class, 'catalog'])->name('catalog');
 

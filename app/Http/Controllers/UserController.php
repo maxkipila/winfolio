@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -378,6 +379,11 @@ class UserController extends Controller
 
         return Inertia::render('Profile/index');
     }
+    public function notifications(Request $request)
+    {
+
+        return Inertia::render('Profile/notifications');
+    }
 
     public function get_user(Request $request)
     {
@@ -397,6 +403,9 @@ class UserController extends Controller
             'status' => 'required',
 
         ]);
+
+        if (($product->year > $request->year))
+            throw ValidationException::withMessages(['year' => 'Datum před vydáním produktu.']);
 
         $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
         // $user->products()->sync([$product->id]);

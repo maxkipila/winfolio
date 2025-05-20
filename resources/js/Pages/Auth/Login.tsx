@@ -284,7 +284,7 @@ function Login(props: Props) {
                                 <PasswordField name="password" placeholder={t('Heslo')} />
                                 <PasswordField name="password_confirmation" placeholder={t('Heslo (znova)')} />
                                 <div className='flex gap-8px items-center font-nunito justify-between w-full '>
-                                    <Checkbox name="newsletter" label={t("Newsletter")} />
+                                    <Checkbox name="newsletter" label={t("Odebírat Newsletter")} />
                                 </div>
                                 <Button className='flex-shrink-0' href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
                             </div>
