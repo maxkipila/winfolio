@@ -9,11 +9,17 @@ import {
     Legend,
     PointElement,
     LineElement,
-    Filler
+    Filler,
+    TimeScale,
+    TimeUnit,
+    TimeSeriesScale,
+    DateAdapter,
+
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { externalTooltipHandler } from '@/Pages/chest';
+import { callback } from 'chart.js/helpers';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -23,7 +29,8 @@ ChartJS.register(
     Legend,
     PointElement,
     LineElement,
-    Filler
+    Filler,
+    TimeScale
 );
 interface Props { }
 
@@ -43,45 +50,7 @@ let max = Math.max(...Object.values(days ?? {}), 1);
 
 
 
-let options = {
-    responsive: true,
-    plugins: {
-        legend: {
-            display: false,
-            position: 'top' as const,
-        },
-        title: {
-            display: false,
-            text: 'Chart.js Bar Chart',
-        },
-        tooltip: {
-            enabled: false,
-            position: 'nearest',
-            external: externalTooltipHandler
-        }
-    },
-    scales: {
-        x: {
-            display: true,
-            grid: {
-                display: false
-            }
-        },
-        y: {
-            display: true,
-            ticks: {
-                callback: function (value: any) {
-                    return Math.floor(value) + ' Kč';
-                },
-                stepSize: max / 4
-            },
-            grid: {
-                display: true
-            }
-        }
-    },
-    maintainAspectRatio: false,
-};
+
 
 interface Props {
     product: Product,
@@ -95,7 +64,15 @@ function PointsGraph(props: Props) {
         return <div className='mt-32px'>Není dostatek dat pro zobrazení grafu</div>;
     }
 
-    console.log(priceHistory, 'priceHistory')
+    // console.log(priceHistory, 'priceHistory')
+    function getMonths(number: number) {
+        if (number / 3 > 6) {
+            return 6
+        } else {
+            return Math.floor(number / 3)
+        }
+
+    }
     /* let prevDates = Object.keys(priceHistory.history).sort() */
     let prevValues = (priceHistory.history.sort((a, b) => a.date > b.date ? 1 : -1)) as any
     /* let historicValues = prevValues.flatMap((h) => h[0]) */
@@ -118,7 +95,7 @@ function PointsGraph(props: Props) {
     let seventh = isGrowing ? last + difference : last - difference
     let nextMonth = moment(dates[dates?.length - 1]).add(1, 'M')
     let untilYear = 11 - nextMonth.month()
-    let amountOfMonths = untilYear + 24
+    let amountOfMonths = getMonths(prevValues.length)
     let nextDates = [moment(dates[dates?.length - 1]).format('YYYY-MM-DD')]
     let nextValues = [last]
 
@@ -138,11 +115,77 @@ function PointsGraph(props: Props) {
 
 
     let graphDates = [...dates, ...nextDates]
-    let graphValues = [...values, ...nextValues]
-    let OsaDiff = max - avarageValue
-    let osa1 = graphValues.map((g) => g + OsaDiff)
-    let osa2 = graphValues.map((g) => g - OsaDiff)
-    console.log(graphDates, graphValues, 'osa:')
+    let formatedGraphDates = graphDates.map((gD) => moment(gD).format('MM. YYYY'))
+    console.log('formatedDates', formatedGraphDates)
+    let graphValues = [...values]
+    let osaValues = [...values, ...nextValues]
+    let down = avarageValue - min
+    let up = max - avarageValue
+    let shouldRise = up > down
+    let OsaDiff = max - min
+    function getOsaValues(number: number, avarage: number) {
+        if (number < avarage) {
+            return avarage
+        } else {
+            return number
+        }
+    }
+    let osa1 = osaValues.map((g, i) => getOsaValues((graphValues[0] + avarageValue) + (shouldRise ? (i * (avarageValue / 100)) : (-i * (avarageValue / 100))), avarageValue))
+    let osa2 = osaValues.map((g, i) => getOsaValues(0 + (shouldRise ? (i * (avarageValue / 100)) : (-i * (avarageValue / 100))), 0))
+    // console.log( 'osa:', graphDates)
+
+    let options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+                position: 'top' as const,
+            },
+            title: {
+                display: false,
+                text: 'Chart.js Bar Chart',
+            },
+            tooltip: {
+                enabled: false,
+                position: 'nearest',
+                external: externalTooltipHandler
+            }
+        },
+        scales: {
+            x: {
+                display: true,
+                // ticks: {
+                //     callback: function (value: any) {
+                //         return value;
+                //     },
+                //     stepSize: max / 4
+                // },
+
+                ticks: {
+                    callback: (value, index, values) => moment(graphDates[index]).format('MM. YYYY'),
+                    maxTicksLimit: 4,
+
+                },
+                grid: {
+                    display: false
+                }
+            },
+            y: {
+                display: true,
+                ticks: {
+                    callback: function (value: any) {
+
+                        return Math.floor(value) + ' $';
+                    },
+                    stepSize: max / 4
+                },
+                grid: {
+                    display: true
+                }
+            }
+        },
+        maintainAspectRatio: false,
+    };
 
     const dummyData = {
         labels: graphDates,
@@ -151,9 +194,9 @@ function PointsGraph(props: Props) {
             {
                 label: 'Total: ',
                 data: osa2,
-                stack: 'Stack 1',
+                stack: 'Stack 2',
                 borderColor: 'transparent',
-                backgroundColor: 'rgba(196, 234, 178, 0.3)',
+                backgroundColor: 'rgba(196, 234, 178, 0.15)',
                 borderWidth: 2,
                 borderRadius: 4,
                 borderSkipped: false,
@@ -162,10 +205,10 @@ function PointsGraph(props: Props) {
                 pointBorderWidth: 0,
                 pointRadius: 0,
 
-                fill: '1'
+                fill: '2'
             },
             {
-                label: 'Profit',
+                label: 'Price',
                 data: graphValues,
                 stack: 'Stack 1',
                 borderColor: '#16A049',
@@ -182,9 +225,9 @@ function PointsGraph(props: Props) {
             {
                 label: 'Total: ',
                 data: osa1,
-                stack: 'Stack 1',
+                stack: 'Stack 3',
                 borderColor: 'transparent',
-                backgroundColor: 'rgba(196, 234, 178, 0.3)',
+                backgroundColor: 'rgba(196, 234, 178, 0.15)',
                 borderWidth: 2,
                 borderRadius: 4,
                 borderSkipped: false,
@@ -193,7 +236,7 @@ function PointsGraph(props: Props) {
                 pointBorderWidth: 0,
                 pointRadius: 0,
 
-                fill: '-1'
+                fill: '-2'
             }
             // {
             //     label: 'Filled',
