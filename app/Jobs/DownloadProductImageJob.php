@@ -40,13 +40,13 @@ class DownloadProductImageJob implements ShouldQueue
     {
         try {
             $product = Product::find($this->productId);
-            Log::info("Downloading Produkt s ID {$this->productId}");
+
             if (!$product) {
                 Log::info("Produkt s ID {$this->productId} nenalezen");
                 return;
             }
 
-            // Vymazat existující obrázky, pokud je vyžadováno
+            //Vymazat existující obrázky, pokud je vyžadováno
             if ($this->force && $product->getMedia('images')->count() > 0) {
                 $product->clearMediaCollection('images');
             } else if (!$this->force && $product->getMedia('images')->count() > 0) {
@@ -54,7 +54,7 @@ class DownloadProductImageJob implements ShouldQueue
                 return;
             }
 
-            Log::info("Saving Produkt s ID {$this->productId}", ['urls' => $this->imageUrls]);
+            //Log::info("Saving Product with ID {$this->productId}", ['urls' => $this->imageUrls]);
             $product->images = $this->imageUrls;
             
         } catch (\Exception $e) {
