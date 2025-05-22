@@ -13,8 +13,8 @@ Artisan::command('inspire', function () {
 
 Schedule::command('telescope:prune --hours=48')->daily();
 
-Schedule::command('app:check-awards')->everyFiveMinutes()->timezone('Europe/Prague'); //kontrola odznaku
-Schedule::command('awards:notify')->everyFiveMinutes()->timezone('Europe/Prague');
+// Schedule::command('app:check-awards')->everyFiveMinutes()->timezone('Europe/Prague'); //kontrola odznaku
+// Schedule::command('awards:notify')->everyFiveMinutes()->timezone('Europe/Prague');
 
 // Schedule::command('app:update-user-records')->daily()->timezone('Europe/Prague'); //aktualizace uzivatelskych recordu
 // Schedule::command('import:lego-data')->dailyAt('23:50')->timezone('Europe/Prague'); //import dat
