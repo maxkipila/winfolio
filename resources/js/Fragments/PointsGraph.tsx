@@ -131,7 +131,7 @@ function PointsGraph(props: Props) {
         }
     }
     let osa1 = osaValues.map((g, i) => getOsaValues((graphValues[0] + OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
-    let osa2 = osaValues.map((g, i) => getOsaValues(0 + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), 0))
+    let osa2 = osaValues.map((g, i) => getOsaValues((graphValues[0] - OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
     // console.log( 'osa:', graphDates)
 
     let options = {
