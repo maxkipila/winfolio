@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Enums\PriceType;
 use App\Jobs\ScrapeBrickEconomyPrices;
-use App\Models\LegoIdMapping;
 use App\Models\Price;
 use App\Models\Product;
 use Carbon\Carbon;
@@ -16,7 +15,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\DomCrawler\Crawler;
 
-class HistoricalPricesBrickEconomyCommand extends Command
+class ImportHistoricalBrickEconomyPrices extends Command
 {
     protected $signature = 'import:historical {--force : Přepsat existující záznamy}';
     protected $description = 'Scrape historical price data from BrickEconomy';

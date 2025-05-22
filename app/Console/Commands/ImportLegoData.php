@@ -163,12 +163,14 @@ class ImportLegoData extends Command
         }
 
         $csvFilePath = $this->downloadAndExtractFile($type);
+        
         if (!$csvFilePath) {
             $this->error("Soubor pro {$type} se nepodařilo stáhnout");
             return;
         }
 
-        $this->processCsvInChunks($csvFilePath, $dataset['import']);
+
+        Excel::import(new $dataset['import'], $csvFilePath);
 
         // Úklid
         unlink($csvFilePath);
