@@ -67,7 +67,7 @@ function AuthenticatedLayout(props: Props) {
                     <div className='flex items-center gap-24px mob:hidden'>
 
                         <Link href={route('dashboard')}>
-                            <Img src="/assets/img/logo.png" />
+                            <Img src="/assets/img/logo.svg" />
                         </Link>
                         <div onClick={() => { _OpenModal(MODALS.GET_PREMIUM) }} className='flex bg-[#FFB400] gap-8px rounded items-center px-12px py-4px cursor-pointer'>
                             <Sparkle size={24} />
@@ -79,7 +79,7 @@ function AuthenticatedLayout(props: Props) {
                             <Sparkle size={14} />
                             <div className='font-bold text-sm'>Premium</div>
                         </div>
-                        <Img src="/assets/img/logo.png" />
+                        <Img src="/assets/img/logo.svg" />
                         <div onClick={() => { _OpenModal(MODALS.NOTIFICATION) }} className='w-100px flex justify-end'>
                             <BellSimple size={24} />
                         </div>

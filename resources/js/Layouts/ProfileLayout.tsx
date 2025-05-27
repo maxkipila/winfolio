@@ -26,10 +26,10 @@ function ProfileLayout(props: Props) {
                     <X onClick={() => { setOpen((p) => !p) }} size={24} />
                 </div>
                 <div className='flex items-center gap-16px w-[345px]'>
-                    <Img className='w-[84px] h-[84px]' src="/assets/img/user.png" />
+                    <Img className='w-[84px] h-[84px]' src="/assets/img/profile-photo.png" />
                     <div>
                         <div className='font-bold text-xl'>{auth?.user?.first_name} {auth?.user?.last_name}</div>
-                        <div className='font-bold'>@{auth?.user?.nickname}</div>
+                        <div className='font-bold'>{auth?.user?.nickname}</div>
                     </div>
                 </div>
                 <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-24px rounded-sm'>
@@ -64,7 +64,7 @@ function ProfileLayout(props: Props) {
                     </div>
                     <ArrowRight size={24} />
                 </div>
-                <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                <Link href={route('profile.notifications')} className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <BellSimple size={24} />
@@ -72,7 +72,7 @@ function ProfileLayout(props: Props) {
                         <div className='font-bold'>{t('Notifikace')}</div>
                     </div>
                     <ArrowRight size={24} />
-                </div>
+                </Link>
 
 
                 <div className='mt-40px text-xl font-bold'>{t('Sociální sítě')}</div>

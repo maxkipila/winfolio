@@ -173,5 +173,6 @@ return [
     'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.' => 'Track the value of your LEGO collection, make smarter purchases, and have fun completing investment missions. All in one place.',
     'Hodnota wishlistu' => 'Wishlist value',
     'All time high portfolia' => 'All time high portfolia',
-    'Datum narození' => 'Birth date'
+    'Datum narození' => 'Birth date',
+    'Odebírat Newsletter'=>'Subscribe to newsletter'
 ];
