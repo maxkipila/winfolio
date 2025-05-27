@@ -32,22 +32,12 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
         $product_id = $this->product_id;
         $product = Product::find($this->product_id);
 
-        if (!$product)
+        if (!$product || !$product->brickeconomy_id)
             return;
 
         $url = "https://www.brickeconomy.com/{$product->product_type}/{$product->brickeconomy_id}/";
 
         try {
-            // $response = Http::withCookies([
-            //     'Region' => 'US',
-            // ], 'www.brickeconomy.com')
-            //     ->withHeaders([
-            //         'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
-            //         'Accept' => 'text/html,application/xhtml+xml,application/xml',
-            //         'Accept-Language' => 'en-US,en;q=0.9',
-            //     ])
-            //     ->get($url);
-
             $response = $this->proxyRequest()
                 ->withCookies([
                     'Region' => 'US',
