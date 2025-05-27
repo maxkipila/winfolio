@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Product;
+use App\Traits\HasUserAgent;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -12,7 +13,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapeRebrickableForIDs implements ShouldQueue
 {
-    use Batchable, Queueable;
+    use Batchable, Queueable, HasUserAgent;
 
     /**
      * Create a new job instance.
@@ -21,6 +22,7 @@ class ScrapeRebrickableForIDs implements ShouldQueue
     {
         //
     }
+
 
     /**
      * Execute the job.
@@ -46,12 +48,13 @@ class ScrapeRebrickableForIDs implements ShouldQueue
             $url = "https://rebrickable.com/minifigs/{$rebrickableId}/";
 
             try {
-                $response = Http::withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-                    'Accept' => 'text/html,application/xhtml+xml,application/xml',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                ])
-                    ->get($url);
+                // $response = Http::withHeaders([
+                //     'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
+                //     'Accept' => 'text/html,application/xhtml+xml,application/xml',
+                //     'Accept-Language' => 'en-US,en;q=0.9',
+                // ])
+                //     ->get($url);
+                $response = $this->proxyRequest()->get($url);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }

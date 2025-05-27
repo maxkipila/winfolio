@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\PriceType;
 use App\Models\Product;
+use App\Traits\HasUserAgent;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -13,7 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ScrapeBrickEconomyPrices implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasUserAgent;
 
     /**
      * Create a new job instance.
@@ -22,7 +23,6 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
     {
         //
     }
-
     /**
      * Execute the job.
      */
@@ -38,15 +38,22 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
         $url = "https://www.brickeconomy.com/{$product->product_type}/{$product->brickeconomy_id}/";
 
         try {
-            $response = Http::withCookies([
-                'Region' => 'US',
-            ], 'www.brickeconomy.com')
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-                    'Accept' => 'text/html,application/xhtml+xml,application/xml',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                ])
+            // $response = Http::withCookies([
+            //     'Region' => 'US',
+            // ], 'www.brickeconomy.com')
+            //     ->withHeaders([
+            //         'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
+            //         'Accept' => 'text/html,application/xhtml+xml,application/xml',
+            //         'Accept-Language' => 'en-US,en;q=0.9',
+            //     ])
+            //     ->get($url);
+
+            $response = $this->proxyRequest()
+                ->withCookies([
+                    'Region' => 'US',
+                ], 'www.brickeconomy.com')
                 ->get($url);
+
         } catch (\Exception $e) {
             Log::error($e->getMessage(), ['product_id' => $product_id, 'brickeconomy_id' => $product?->brickeconomy_id]);
         }
@@ -80,8 +87,7 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
                             return $node->filter('.col-xs-5.text-muted')->text('') === 'Value';
                         })->filter('.col-xs-7 b')->text('');
 
-                        if($sealedValue != '')
-                        {
+                        if ($sealedValue != '') {
                             $product->prices()->create([
                                 'date' => now()->format('Y-m-d'),
                                 'value' =>  (float) preg_replace('/[^\d.]/', '', $sealedValue),
@@ -92,8 +98,7 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
                         }
                     }
                 }
-            }
-            else if ($product->product_type == 'minifig') {
+            } else if ($product->product_type == 'minifig') {
                 $pricingDiv = $crawler->filter('#ContentPlaceHolder1_PanelMinifigPricing');
 
                 if ($pricingDiv->count() > 0) {
@@ -102,8 +107,7 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
                         return stripos($node->filter('.col-xs-5.text-muted')->text(''), 'Value') !== false;
                     })->filter('.col-xs-7 b')->text('');
 
-                    if($value != '')
-                    {
+                    if ($value != '') {
                         $product->prices()->create([
                             'date' => now()->format('Y-m-d'),
                             'value' => (float) preg_replace('/[^\d.]/', '', $value),
@@ -111,7 +115,7 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
                             'type' => PriceType::SCRAPED
                         ]);
                     }
-                } 
+                }
             }
         }
 
