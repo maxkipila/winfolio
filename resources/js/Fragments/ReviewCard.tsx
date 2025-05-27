@@ -39,45 +39,45 @@ function ReviewCard(props: Props) {
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 0 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
-                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                             </div>
                             <div className='grid'>
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 1 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
-                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
 
                             </div>
                             <div className='grid'>
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 2 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
-                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                             </div>
                             <div className='grid'>
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 3 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
-                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                             </div>
                             <div className='grid'>
 
                                 {
                                     Math.floor(reviewValue / ratingValues?.length) > 4 &&
-                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                 }
-                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                             </div>
                         </div>
-                        <div className='text-[#4D4D4D]'>{product?.reviews?.length ?? 0} {t('ratings')}</div>
+                        <div className='text-[#4D4D4D] mt-8px'>{product?.reviews?.length ?? 0} {t('ratings')}</div>
                     </div>
                     <div className='flex gap-16px'>
                         <div className='font-bold font-teko text-5xl'>{reviewValue ? Math.floor(reviewValue / ratingValues?.length) : 0}</div>

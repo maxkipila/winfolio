@@ -3,7 +3,7 @@ import { PortfolioContext } from '@/Components/contexts/PortfolioContext';
 import Img from '@/Components/Image';
 import usePageProps from '@/hooks/usePageProps';
 import { ArrowLeft, ArrowRight, ArrowUpRight, HandPointing, MagnifyingGlass, X } from '@phosphor-icons/react';
-import React, { useContext, useState } from 'react'
+import React, { ReactNode, useContext, useEffect, useState } from 'react'
 import { Button } from './UI/Button';
 import Form from './forms/Form';
 import { useForm } from '@inertiajs/react';
@@ -33,13 +33,15 @@ function SearchCard({ name, type, image, href }) {
 interface CardProps {
     headline: string
     text: string,
+    className?: string,
+    src: string
 
 }
 function TextCard(props: CardProps) {
-    const { headline, text } = props
+    const { headline, text, className, src } = props
     return (
-        <div className='border-2 border-black max-w-[380px] min-w-[380px] grid'>
-            <Img className='object-cover row-start-1 col-start-1 h-full' src="/assets/img/brick-placeholder.png" />
+        <div className={`border-2 border-black max-w-[380px] min-w-[380px] overflow-hidden grid ${className}`}>
+            <Img className='object-cover row-start-1 col-start-1 h-full' src={src} />
             <div className='row-start-1 col-start-1 p-[56px]'>
                 <div className='font-teko font-bold text-3xl text-white text-center'>{text}</div>
                 <div className='text-white font-nunito text-center'>{headline}</div>
@@ -58,6 +60,9 @@ function PortfolioModal(props: Props) {
     let { setDisplayModal, hasProducts, selected, setSelected, setProducts, products: _contextProducts } = useContext(PortfolioContext)
     let [createPortfolio, setCreatePortfolio] = useState(create_portfolio ?? hasProducts)
     const { auth, search_products } = usePageProps<{ auth: { user: User }, search_products: Array<Product> }>();
+
+    let [trendingProducts, trendButton] = useLazyLoad<{ product: Product }>('trendingProducts');
+
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const form = useForm({
         search_products: '',
@@ -90,12 +95,14 @@ function PortfolioModal(props: Props) {
     let [prev, setPrev] = useState(1)
     let [next, setNext] = useState(3)
     let carouselTexts = [
-        { text: 'Vzácný Harry Potter 1', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { text: 'Vzácný Harry Potter 2', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { text: 'Vzácný Harry Potter 3', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { text: 'Vzácný Harry Potter 4', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { text: 'Vzácný Harry Potter 5', headline: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' }
+        { src: '/assets/img/architect.png', headline: t('Kostky tvého investičního impéria padají správně'), text: t('Sleduj hodnotu svých setů v reálném čase, analyzuj vývoj cen, získej predikce a tipy na nákup nebo prodej.') },
+        { src: '/assets/img/harry-potter-welcome.png', headline: t('Hraj, plň mise a staň se LEGO šampionem'), text: t('Investování může být i zábava. Winfolio je nejen analytický nástroj, ale i herní platforma – s výzvami, misemi a odměnami, které tě provedou světem LEGO investic. Získej odznaky, postupuj úrovněmi a buduj si reputaci investora, kterého bude komunita sledovat.') },
+        { src: '/assets/img/friends.png', headline: t('Komunita, která staví na stejných základech'), text: t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.') },
+        { src: '/assets/img/architect.png', headline: t('Kostky tvého investičního impéria padají správně'), text: t('Sleduj hodnotu svých setů v reálném čase, analyzuj vývoj cen, získej predikce a tipy na nákup nebo prodej.') },
+        { src: '/assets/img/harry-potter-welcome.png', headline: t('Hraj, plň mise a staň se LEGO šampionem'), text: t('Investování může být i zábava. Winfolio je nejen analytický nástroj, ale i herní platforma – s výzvami, misemi a odměnami, které tě provedou světem LEGO investic. Získej odznaky, postupuj úrovněmi a buduj si reputaci investora, kterého bude komunita sledovat.') },
+        { src: '/assets/img/friends.png', headline: t('Komunita, která staví na stejných základech'), text: t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.') },
     ]
+
 
     function nextCarousel() {
         let length = carouselTexts.length
@@ -143,6 +150,41 @@ function PortfolioModal(props: Props) {
         }
     }
 
+    // useEffect(() => {
+    //     let interval = setInterval(() => { nextCarousel() }, 1000)
+    //     return (
+    //         clearInterval(interval)
+    //     )
+    // }, [])
+
+    // let interval;
+    // const [slide, setSlide] = useState(0);
+    // const [elapsed, setElapsed] = useState(0);
+    // const [paused, setPaused] = useState(false);
+
+    // useEffect(() => {
+
+    //     if (!paused)
+    //         interval = setInterval(() => {
+    //             setElapsed(e => Math.min(e + 1, 10));
+    //         }, 500);
+
+    //     return () => clearInterval(interval);
+
+    // }, [paused]);
+
+    // useEffect(() => {
+    //     if (elapsed >= 9) {
+    //         setSlide(s => {
+    //             setElapsed(0);
+    //             return ((s + 1) % carouselTexts.length)
+    //         });
+
+
+    //     }
+    // }, [elapsed])
+
+
     return (
         <div onClick={() => { close() }} className="bg-black bg-opacity-80 fixed top-0 left-0 w-full h-screen items-center justify-center mob:block mob:max-h-full flex z-max mob:pb-0">
             <div onClick={(e) => { e.stopPropagation(); }} className='bg-white w-full h-full overflow-y-auto'>
@@ -156,22 +198,30 @@ function PortfolioModal(props: Props) {
                         (!createPortfolio && !hasProducts) ?
                             <div className='h-full py-64px max-h-full flex flex-col'>
                                 <div className='w-full flex flex-col items-center justify-center'>
-                                    <Img className='w-[84px] h-[84px]' src="/assets/img/big-user.png" />
+                                    <Img className='w-[84px] h-[84px] rounded-full' src="/assets/img/user-fix.jpg" />
                                     <div className='py-16px'>{t('Vítej ve Winfolio')}</div>
                                     <div className='font-bold text-6xl text-center'>{auth?.user?.first_name}!</div>
                                 </div>
-                                <div className='mx-auto relative h-full px-80px overflow-hidden'>
-                                    <div onClick={() => { prevCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center left-0 top-1/2 transform translate-y-1/2'>
+                                <div className='mx-auto relative h-full px-80px overflow-hidden mob:px-16px '>
+                                    <div className='absolute bottom-32px flex items-center w-full pr-32px gap-12px justify-center nMob:hidden'>
+                                        {
+                                            carouselTexts.map((ct, i) =>
+                                                <div className={`w-8px h-8px bg-white ${index == i ? "" : "opacity-30"}`}></div>
+                                            )
+                                        }
+
+                                    </div>
+                                    <div onClick={() => { prevCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center left-0 top-1/2 transform translate-y-1/2 mob:hidden'>
                                         <ArrowLeft size={24} color='white' />
                                     </div>
-                                    <div className='grid grid-cols-3 mx-auto gap-32px overflow-x-auto mt-32px h-full'>
+                                    <div className='grid grid-cols-3 mx-auto gap-32px overflow-x-auto mob:overflow-visible mt-32px h-full mob:grid-cols-1'>
 
-                                        <TextCard headline={carouselTexts[prev].headline} text={carouselTexts[prev].text} />
-                                        <TextCard headline={carouselTexts[index].headline} text={carouselTexts[index].text} />
-                                        <TextCard headline={carouselTexts[next].headline} text={carouselTexts[next].text} />
+                                        <TextCard src={carouselTexts[prev].src} headline={carouselTexts[prev].text} text={carouselTexts[prev].headline} className='mob:col-start-1 mob:row-start-1 mob:mb-32px' />
+                                        <TextCard src={carouselTexts[index].src} headline={carouselTexts[index].text} text={carouselTexts[index].headline} className='mob:col-start-1 mob:row-start-1 mob:mb-64px' />
+                                        <TextCard src={carouselTexts[next].src} headline={carouselTexts[next].text} text={carouselTexts[next].headline} className='mob:col-start-1 mob:row-start-1 mob:mb-[96px]' />
 
                                     </div>
-                                    <div onClick={() => { nextCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center right-0 top-1/2 transform translate-y-1/2'>
+                                    <div onClick={() => { nextCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center right-0 top-1/2  transform translate-y-1/2 mob:hidden'>
                                         <ArrowRight size={24} color='white' />
                                     </div>
                                 </div>
@@ -341,14 +391,14 @@ function PortfolioModal(props: Props) {
                                         </div>
 
                                         :
-                                        <div className='flex divide-x-2 divide-[#DEDFE5]'>
+                                        <div className='flex divide-x-2 divide-[#DEDFE5] mob:flex-col'>
                                             <div className='w-full mt-48px'>
                                                 <div className='flex gap-8px items-center mx-auto w-full justify-center mb-48px'>
                                                     <div className='h-2px w-38px bg-[#666666]'></div>
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                 </div>
-                                                <div className='max-w-1/3 mob:max-w-max mx-auto'>
+                                                <div className='max-w-1/3 mob:max-w-none mob:w-full mx-auto mob:px-16px'>
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
                                                     <Search<Product>
                                                         // className="min-w-[400px]"
@@ -367,33 +417,42 @@ function PortfolioModal(props: Props) {
                                                 </div>
 
                                                 {
-                                                    data['q']?.length > 0 &&
-                                                    <>
-                                                        {
-                                                            search_products?.length > 0 ?
-                                                                <>
-                                                                    <div className='flex justify-center items-center gap-12px mt-28px'>
-                                                                        <ArrowUpRight size={24} weight='bold' />
-                                                                        <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length : ''}`}</div>
-                                                                    </div>
-                                                                    <div className='grid grid-cols-2 mob:grid-cols-1 gap-16px p-24px'>
-                                                                        {
-                                                                            search_products?.length > 0 ?
-                                                                                search_products?.map((sp) =>
-                                                                                    <PortfolioProductCard wide {...sp} />
-                                                                                )
-                                                                                :
-                                                                                products?.map((sp) =>
-                                                                                    <PortfolioProductCard wide {...sp} />
-                                                                                )
+                                                    data['q']?.length > 0 ?
+                                                        <>
+                                                            {
+                                                                search_products?.length > 0 ?
+                                                                    <>
+                                                                        <div className='flex justify-center items-center gap-12px mt-28px'>
+                                                                            <ArrowUpRight size={24} weight='bold' />
+                                                                            <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length : ''}`}</div>
+                                                                        </div>
+                                                                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-16px p-24px'>
+                                                                            {
+                                                                                search_products?.length > 0 ?
+                                                                                    search_products?.map((sp) =>
+                                                                                        <PortfolioProductCard wide {...sp} />
+                                                                                    )
+                                                                                    :
+                                                                                    products?.map((sp) =>
+                                                                                        <PortfolioProductCard wide {...sp} />
+                                                                                    )
 
-                                                                        }
-                                                                    </div>
-                                                                </>
-                                                                :
-                                                                <div className='font-bold text-3xl text-center py-40px'>{t('Pro vaše vyhledávání nejsou výsledky, nebo jste zatím nic nevyhledali')}</div>
-                                                        }
-                                                    </>
+                                                                            }
+                                                                        </div>
+                                                                    </>
+                                                                    :
+                                                                    <div className='font-bold text-3xl text-center py-40px'>{t('Pro vaše vyhledávání nejsou výsledky, nebo jste zatím nic nevyhledali')}</div>
+                                                            }
+                                                        </>
+                                                        :
+                                                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px p-24px'>
+                                                            {
+                                                                trendingProducts?.map((s) =>
+                                                                    <PortfolioProductCard {...s.product} />
+                                                                )
+                                                            }
+
+                                                        </div>
                                                 }
                                                 <div className='flex justify-center mt-24px mb-48px'>
                                                     <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>{t('Dokončit')}</Button>

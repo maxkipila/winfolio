@@ -8,7 +8,7 @@ import useLazyLoad from '@/hooks/useLazyLoad';
 import usePageProps from '@/hooks/usePageProps';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
+import { ArrowDownRight, ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
 import { useContext, useState } from 'react';
 
 function SmallBlogCard() {
@@ -22,10 +22,13 @@ function SmallBlogCard() {
 }
 
 interface CardsProps {
-    portfolioValue: number
+    portfolioValue: number,
+    portfolioStats?: {
+        growth_percentage?: number
+    }
 }
 function CardsDesktop(props: CardsProps) {
-    const { portfolioValue } = props
+    const { portfolioValue, portfolioStats } = props
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let wishlistValue = 0
     let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
@@ -35,23 +38,28 @@ function CardsDesktop(props: CardsProps) {
     return (
         <div className='flex border-b border-[#DEDFE5] px-24px mob:hidden'>
             <div className='w-full py-48px'>
-                <div>{t('Hodnota portfolia')}</div>
+                <div className='font-nunito font-semibold'>{t('Hodnota portfolia')}</div>
                 <div className='flex items-center'>
                     <div className='font-bold text-7xl'>$</div>
                     <div className='font-bold text-9xl'>{Math.round(portfolioValue * 100) / 100}</div>
-                    {/* <div className='text-[#999999] font-bold text-7xl'>.13</div> */}
+                    <div className='text-[#999999] font-bold text-7xl'>.{((Math.round(portfolioValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                 </div>
-                {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
-                    <ArrowUpRight color="white" />
-                    <div className='text-white'>+4,1 %</div>
-                </div> */}
+                <div className={`${portfolioStats?.growth_percentage > 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
+                    {
+                        portfolioStats?.growth_percentage ?? 0 > 0 ?
+                            <ArrowUpRight color="white" />
+                            :
+                            <ArrowDownRight color="white" />
+                    }
+                    <div className='text-white'>{Math.round(portfolioStats?.growth_percentage * 100) / 100} %</div>
+                </div>
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
-                <div>{t('Hodnota wishlistu')}</div>
+                <div className='font-nunito font-semibold'>{t('Hodnota wishlistu')}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
                     <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
-                    {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
+                    <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
                     <ArrowUpRight color="white" />
@@ -59,11 +67,11 @@ function CardsDesktop(props: CardsProps) {
                 </div> */}
             </div>
             <div className='flex-shrink-0 py-48px px-48px'>
-                <div>{t("All time high portfolia")}</div>
+                <div className='font-nunito font-semibold'>{t("All time high portfolia")}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
                     <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
-                    {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
+                    <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
                     <ArrowUpRight color="white" />
@@ -82,12 +90,12 @@ function CardsDesktop(props: CardsProps) {
 
 function CardsMobile(props: CardsProps) {
     let [index, setIndex] = useState(0)
-    const { portfolioValue } = props
+    const { portfolioValue, portfolioStats } = props
     return (
         <div className='nMob:hidden w-full px-24px py-16px'>
             <div className='w-full'>
                 <div className='flex items-center w-full justify-between'>
-                    <div>{t('Hodnota portfolia')}</div>
+                    <div className='font-nunito font-semibold'>{t('Hodnota portfolia')}</div>
                     <div className='flex items-center gap-8px'>
                         <div className='w-8px h-8px rounded-sm bg-black'></div>
                         <div className='w-8px h-8px rounded-sm bg-[#999999]'></div>
@@ -98,12 +106,17 @@ function CardsMobile(props: CardsProps) {
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
                         <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100}</div>
-                        {/* <div className='text-[#999999] font-bold text-4xl'></div> */}
+                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(portfolioValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                     </div>
-                    {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
-                        <ArrowUpRight color="white" />
-                        <div className='text-white'>+4,1 %</div>
-                    </div> */}
+                    <div className={`${portfolioStats?.growth_percentage ?? 0 > 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
+                        {
+                            portfolioStats?.growth_percentage ?? 0 > 0 ?
+                                <ArrowUpRight color="white" />
+                                :
+                                <ArrowDownRight color="white" />
+                        }
+                        <div className='text-white'>{Math.round(portfolioStats?.growth_percentage ?? 0 * 100) / 100} %</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,12 +124,15 @@ function CardsMobile(props: CardsProps) {
 }
 
 interface DashBoardProps {
-    portfolioValue: number
+    portfolioValue: number,
+    portfolioStats?: {
+        growth_percentage?: number
+    }
 }
 export default function Dashboard(props: DashBoardProps) {
 
     // const [products, button, meta, setItems] = useLazyLoad<Product>('products');
-    const { portfolioValue } = props
+    const { portfolioValue, portfolioStats } = props
     let [topMovers, button] = useLazyLoad<{ product: Product }>('topMovers');
     let [trendingProducts, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trendingProducts');
 
@@ -169,7 +185,7 @@ export default function Dashboard(props: DashBoardProps) {
 
                 </div>
 
-                <div className='p-24px border-t border-[#DEDFE5] mt-24px'>
+                {/* <div className='p-24px border-t border-[#DEDFE5] mt-24px'>
                     <div className='font-bold text-xl'>{t('Novinky a analýzy')}</div>
                     <div className='flex w-full gap-48px mt-12px mob:flex-col'>
                         <Link href={route('blog-layout')} className='w-full grid mob:hidden'>
@@ -189,7 +205,7 @@ export default function Dashboard(props: DashBoardProps) {
                             <SmallBlogCard />
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </AuthenticatedLayout>
     );

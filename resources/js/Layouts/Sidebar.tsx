@@ -62,7 +62,7 @@ function Sidebar(props: Props) {
             <div className="relative" ref={menuRef}>
                 <Img
                     onClick={() => setUserOptions(prev => !prev)}
-                    src={auth?.user?.thumbnail ?? "/assets/img/user.png"}
+                    src={auth?.user?.thumbnail ?? "/assets/img/user-fix.jpg"}
                     alt="Profilový obrázek uživatele"
                     className="object-cover object-center rounded-full w-full h-full cursor-pointer"
                 />

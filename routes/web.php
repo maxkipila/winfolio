@@ -98,8 +98,8 @@ Route::middleware('auth:web')->group(function () {
     /*  Route::get('/dashboard/data/calc', [DashboardController::class, 'index'])->name('dashboard.data'); */
     Route::get('/get-user', [UserController::class, 'get_user'])->name('get_user');
     Route::match(['POST', 'GET'], '/add_product_to_user/{product}', [UserController::class, 'add_product_to_user'])->name('add_product_to_user');
-    /*     Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
- */
+    Route::match(['POST', 'GET'], '/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])->name('remove_product_from_user');
+ 
     Route::get('/blog-layout', function () {
         return Inertia::render('blog');
     })->name('blog-layout');
@@ -116,8 +116,8 @@ Route::middleware('auth:web')->group(function () {
 
     Route::match(['GET', 'POST'], '/awards', [AwardController::class, 'index'])->name('awards');
 
-    Route::delete('/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])
-        ->name('remove_product_from_user');
+    // Route::delete('/remove_product_from_user/{product}', [UserController::class, 'remove_product_from_user'])
+    //     ->name('remove_product_from_user');
 
     Route::post('/awards/{award}/claim', [AwardController::class, 'claimBadge'])->name('awards.claim');
 
