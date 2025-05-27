@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Support\Str;
 
 return [
@@ -70,7 +71,10 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => [  
+        'web',
+        Authorize::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------
