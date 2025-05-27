@@ -28,16 +28,18 @@ function ThemeCard(props: ThemeCardProps) {
     )
 }
 
-interface Props { }
+interface Props { 
+    themes: Array<Theme>
+}
 
 function Catalog(props: Props) {
-    const { } = props
+    const { themes } = props
     const form = useForm({
         search: ''
     });
     const { data } = form;
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
-    const [themes] = useLazyLoad<Theme>('themes');
+    // const [themes] = useLazyLoad<Theme>('themes');
     let [selected, setSelected] = useState<Theme>(null)
     let [themeChildren, setThemeChildren] = useState<Array<number>>([])
     let [type, setType] = useState(null)
@@ -76,26 +78,26 @@ function Catalog(props: Props) {
                         )
                     }
                 </div>
-                <div className='mt-24px border-t-2 border-[#E6E6E6] pt-24px flex justify-between items-center mob:flex-col mob:gap-12px mob:items-start mob:px-24px'>
-                    <div className='flex items-center gap-12px'>
+                <div className='mt-24px border-t-2 border-[#E6E6E6] pt-24px flex justify-between items-center mob:flex-col mob:gap-12px mob:items-start '>
+                    <div className='flex items-center gap-12px mob:px-24px'>
                         <div onClick={() => { setType(null) }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == null ? "text-white bg-black" : ""}`}>{t('Vše')}</div>
                         <div onClick={() => { setType('set') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "set" ? "text-white bg-black" : ""}`}>{t('Sety')}</div>
                         <div onClick={() => { setType('minifig') }} className={`cursor-pointer p-12px font-nunito font-bold border-2 border-black ${type == "minifig" ? "text-white bg-black" : ""}`}>{t('Minifigs')}</div>
                     </div>
-                    <div className='flex gap-12px items-center'>
-                        <div className='items-center gap-8px grid grid-cols-3 max-w-[450px]'>
+                    <div className='flex gap-12px items-center mob:w-full'>
+                        <div className='items-center gap-8px grid grid-cols-3 max-w-[450px] mob:max-w-fit mob:flex overflow-auto mob:px-24px'>
                             {
                                 selected?.children?.map((c) => {
                                     let included = themeChildren?.includes(c?.id)
                                     return (
-                                        <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer ${included ? "border-[#FFB400]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center`}>{c.name}</div>
+                                        <div onClick={() => { setThemeChildren((p) => included ? p.filter((f) => f != c.id) : [...p, c.id]) }} className={`border-2 cursor-pointer mob:whitespace-nowrap ${included ? "border-[#FFB400]" : "border-[#F5F5F5]"} px-16px py-8px font-nunito font-bold bg-[#F5F5F5] text-center `}>{c.name}</div>
                                     )
                                 }
                                 )
                             }
 
                         </div>
-                        <SlidersHorizontal className='flex-shrink-0' size={24} />
+                        {/* <SlidersHorizontal className='flex-shrink-0 mr-24px' size={24} /> */}
                     </div>
                 </div>
 

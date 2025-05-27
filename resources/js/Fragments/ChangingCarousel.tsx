@@ -9,9 +9,9 @@ interface Props { }
 function ChangingCarousel(props: Props) {
     const { } = props
     let slides = [
-        { src: '/assets/img/architect.png', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: '/assets/img/harry-potter-welcome.png', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
-        { src: '/assets/img/friends.png', headline: t('Vzácný Harry Potter'), text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.' },
+        { src: '/assets/img/architect.png', headline: t('Kostky tvého investičního impéria padají správně'), text: t('Sleduj hodnotu svých setů v reálném čase, analyzuj vývoj cen, získej predikce a tipy na nákup nebo prodej.') },
+        { src: '/assets/img/harry-potter-welcome.png', headline: t('Hraj, plň mise a staň se LEGO šampionem'), text: t('Investování může být i zábava. Winfolio je nejen analytický nástroj, ale i herní platforma – s výzvami, misemi a odměnami, které tě provedou světem LEGO investic. Získej odznaky, postupuj úrovněmi a buduj si reputaci investora, kterého bude komunita sledovat.') },
+        { src: '/assets/img/friends.png', headline: t('Komunita, která staví na stejných základech'), text: t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.') },
 
     ]
 

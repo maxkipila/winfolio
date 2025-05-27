@@ -12,7 +12,8 @@ import {
     Legend,
     PointElement,
     LineElement,
-    Filler
+    Filler,
+    ScriptableContext
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
@@ -58,7 +59,6 @@ while (day.isBefore(moment().add('days', "30"))) {
 
 let daysLabel = Object.keys(days ?? {}).map(d => moment(d, 'YYYY-MM-DD').format('D.'));
 let max = Math.max(...Object.values(days ?? {}), 1);
-
 
 
 const dummyData = {
@@ -258,7 +258,13 @@ function Chest(props: Props) {
                 data: historyValues,
                 stack: 'Stack 1',
                 borderColor: '#16A049',
-                backgroundColor: '#46BD0F80',
+                backgroundColor: (context: ScriptableContext<"line">) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+                    gradient.addColorStop(0, "rgba(70, 189, 15, 0.5)");
+                    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+                    return gradient;
+                },
                 borderWidth: 2,
                 borderRadius: 4,
                 borderSkipped: false,
@@ -274,11 +280,11 @@ function Chest(props: Props) {
     useEffect(() => {
         setOpenCalendar(false)
     }, [range])
-    
+
     return (
         <AuthenticatedLayout>
             <Head title="Chest | Winfolio" />
-            <div className='w-full pt-32px mob:pt-24px px-24px min-h-screen-no-header'>
+            <div className='w-full pt-32px mob:pt-24px px-24px min-h-screen-no-header pb-48px'>
                 <div className='flex justify-between mob:flex-col-reverse mob:gap-16px'>
                     <div className='flex items-center w-full justify-between'>
                         <div className='flex items-center'>
@@ -316,7 +322,7 @@ function Chest(props: Props) {
                     <div className='w-full mt-24px'>
                         {
                             //@ts-expect-error
-                            <Line height={102} options={options} data={data} />
+                            <Line id={'canvas'} height={102} options={options} data={data} />
                         }
 
                     </div>
@@ -345,7 +351,7 @@ function Chest(props: Props) {
                                         <div className='h-full w-full flex-shrink-0'>
                                             <LegoSmiley className='mx-auto' size={64} />
                                             <div className='mt-24px font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
-                                            <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                                            {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
                                             <Button className='max-w-150px mx-auto' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button>
                                         </div>
                                     </div>
@@ -367,7 +373,7 @@ function Chest(props: Props) {
                                         <div className='h-full w-full flex-shrink-0'>
                                             <LegoSmiley className='mx-auto' size={64} />
                                             <div className='mt-24px font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
-                                            <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                                            {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
                                             {/* <Button className='max-w-150px mx-auto' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button> */}
                                         </div>
                                     </div>
