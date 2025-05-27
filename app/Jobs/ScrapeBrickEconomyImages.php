@@ -38,15 +38,10 @@ class ScrapeBrickEconomyImages implements ShouldQueue
 
         $response = NULL;
         try {
-            // $response = Http::withHeaders([
-            //     'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
-            //     'Accept' => 'text/html,application/xhtml+xml,application/xml',
-            //     'Accept-Language' => 'en-US,en;q=0.9',
-            // ])
-            //     ->get($url);
             $response = $this->proxyRequest()->get($url);
         } catch (\Exception $e) {
             Log::error($e->getMessage(), ['product_id' => $product_id, 'brickeconomy_id' => $product?->brickeconomy_id]);
+            $this->fail($e);
         }
 
         $html = $response?->body();

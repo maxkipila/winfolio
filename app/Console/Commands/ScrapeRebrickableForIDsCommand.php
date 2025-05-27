@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Jobs\ScrapeRebrickableForIDs;
 use App\Models\Product;
+use Illuminate\Bus\Batch;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\DomCrawler\Crawler;
@@ -23,7 +25,20 @@ class ScrapeRebrickableForIDsCommand extends Command
     {
         $limit = (int) $this->option('limit');
         $offset = (int) $this->option('offset');
-        $this->scrape($this, $limit, $offset);
+        $jobs = $this->scrape($this, $limit, $offset);
+
+        $chunkSize = 500; // Number of jobs per batch
+        $chunks = $jobs->chunk($chunkSize); // Split jobs into chunks
+        $length = $chunks->count() - 1;
+
+        foreach ($chunks as $key => $chunk) {
+            Bus::batch($chunk)
+                ->name("RebrickableScrape")
+                ->allowFailures()
+                ->dispatch();
+
+            $this->info("Chunk $key/{$length} dispatched");
+        }
     }
 
     public static function scrape(Command $command, $limit = 0, $offset = 0)
@@ -55,7 +70,7 @@ class ScrapeRebrickableForIDsCommand extends Command
 
         $jobs =  collect([]);
 
-        $command->withProgressBar($query->pluck('id'), function ($product_id) use($jobs) {
+        $command->withProgressBar($query->pluck('id'), function ($product_id) use ($jobs) {
             $jobs->push(new ScrapeRebrickableForIDs($product_id));
         });
 
