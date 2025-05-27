@@ -98,7 +98,7 @@ class UserController extends Controller
 
         $products = _Product::collection(
             Product::orderByRelation($request->sort ?? [], ['id', 'asc'], App::getLocale())
-                ->paginate($request->paginate ?? 4)
+                ->paginate($request->paginate ?? 2)
         );
 
         $latestDate = Trend::where('type', 'trending')->max('calculated_at');
@@ -119,7 +119,7 @@ class UserController extends Controller
         }
 
         $trending_products = _Trend::collection(
-            $trendingQuery->paginate($request->paginate ?? 4)
+            $trendingQuery->paginate($request->paginate ?? 2)
         );
 
         $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
@@ -140,7 +140,7 @@ class UserController extends Controller
         } */
 
         $top_movers = _Trend::collection(
-            $topMoversQuery->paginate($request->paginate ?? 4)
+            $topMoversQuery->paginate($request->paginate ?? 2)
         );
 
 
@@ -217,13 +217,13 @@ class UserController extends Controller
         }
 
         $products = _Product::collection(
-            $productsQuery->latest()->paginate($request->paginate ?? 10)
+            $productsQuery->latest()->paginate($request->paginate ?? 16)
         );
 
         $themes = _Theme::collection(
             Theme::with('children')
                 ->where('parent_id', NULL)
-                ->paginate($request->paginate ?? 10)
+                ->get()
         );
 
         return Inertia::render('catalog', compact('products', 'themes', 'trending_products'));

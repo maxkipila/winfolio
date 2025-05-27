@@ -25,7 +25,7 @@ function ProductCard(props: Props) {
                     <div className='pt-8px border-t border-[#D0D4DB]'>{year}</div>
                 </div>
             </div>
-            <div className={`p-16px w-full grid bg-[#F5F5F5] ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>
+            <div className={`p-16px w-full grid bg-[white] ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>
                 <div>
                     <div className='text-[#4D4D4D]'>{t('Retail')}</div>
                     <div className='mt-6px font-bold'>$ {latest_price?.retail}</div>

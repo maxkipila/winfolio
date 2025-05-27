@@ -123,42 +123,42 @@ function ReviewsModal(props: Props) {
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 0 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                        <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 1 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                        <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='bold' />
 
                                 </div>
                                 <div className='grid'>
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 2 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                        <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 3 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                        <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                                 <div className='grid'>
 
                                     {
                                         Math.floor(reviewValue / ratingValues?.length) > 4 &&
-                                        <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                        <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                     }
-                                    <Star className='col-start-1 row-start-1' weight='bold' />
+                                    <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                 </div>
                             </div>
                         </div>
@@ -205,7 +205,7 @@ function ReviewsModal(props: Props) {
                         </div>
 
                     </div>
-                    <div className='w-full p-24px'>
+                    <div className='w-full p-24px mob:border-t-2 border-black'>
 
                         {
                             userReviewed ?
@@ -221,37 +221,37 @@ function ReviewsModal(props: Props) {
                                             <div onClick={() => { setData('rating', 1) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 0 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
-                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 2) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 1 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
-                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 3) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 2 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
-                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 4) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 3 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
-                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                             <div onClick={() => { setData('rating', 5) }} className='grid cursor-pointer'>
                                                 {
                                                     data['rating'] > 4 &&
-                                                    <Star className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
+                                                    <Star size={24} className='col-start-1 row-start-1' weight='fill' color='#FFB400' />
                                                 }
-                                                <Star className='col-start-1 row-start-1' weight='bold' />
+                                                <Star size={24} className='col-start-1 row-start-1' weight='bold' />
                                             </div>
                                         </div>
                                     </div>
@@ -275,19 +275,22 @@ function ReviewsModal(props: Props) {
 
                     </div>
                 </div>
-                <div className='p-24px border-t-2 border-black'>
-                    <div className='font-bold text-3xl'>Customer Feedbacks</div>
-                    {
-                        product?.reviews?.length > 0 ?
-                            product?.reviews?.map((r) =>
-                                <ReviewLine {...r} />
-                            )
-                            :
-                            <div className='mx-auto w-full font-bold text-2xl text-center'>
-                                {t('Tento produkt nebyl zatím recenzován.')}
-                            </div>
-                    }
-                </div>
+                {
+                    product?.reviews?.length > 0 &&
+                    <div className='p-24px border-t-2 border-black'>
+                        <div className='font-bold text-3xl'>Customer Feedbacks</div>
+                        {
+                            product?.reviews?.length > 0 ?
+                                product?.reviews?.map((r) =>
+                                    <ReviewLine {...r} />
+                                )
+                                :
+                                <div className='mx-auto w-full font-bold text-2xl text-center'>
+                                    {t('Tento produkt nebyl zatím recenzován.')}
+                                </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     )
