@@ -13,7 +13,7 @@ function PublicHeader(props: Props) {
     let [mobile, setMobile] = useState(false)
     return (
         <div className='py-16px flex justify-between items-center px-24px border-b-2 bg-white border-black font-teko fixed top-0 w-full z-max mob:min-h-[82px]'>
-            <Img src="/assets/img/logo.png" />
+            <Img src="/assets/img/logo.svg" />
             <div className='flex gap-24px items-center mob:flex-row-reverse'>
                 <Link className='font-nunito font-bold mob:hidden' href="#howItWorks">{t('Jak to funguje')}</Link>
                 {/* <Link className='font-nunito font-bold' href="">{t('Knihovna')}</Link> */}

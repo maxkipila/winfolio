@@ -54,7 +54,12 @@ function Product(props: Props) {
                     <div className='mt-12px flex items-center justify-between w-full'>
                         <div className='flex gap-8px items-center'>
                             <div className='font-nunito font-bold'>{product?.year}</div>
-                            <div className='h-16px w-16px bg-[#46BD0F] rounded-full'></div>
+                            <div className='relative group'>
+                                <div className={`h-16px w-16px  ${product.availability != null ? "bg-[#46BD0F]" : "bg-[#FEB34A]"} rounded-full`}></div>
+                                <div className='hidden group-hover:block  absolute translate-x-1/2 p-4px bg-white border-2 border-black -mt-8px top-0 left-0 whitespace-nowrap'>
+                                    {product?.availability == null? "Non-avilable":"Available"}
+                                </div>
+                            </div>
                         </div>
                         <div className='flex gap-16px'>
                             <Export size={24} />

@@ -1,5 +1,7 @@
+import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import Img from '@/Components/Image';
 import { _, t } from '@/Components/Translator';
+import { MODALS } from '@/Fragments/Modals';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
 import useLazyLoad from '@/hooks/useLazyLoad';
@@ -7,7 +9,7 @@ import usePageProps from '@/hooks/usePageProps';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 function SmallBlogCard() {
 
@@ -28,7 +30,8 @@ function CardsDesktop(props: CardsProps) {
     let wishlistValue = 0
     let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
     wishListValues.map((wV) => wishlistValue += parseFloat(wV))
-    console.log('wishlist values',auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value))
+    // console.log('wishlist values',auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value))
+    let { open } = useContext(ModalsContext)
     return (
         <div className='flex border-b border-[#DEDFE5] px-24px mob:hidden'>
             <div className='w-full py-48px'>
@@ -59,7 +62,7 @@ function CardsDesktop(props: CardsProps) {
                 <div>{t("All time high portfolia")}</div>
                 <div className='flex items-center py-34px'>
                     <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100 }</div>
+                    <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
                     {/* <div className='text-[#999999] font-bold text-4xl'>.13</div> */}
                 </div>
                 {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
@@ -70,7 +73,7 @@ function CardsDesktop(props: CardsProps) {
             <div className='pl-48px py-48px'>
                 <div className='bg-[#FFD266] flex flex-col justify-center items-center w-full p-52px'>
                     <div className='font-bold text-xl mb-12px'>{t("Join signals community")}</div>
-                    <Button icon={<TelegramLogo size={24} />} href={"#"}>{t('Join on Telegram')}</Button>
+                    <Button onClick={(e) => { e.preventDefault(); open(MODALS.GET_PREMIUM) }} icon={<TelegramLogo size={24} />} href={"#"}>{t('Join on Telegram')}</Button>
                 </div>
             </div>
         </div>
@@ -94,7 +97,7 @@ function CardsMobile(props: CardsProps) {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100 }</div>
+                        <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100}</div>
                         {/* <div className='text-[#999999] font-bold text-4xl'></div> */}
                     </div>
                     {/* <div className='bg-[#46BD0F] flex items-center  py-2px rounded w-[78px] text-center justify-center'>
@@ -116,7 +119,7 @@ export default function Dashboard(props: DashBoardProps) {
     const { portfolioValue } = props
     let [topMovers, button] = useLazyLoad<{ product: Product }>('topMovers');
     let [trendingProducts, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trendingProducts');
-    
+
     console.log('trendingProducts:', trendingProducts)
     return (
         <AuthenticatedLayout>
@@ -131,7 +134,7 @@ export default function Dashboard(props: DashBoardProps) {
                             <Ranking size={24} />
                             <div className='font-bold text-xl'>{t('Momentálně trendují')}</div>
                         </div>
-                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
+                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
                             {
                                 trendingProducts?.map((s) =>
                                     <ProductCard {...s.product} />
@@ -150,7 +153,7 @@ export default function Dashboard(props: DashBoardProps) {
                             <Ranking size={24} />
                             <div className='font-bold text-xl'>{t('Top Movers')}</div>
                         </div>
-                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mob:mt-12px'>
+                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
                             {
                                 topMovers?.map((s) =>
                                     <ProductCard {...s.product} />

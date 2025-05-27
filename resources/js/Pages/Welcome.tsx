@@ -222,7 +222,7 @@ function Welcome(props: Props) {
                         {/* <Img className='w-full col-start-1 row-start-1' src="/assets/img/john-landing.png" /> */}
                         <div className='bg-black px-24px h-[400px] items-center flex gap-[58px] text-white mob:flex-col mob:justify-center'>
                             <div className='w-full'>
-                                <Img src="/assets/img/logo-white.png" />
+                                <Img src="/assets/img/logo-white.svg" />
                                 <div className='font-nunito text-lg my-24px'>{t('Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.')}</div>
                                 <a className='font-nunito font-bold text-lg' href="mailto:info@winfolio.cz">info@winfolio.cz</a>
                             </div>

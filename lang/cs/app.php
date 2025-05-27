@@ -177,6 +177,7 @@ return [
     'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.'=>'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.',
 
     'Hodnota wishlistu'=>'Hodnota Wishlistu',
-    'All time high portfolia'=>'Nejvyšší hodnota'
-    'Datum narození'=>'Datum narození'
+    'All time high portfolia'=>'Nejvyšší hodnota',
+    'Datum narození'=>'Datum narození',
+    'Odebírat Newsletter'=>'Odebírat Newsletter'
 ];
