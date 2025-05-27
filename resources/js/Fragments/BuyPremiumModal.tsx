@@ -19,7 +19,7 @@ function BuyPremiumModal(props: Props) {
                 </div>
                 <div className='col-start-1 row-start-1'>
                     <div className='flex items-end justify-end mob:mt-24px mob:px-24px mob:justify-between mob:items-center'>
-                        <Img className='nMob:hidden' src="/assets/img/logo.png" />
+                        <Img className='nMob:hidden' src="/assets/img/logo.svg" />
                         <div onClick={() => { close() }} className='w-40px h-40px bg-black flex items-center justify-center'>
                             <X color='white' size={24} />
                         </div>

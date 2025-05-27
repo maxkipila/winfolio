@@ -68,7 +68,7 @@ function Header(props: Props) {
         <header className="border-b-[1px] w-full flex items-center justify-between relative">
             {/* Levá část: Logo */}
             <Link href={route('admin.dashboard')}>
-                <Img className="p-16px" src="/assets/img/logo.png" />
+                <Img className="p-16px" src="/assets/img/logo.svg" />
             </Link>
 
             <div className="flex mx-auto">

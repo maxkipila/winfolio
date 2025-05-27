@@ -66,7 +66,7 @@ function Login(props: Props) {
             <div className='w-1/2 h-full flex flex-col'>
                 <div className='h-full flex-col  justify-center items-center flex p-80px'>
                     <div className='flex items-center justify-center'>
-                        <Link href={route('welcome')}><Img src="/assets/img/logo.png" /></Link>
+                        <Link href={route('welcome')}><Img src="/assets/img/logo.svg" /></Link>
                     </div>
                     <Form onSubmit={submit} className='w-full ' form={form}>
                         {/* <div className='text-xl  font-bold mb-16px text-center'>Začněte zadáním e-mailu</div> */}

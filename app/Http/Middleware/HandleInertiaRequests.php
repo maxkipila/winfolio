@@ -12,10 +12,14 @@ use App\Models\Minifig;
 use App\Models\Product;
 use App\Models\Set;
 use App\Models\Theme;
+use App\Models\Trend;
 use App\Models\User;
+use App\Services\TrendService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +52,14 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
+
+    protected $trendService;
+
+    public function __construct(TrendService $trendService)
+    {
+        $this->trendService = $trendService;
+    }
+    
     public function share(Request $request): array
     {
 
@@ -55,6 +67,7 @@ class HandleInertiaRequests extends Middleware
         $users = fn(): AnonymousResourceCollection => _User::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
         $themes = fn(): AnonymousResourceCollection => _Theme::collection(Theme::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
         $products = fn(): AnonymousResourceCollection => _Product::collection(Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get());
+        
 
         return [
             ...parent::share($request),
@@ -91,7 +104,8 @@ class HandleInertiaRequests extends Middleware
                 ? $request->user()->awards()->wherePivot('notified', false)->get()
                 : [],
             'flash' => Session::get('flash'),
-            'locale' => App::getLocale()
+            'locale' => App::getLocale(),
+            // 'trendingProducts' => $trendingData,
             /*  'searchAllUsers' => Inertia::lazy($searchAllUser),
             'searchAllSets' => Inertia::lazy($this->searchByModel(Set::class, 'name', _Set::class, $request->q ?? "")),
             'searchAllMinifigs' => Inertia::lazy($this->searchByModel(Minifig::class, 'name', _Minifig::class, $request->q ?? "")), */
