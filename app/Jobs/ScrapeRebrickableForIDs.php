@@ -75,60 +75,25 @@ class ScrapeRebrickableForIDs implements ShouldQueue
 
     private function extractBrickLinkId(Crawler $crawler): ?string
     {
-        //Hledání BL id v URL
-        $brickLinkId = null;
-        $crawler->filter('a')->each(function (Crawler $link) use (&$brickLinkId) {
-            if ($brickLinkId) return;
-
-            $href = $link->attr('href');
-
-            // Hledáme specificky v URL části bricklink.com/v2/catalog/catalogitem.page?
-            if (preg_match('/bricklink\.com\/v2\/catalog\/catalogitem\.page\?([^&]*)/', $href, $matches)) {
-
-                parse_str($matches[1], $params);
-                if (isset($params['M'])) {
-                    $brickLinkId = $params['M'];
-                    return;
-                }
-            }
-            $text = trim($link->text());
-            if (stripos($text, 'bricklink') !== false && preg_match('/([a-z0-9]{3,10})/i', $text, $matches)) {
-                $brickLinkId = $matches[1];
-            }
+        // Find the section with External Sites
+        $section = $crawler->filter('section')->reduce(function (Crawler $node) {
+            return $node->filter('h4')->count() && trim($node->filter('h4')->text()) === 'External Sites';
         });
 
-        if ($brickLinkId) return $brickLinkId;
+        $brickLinkId = null;
 
-        $crawler->filter('h4, h3, .external-ids, .external-links')->each(function (Crawler $section) use (&$brickLinkId) {
-            if ($brickLinkId) return;
-
-            $section->filter('table tr')->each(function (Crawler $row) use (&$brickLinkId) {
-                if ($brickLinkId) return;
-
-                if ($row->filter('td')->count() >= 2) {
-                    $label = trim($row->filter('td')->eq(0)->text());
-                    if (stripos($label, 'BrickLink') !== false) {
-                        $valueText = trim($row->filter('td')->eq(1)->text());
-                        $cleanId = preg_replace('/^(ID|No|Number):\s*/i', '', $valueText);
-                        $brickLinkId = trim($cleanId);
+        if ($section->count()) {
+            // Find the BrickLink row in the table
+            $section->filter('table tr')->each(function (Crawler $tr) use (&$brickLinkId) {
+                $tds = $tr->filter('td');
+                if ($tds->count() >= 2 && trim($tds->eq(0)->text()) === 'BrickLink') {
+                    // Get the text inside the <a> tag (the ID)
+                    $link = $tds->eq(1)->filter('a');
+                    if ($link->count()) {
+                        $brickLinkId = trim($link->text());
                     }
                 }
             });
-
-            if (!$brickLinkId) {
-                $section->filter('a, span, div')->each(function (Crawler $element) use (&$brickLinkId) {
-                    if ($brickLinkId) return;
-
-                    $text = $element->text();
-                    if (preg_match('/(frnd|sw|hp|col|sh|bat|njo|lor|cty|poc)(\d+)/i', $text, $matches)) {
-                        $brickLinkId = $matches[0];
-                    }
-                });
-            }
-        });
-
-        if ($brickLinkId === 'v2') {
-            return null;
         }
 
         return $brickLinkId;
