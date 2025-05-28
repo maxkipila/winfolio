@@ -24,11 +24,11 @@ puppeteer.use(StealthPlugin());
         });
     }
 
-    await page.goto(url, { waitUntil: "networkidle2" });
+    const response = await page.goto(url, { waitUntil: "networkidle2" });
 
-    if (page.response.status() != 200) {
+    if (response?.status() != 200) {
         await browser.close();
-        throw new Error(`Non-200 status code: ${response.status()}`);
+        throw new Error(`Non-200 status code: ${response?.status()}`);
     }
 
     console.log(await page.content());
