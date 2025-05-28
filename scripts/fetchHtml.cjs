@@ -16,6 +16,16 @@ puppeteer.use(StealthPlugin());
     const browser = await puppeteer.launch({ args: launchArgs });
     const page = await browser.newPage();
 
+    await page.setCookie({
+        name: "Region",
+        value: "US",
+        domain: "www.brickeconomy.com",
+        path: "/",
+        httpOnly: false,
+        secure: true,
+        sameSite: "Lax",
+    });
+
     // If proxy requires authentication
     if (proxyUrl.username && proxyUrl.password) {
         await page.authenticate({
@@ -24,9 +34,21 @@ puppeteer.use(StealthPlugin());
         });
     }
 
-    const response = await page.goto(url, { waitUntil: "networkidle2" });
+    const response = await page.goto(url, {
+        waitUntil: "networkidle2",
+        timeout: 0,
+    });
 
     if (response?.status() != 200) {
+        if (response?.status() == 429 || response?.status() == 403) {
+            const timestamp = new Date();
+            const formatted = timestamp.toISOString().replace(/[:.]/g, "-");
+            await page.screenshot({
+                path: `storage/app/error_screenshot-${formatted}.png`,
+                fullPage: true,
+            });
+        }
+
         await browser.close();
         throw new Error(`Non-200 status code: ${response?.status()}`);
     }

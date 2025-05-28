@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class DownloadProductImageJob implements ShouldQueue
@@ -30,7 +31,7 @@ class DownloadProductImageJob implements ShouldQueue
     {
         $this->productId = $productId;
         $this->imageUrls = $imageUrls;
-      
+
         $this->force = $force;
     }
     /**
@@ -54,11 +55,34 @@ class DownloadProductImageJob implements ShouldQueue
                 return;
             }
 
-            //Log::info("Saving Product with ID {$this->productId}", ['urls' => $this->imageUrls]);
-            $product->images = $this->imageUrls;
-            
+            foreach ($this->imageUrls as $imageUrl) {
+                try {
+                    // Download image through proxy
+                    $response = Http::withOptions([
+                        'verify' => false, // if you have SSL issues
+                        'timeout' => 60,
+                    ])->get($imageUrl);
+
+                    if ($response->successful()) {
+                        // Save to temp file
+                        $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                        $tmpPath = storage_path('app/tmp_' . uniqid() . '.' . $extension);
+                        file_put_contents($tmpPath, $response->body());
+
+                        // Add to media library
+                        $product->addMedia($tmpPath)->toMediaCollection('images');
+                    } else {
+                        Log::error("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());
+                        $this->fail("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Chyba při stahování nebo ukládání obrázku {$imageUrl} pro produkt {$this->productId}: " . $e->getMessage());
+                    $this->fail($e);
+                }
+            }
         } catch (\Exception $e) {
             Log::error("Chyba při stahování obrázků pro produkt {$this->productId}: " . $e->getMessage());
+            $this->fail($e);
         }
     }
 
