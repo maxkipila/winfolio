@@ -55,7 +55,7 @@ class ImportLegoImages extends Command
             return 0;
         }
 
-        $this->withProgressBar($query->take(200)->pluck('id'), function ($product_id) use ($force) {
+        $this->withProgressBar($query->pluck('id'), function ($product_id) use ($force) {
             ScrapeBrickEconomyImages::dispatch($product_id);
         });
 
