@@ -37,14 +37,15 @@ class ScrapeBrickEconomyImages implements ShouldQueue
         $url = "https://www.brickeconomy.com/{$product->product_type}/{$product->brickeconomy_id}/";
 
         $response = NULL;
+
         try {
-            $response = $this->proxyRequest()->get($url);
+            $response = $this->proxyRequest($url);
         } catch (\Exception $e) {
             Log::error($e->getMessage(), ['product_id' => $product_id, 'brickeconomy_id' => $product?->brickeconomy_id]);
             $this->fail($e);
         }
 
-        $html = $response?->body();
+        $html = $response; //?->body();
 
         $regex = '/<ul id="setmediagallery"[^>]*>(.*?)<\/ul>/s';
 
@@ -52,7 +53,7 @@ class ScrapeBrickEconomyImages implements ShouldQueue
         if ($html && preg_match($regex, $html, $ulMatch)) {
             $ulContent = $ulMatch[1];
             // Now, extract all src attributes from the <img> tags within the <ul>
-            $imgRegex = '/<img[^>]*src="([^"]+)"[^>]*>/';
+            $imgRegex = "/\\.attr\\('src',\\s*'([^']+)'\\)/";
             if (preg_match_all($imgRegex, $ulContent, $imgMatches)) {
                 // Array of all src attributes
                 $srcs = collect($imgMatches[1])->map(fn($url) => "https://www.brickeconomy.com{$url}");

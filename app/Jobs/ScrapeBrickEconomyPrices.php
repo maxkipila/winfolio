@@ -38,17 +38,17 @@ class ScrapeBrickEconomyPrices implements ShouldQueue
         $url = "https://www.brickeconomy.com/{$product->product_type}/{$product->brickeconomy_id}/";
 
         try {
-            $response = $this->proxyRequest()
-                ->withCookies([
-                    'Region' => 'US',
-                ], 'www.brickeconomy.com')
-                ->get($url);
+            $response = $this->proxyRequest($url);
+                // ->withCookies([
+                //     'Region' => 'US',
+                // ], 'www.brickeconomy.com')
+                // ->get($url);
         } catch (\Exception $e) {
             Log::error($e->getMessage(), ['product_id' => $product_id, 'brickeconomy_id' => $product?->brickeconomy_id]);
             $this->fail($e);
         }
 
-        $html = $response->body();
+        $html = $response;//->body();
 
         if (($this->daily ?? false)) {
 

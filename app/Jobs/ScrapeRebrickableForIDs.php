@@ -46,15 +46,16 @@ class ScrapeRebrickableForIDs implements ShouldQueue
         try {
             // Sestavení URL pro scraping
             $url = "https://rebrickable.com/minifigs/{$rebrickableId}/";
+            $response = NULL;
 
             try {
-                $response = $this->proxyRequest()->get($url);
+                $response = $this->proxyRequest($url); //->get($url);
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
                 $this->fail($e);
             }
 
-            $html = $response->body();
+            $html = $response; //->body();
 
             $crawler = new Crawler($html);
 

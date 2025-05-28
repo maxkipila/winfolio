@@ -32,6 +32,11 @@ class ImportLegoImages extends Command
         ini_set('memory_limit', '512M');
         $force = $this->option('force');
 
+
+        // $response = $this->proxyRequest("https://whatleaks.site/");
+
+        // dd($response->body());
+
         $this->info("Začínám import obrázků");
 
         $query = Product::orderBy('id');
@@ -50,7 +55,7 @@ class ImportLegoImages extends Command
             return 0;
         }
 
-        $this->withProgressBar($query->pluck('id'), function ($product_id) use ($force) {
+        $this->withProgressBar($query->take(200)->pluck('id'), function ($product_id) use ($force) {
             ScrapeBrickEconomyImages::dispatch($product_id);
         });
 

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\Process\Process;
 
 trait HasUserAgent
 {
@@ -54,24 +55,41 @@ trait HasUserAgent
         'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)',
     ];
 
-    function proxyRequest()
+    function proxyRequest($url)
     {
 
-        $API_KEY = env('PROXY_API_KEY');
-        $cacheKey = 'api_data_' . md5("https://proxy-seller.com/personal/api/v1/{$API_KEY}/proxy/download/resident?listId=12268929"); // Unique cache key for the URL
-        $ttl = 60; // Cache for 1 hour (in seconds)
+        // $API_KEY = env('PROXY_API_KEY');
+        $API_CREDENTIALS = env('PROXY_CREDENTIALS');
+        // $cacheKey = 'api_data_' . md5("https://proxy-seller.com/personal/api/v1/{$API_KEY}/proxy/download/resident?listId=12268929"); // Unique cache key for the URL
+        // $ttl = 60; // Cache for 1 hour (in seconds)
 
-        $proxy = Cache::remember($cacheKey, $ttl, function () use ($API_KEY) {
-            return Http::get("https://proxy-seller.com/personal/api/v1/{$API_KEY}/proxy/download/resident?listId=12268929")->body();
-        });
+        // $proxy = Cache::remember($cacheKey, $ttl, function () use ($API_KEY) {
+        //     return Http::get("https://proxy-seller.com/personal/api/v1/{$API_KEY}/proxy/download/resident?listId=12268929")->body();
+        // });
 
-        return Http::withOptions([
-            'proxy' => $proxy
-        ])
-            ->withHeaders([
-                'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
-                'Accept' => 'text/html,application/xhtml+xml,application/xml',
-                'Accept-Language' => 'en-US,en;q=0.9',
-            ]);
+        $process = new Process(['node', base_path('scripts/fetchHtml.cjs'), $url, "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \Exception($process->getErrorOutput());
+        }
+
+        $html = $process->getOutput();
+
+        // $html = Http::withOptions([
+        //     'proxy' => "maxkipila:niAh8JrkDz@217.30.10.33:43587"
+        // ])
+        //     ->withHeaders([
+        //         'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
+        //         'Accept' => 'text/html,application/xhtml+xml,application/xml',
+        //         'Accept-Language' => 'en-US,en;q=0.9',
+        //     ])->get($url);
+
+        // $filePath = storage_path('app/fetch_output.html');
+        // file_put_contents($filePath, $html);
+
+        // dd("Saved HTML");
+        // return $process->getOutput();
+        return $html;
     }
 }
