@@ -41,28 +41,44 @@ puppeteer.use(StealthPlugin());
 
     if (response?.status() != 200) {
         if (response?.status() == 429 || response?.status() == 403) {
-
             const timestamp = new Date();
             const formatted = timestamp.toISOString().replace(/[:.]/g, "-");
 
-            try {
-                await page.waitForSelector(
-                    "#ContentPlaceHolder1_PanelSetPricing",
-                    { timeout: 60000 }
-                );
-               
-                await page.screenshot({
-                    path: `storage/app/success_screenshot-${formatted}.png`,
-                    fullPage: true,
-                });
-            } catch (error) {
-                await page.screenshot({
-                    path: `storage/app/error_screenshot-${formatted}.png`,
-                    fullPage: true,
-                });
-                await browser.close();
-                throw new Error(`Non-200 status code: ${response?.status()}`);
+            let success = false;
+            const maxRetries = 3;
+            let attempt = 0;
+
+            while (!success && attempt < maxRetries) {
+                try {
+                    await page.waitForSelector(
+                        "#ContentPlaceHolder1_PanelSetPricing",
+                        { timeout: 15000 }
+                    );
+                    success = true;
+                } catch (error) {
+                    attempt++;
+                    if (attempt < maxRetries) {
+                        await page.reload({ waitUntil: "networkidle2" });
+                    } else {
+                        const timestamp = new Date()
+                            .toISOString()
+                            .replace(/[:.]/g, "-");
+                        await page.screenshot({
+                            path: `storage/app/error_screenshot-${timestamp}.png`,
+                            fullPage: true,
+                        });
+                        await browser.close();
+                        throw new Error(
+                            `Failed to find selector after ${maxRetries} attempts`
+                        );
+                    }
+                }
             }
+
+            await page.screenshot({
+                path: `storage/app/success_${attempt}_screenshot-${formatted}.png`,
+                fullPage: true,
+            });
         }
     }
 
