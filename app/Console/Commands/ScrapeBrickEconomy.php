@@ -35,7 +35,7 @@ class ScrapeBrickEconomy extends Command
 
         foreach ($chunks as $key => $chunk) {
             JobsScrapeBrickEconomy::dispatch($chunk, true, true, true);
-            $this->info("Chunk $key/{$length} dispatched");
+            $this->info("Chunk $key/{$length} dispatched"); 
         }
 
         $this->info("All chunks dispatched");
