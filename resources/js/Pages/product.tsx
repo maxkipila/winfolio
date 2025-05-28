@@ -359,7 +359,7 @@ function Product(props: Props) {
                                 <div>{t('Value')}</div>
                                 <Question size={20} color="#4D4D4D" />
                             </div>
-                            <div>{product.latest_price.value}</div>
+                            <div>{product?.latest_price?.value}</div>
                         </div>
 
                         <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px'>

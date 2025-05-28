@@ -73,7 +73,7 @@ export default defineConfig(({ command, mode }) => {
         server: {
             host: "0.0.0.0",
             hmr: {
-                host: "localhost"
+                host: env?.VITE_HMR_HOST ?? "localhost"
             },
             // watch: {
             //     usePolling: true
