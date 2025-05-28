@@ -65,7 +65,7 @@ function ChangingCarousel(props: Props) {
                     <div className='font-bold text-3xl text-center'>{slides[slide].headline}</div>
                     <div className='text-center font-nunito'>{slides[slide].text}</div>
                 </div>
-                <div className='flex absolute bottom-[80px] w-full gap-8px justify-center'>
+                <div className='flex absolute bottom-[100px] w-full gap-8px justify-center'>
                     <div className={`w-8px h-8px ${slide == 0 ? "bg-white" : "bg-white bg-opacity-50"}  rounded-sm`}></div>
                     <div className={`w-8px h-8px ${slide == 1 ? "bg-white" : "bg-white bg-opacity-50"}  rounded-sm`}></div>
                     <div className={`w-8px h-8px ${slide == 2 ? "bg-white" : "bg-white bg-opacity-50"}  rounded-sm`}></div>

@@ -32,7 +32,7 @@ function ReviewCard(props: Props) {
         <div className='border-2 border-black p-32px mt-32px'>
             <div className='font-bold'>{product?.name} {t('Reviews')}</div>
             <div className='flex items-center gap-16px mt-16px'>
-                <div className='flex gap-40px mob:flex-col mob:gap-12px'>
+                <div className='flex gap-24px mob:flex-col mob:gap-12px'>
                     <div>
                         <div className='flex gap-4px'>
                             <div className='grid'>

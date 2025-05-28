@@ -19,8 +19,8 @@ function ThemeCard(props: ThemeCardProps) {
     const { name, selected, id, setSelected } = props
 
     return (
-        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
-            <div className='w-40px h-40px bg-white flex items-center justify-center rounded-full  '>
+        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]"}  flex items-center justify-center  flex-col p-12px gap-8px mob:min-w-[112px]`}>
+            <div className={`w-40px h-40px bg-white text-black flex items-center justify-center rounded-full  `}>
                 <TrendUp size={24} />
             </div>
             <div className='font-bold text-center font-nunito'>{name}</div>
@@ -28,7 +28,7 @@ function ThemeCard(props: ThemeCardProps) {
     )
 }
 
-interface Props { 
+interface Props {
     themes: Array<Theme>
 }
 
