@@ -52,7 +52,7 @@ puppeteer.use(StealthPlugin());
                 try {
                     await page.waitForSelector(
                         "#ContentPlaceHolder1_PanelSetPricing",
-                        { timeout: 15000 }
+                        { timeout: 7500 }
                     );
                     success = true;
                 } catch (error) {
@@ -60,11 +60,8 @@ puppeteer.use(StealthPlugin());
                     if (attempt < maxRetries) {
                         await page.reload({ waitUntil: "networkidle2" });
                     } else {
-                        const timestamp = new Date()
-                            .toISOString()
-                            .replace(/[:.]/g, "-");
                         await page.screenshot({
-                            path: `storage/app/error_screenshot-${timestamp}.png`,
+                            path: `storage/app/error_screenshot-${formatted}.png`,
                             fullPage: true,
                         });
                         await browser.close();
