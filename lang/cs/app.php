@@ -179,5 +179,7 @@ return [
     'Hodnota wishlistu'=>'Hodnota Wishlistu',
     'All time high portfolia'=>'Nejvyšší hodnota',
     'Datum narození'=>'Datum narození',
-    'Odebírat Newsletter'=>'Odebírat Newsletter'
+    'Odebírat Newsletter'=>'Odebírat Newsletter',
+    'Subscribe'=>'Předplatit',
+    'Limited Offer'=>'Omezená nabídka'
 ];

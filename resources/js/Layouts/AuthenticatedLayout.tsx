@@ -105,7 +105,7 @@ function AuthenticatedLayout(props: Props) {
                 <div className='mt-[72px] mob:pb-50px relative'>
                     {
                         route()?.current()?.includes('chest') &&
-                        <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} className='cursor-pointer fixed bottom-64px right-40px w-40px h-40px border border-black bg-[#FFB400] rounded-full flex items-center justify-center'>
+                        <div onClick={() => { _OpenModal(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} className='cursor-pointer fixed bottom-64px right-40px w-40px h-40px border-2 border-black bg-[#FFB400] rounded-full flex items-center justify-center'>
                             <Plus size={24} />
                         </div>
                     }

@@ -174,5 +174,7 @@ return [
     'Hodnota wishlistu' => 'Wishlist value',
     'All time high portfolia' => 'All time high portfolia',
     'Datum narození' => 'Birth date',
-    'Odebírat Newsletter'=>'Subscribe to newsletter'
+    'Odebírat Newsletter'=>'Subscribe to newsletter',
+    'Subscribe'=>'Subscribe',
+    'Limited Offer'=>'Limited Offer'
 ];

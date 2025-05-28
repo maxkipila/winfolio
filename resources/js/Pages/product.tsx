@@ -69,7 +69,7 @@ function Product(props: Props) {
                         </div>
                     </div>
                     <div className='mt-24px font-bold text-xl'>{t('Forecast')}</div>
-                    <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                    {/* <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
                     <div className='border-2 border-black p-32px mt-20px'>
                         <div className='font-bold text-xl mb-12px'>{t('Set Pricing')}</div>
                         <div className='flex items-center justify-between w-full pb-16px border-b border-[#D0D4DB]'>
@@ -169,7 +169,7 @@ function Product(props: Props) {
                         </div>
                     </div> */}
                     <div className='mt-40px font-bold text-xl'>{t('Claim')}</div>
-                    <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                    {/* <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
 
                     <div className='mt-40px bg-[#F5F5F5] p-24px'>
                         {/* <div className='font-bold text-xl'>Buy this set</div>
@@ -207,7 +207,7 @@ function Product(props: Props) {
 
                             <>
                                 <div className='mt-40px font-bold text-xl'>{t('Minifigs')}</div>
-                                <div className='mt-16px text-[#4D4D4D] font-nunito'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</div>
+                                {/* <div className='mt-16px text-[#4D4D4D] font-nunito'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</div> */}
                                 {
                                     product?.minifigs?.length > 0 ?
                                         <div className='grid grid-cols-4 mob:grid-cols-1 gap-12px mob:overflow-y-auto'>

@@ -21,7 +21,7 @@ function SuccessModal(props: Props) {
                         <Check weight='bold' size={48} color="white" />
                     </div>
                     <div className='mt-16px font-bold font-teko text-center'>Gratulujeme</div>
-                    <div className='font-nunito text-[#4D4D4D] my-16px text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div>
+                    {/* <div className='font-nunito text-[#4D4D4D] my-16px text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
                     <Button onClick={(e) => { e.preventDefault(); close() }} href={"#"} icon={<Check size={24} />}>Dokončit</Button>
                 </div>
 
