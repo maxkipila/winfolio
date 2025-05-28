@@ -41,6 +41,9 @@ puppeteer.use(StealthPlugin());
 
     if (response?.status() != 200) {
         if (response?.status() == 429 || response?.status() == 403) {
+
+            await page.waitForSelector('#ContentPlaceHolder1_PanelSetPricing', { timeout: 30 });
+            
             const timestamp = new Date();
             const formatted = timestamp.toISOString().replace(/[:.]/g, "-");
             await page.screenshot({
