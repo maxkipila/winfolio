@@ -20,7 +20,8 @@
         "paradigma/pictura": "^1.3",
         "symfony/css-selector": "^7.2",
         "symfony/dom-crawler": "^7.2",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "zoon/puphpeteer": "^2.4"
     },
     "require-dev": {
         "laravel/breeze": "^2.3",

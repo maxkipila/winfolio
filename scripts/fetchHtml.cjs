@@ -58,6 +58,31 @@ puppeteer.use(StealthPlugin());
                 } catch (error) {
                     attempt++;
                     if (attempt < maxRetries) {
+                        const errorSelector = "h3.text-center.mt-20";
+                        const errorElement = await page.$(errorSelector);
+
+                        if (errorElement) {
+                            const errorText = await page.evaluate(
+                                (el) => el.textContent,
+                                errorElement
+                            );
+                            if (
+                                errorText &&
+                                errorText.includes(
+                                    "The page you are looking for could not be found."
+                                )
+                            ) {
+                                await page.screenshot({
+                                    path: `storage/app/not_found_screenshot-${formatted}.png`,
+                                    fullPage: true,
+                                });
+                                await browser.close();
+                                throw new Error(
+                                    "Page not found error detected!"
+                                );
+                            }
+                        }
+
                         await page.reload({ waitUntil: "networkidle2" });
                     } else {
                         await page.screenshot({

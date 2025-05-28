@@ -68,9 +68,11 @@ class DownloadProductImageJob implements ShouldQueue
                         $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
                         $tmpPath = storage_path('app/tmp_' . uniqid() . '.' . $extension);
                         file_put_contents($tmpPath, $response->body());
-
+                        Log::info("adding $tmpPath");
                         // Add to media library
-                        $product->addMedia($tmpPath)->toMediaCollection('images');
+                        $product->addMedia($tmpPath)
+                            ->withResponsiveImages()
+                            ->toMediaCollection('images');
                     } else {
                         Log::error("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());
                         $this->fail("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());

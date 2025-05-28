@@ -2,8 +2,14 @@
 
 namespace App\Traits;
 
+
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Nesk\Puphpeteer\Puppeteer;
+use Nesk\Rialto\Data\JsFunction;
+use Nesk\Rialto\Exceptions\Node\FatalException;
 use Symfony\Component\Process\Process;
 
 trait HasUserAgent
@@ -91,5 +97,159 @@ trait HasUserAgent
         // dd("Saved HTML");
         // return $process->getOutput();
         return $html;
+    }
+
+
+    function puppeteerRequest($urls = [])
+    {
+        $API_CREDENTIALS = env('PROXY_CREDENTIALS');
+        $proxy = "https://{$API_CREDENTIALS}@217.30.10.33:43587";
+
+        // Parse proxy
+        $proxyUrl = parse_url($proxy);
+        $proxyHost = $proxyUrl['host'] . ':' . $proxyUrl['port'];
+        $proxyAuth = isset($proxyUrl['user'], $proxyUrl['pass']) ? $proxyUrl['user'] . ':' . $proxyUrl['pass'] : null;
+
+        $launchArgs = [
+            '--no-sandbox',
+            '--proxy-server=' . $proxyHost,
+        ];
+
+        $puppeteer = new Puppeteer(
+            [
+                'js_extra' =>
+                /** @lang JavaScript */
+                "
+            const puppeteer = require('puppeteer-extra');
+            const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+            puppeteer.use(StealthPlugin());
+            instruction.setDefaultResource(puppeteer);
+        "
+            ]
+        );
+        $browser = $puppeteer->launch([
+            'args' => $launchArgs,
+            'headless' => true,
+        ]);
+
+        $pages = [];
+        try {
+            $page = $browser->tryCatch->newPage();
+
+            foreach ($urls as $product_id => $url) {
+                try {
+                    Log::info("Scraping $product_id => $url");
+
+                    // Set cookie
+                    $page->tryCatch->setCookie([
+                        'name' => 'Region',
+                        'value' => 'US',
+                        'domain' => 'www.brickeconomy.com',
+                        'path' => '/',
+                        'httpOnly' => false,
+                        'secure' => true,
+                        'sameSite' => 'Lax',
+                    ]);
+
+                    // Proxy authentication if needed
+                    if ($proxyAuth) {
+                        [$username, $password] = explode(':', $proxyAuth, 2);
+                        $page->tryCatch->authenticate([
+                            'username' => $username,
+                            'password' => $password,
+                        ]);
+                    }
+                    Log::info("Going to $url");
+                    $response = $page->tryCatch->goto($url, [
+                        'waitUntil' => 'networkidle2',
+                        'timeout' => 0,
+                    ]);
+
+                    $status = $response?->status() ?? NULL;
+
+                    try {
+                        if ($status !== 200) {
+                            if ($status == 429 || $status == 403 || $status == NULL) {
+                                $timestamp = now()->format('Y-m-d_H-i-s');
+                                $success = false;
+                                $maxRetries = 3;
+                                $attempt = 0;
+
+                                Log::info("Got 429 or 403 on $url");
+
+                                while (!$success && $attempt < $maxRetries) {
+                                    try {
+                                        $page->tryCatch->waitForSelector('#ContentPlaceHolder1_PanelSetPricing', ['timeout' => 7500]);
+                                        $success = true;
+                                    } catch (\Exception $e) {
+                                        $attempt++;
+                                        if ($attempt < $maxRetries) {
+                                            // Check for not found error
+                                            $errorSelector = 'h3.text-center.mt-20';
+                                            try {
+                                                $errorElement = $page->tryCatch->querySelector($errorSelector);
+                                                if ($errorElement) {
+                                                    $errorText = $page->tryCatch->evaluate(JsFunction::createWithBody('el => el.textContent'), [$errorElement]);
+                                                    if (strpos($errorText, 'The page you are looking for could not be found.') !== false) {
+                                                        $page->tryCatch->screenshot([
+                                                            'path' => "storage/app/screenshots/not_found_screenshot-{$timestamp}.png",
+                                                            'fullPage' => true,
+                                                        ]);
+                                                        // throw new Exception('Page not found error detected!');
+                                                        Log::warning('Page not found error detected!', ['product_id' => $product_id]);
+                                                    }
+                                                }
+                                                $page->tryCatch->reload(['waitUntil' => 'networkidle2']);
+                                            } catch (\Throwable $th) {
+                                                Log::error($th->getMessage(), [$th]);
+                                            }
+                                        } else {
+                                            $page->tryCatch->screenshot([
+                                                'path' => "storage/app/screenshots/error_screenshot-{$timestamp}.png",
+                                                'fullPage' => true,
+                                            ]);
+                                            // throw new Exception("Failed to find selector after {$maxRetries} attempts");
+                                            Log::warning("Failed to find selector after {$maxRetries} attempts", ['product_id' => $product_id]);
+                                        }
+                                    }
+                                }
+                                Log::info("Done trying for $url");
+                                if ($success) {
+                                    try {
+                                        $page->tryCatch->screenshot([
+                                            'path' => "storage/app/screenshots/success_{$attempt}_screenshot-{$timestamp}.png",
+                                            'fullPage' => true,
+                                        ]);
+                                    } catch (\Throwable $th) {
+                                        Log::error($th->getMessage(), [$th]);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (\Throwable $th) {
+                        Log::error($th->getMessage(), [$th]);
+                    }
+                } catch (\Throwable $th) {
+                    Log::error($th->getMessage(), [$th]);
+                }
+
+                try {
+                    $content = $page->tryCatch->content();
+
+                    if ($content) {
+                        Log::info("Adding page to array $product_id => $url");
+                        $pages[$product_id] = $content;
+                    }
+                } catch (\Throwable $th) {
+                    Log::error($th->getMessage(), [$th]);
+                }
+            }
+        } catch (FatalException $e) {
+            Log::error($e->getMessage(), [$e]);
+        }
+
+        $browser->close();
+
+        return $pages;
     }
 }
