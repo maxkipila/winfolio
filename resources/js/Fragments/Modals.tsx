@@ -8,6 +8,7 @@ import SuccessModal from './SuccessModal';
 import PortfolioModal from './PortfolioModal';
 import UnclaimedModal from './UnclaimedModal';
 import ConfirmModal from './modals/ConfirmModal';
+import CatalogFiltersModals from './CatalogFiltersModals';
 
 interface Props { }
 
@@ -20,6 +21,7 @@ export enum MODALS {
     PORTFOLIO,
     UNCLAIMED_AWARDS,
     CONFIRM,
+    CATALOG_FILTERS,
 }
 
 export function ModalsProvider(props) {
@@ -98,6 +100,7 @@ function Modals(props: Props) {
             {(modal?.modal == MODALS.PORTFOLIO) && <PortfolioModal  {...modal.data} />}
             {(modal?.modal == MODALS.UNCLAIMED_AWARDS) && <UnclaimedModal  {...modal.data} />}
             {(modal?.modal == MODALS.CONFIRM) && <ConfirmModal  {...modal.data} />}
+            {(modal?.modal == MODALS.CATALOG_FILTERS) && <CatalogFiltersModals  {...modal.data} />}
         </>
     )
 }

@@ -63,6 +63,7 @@ export default {
             "80vh": "80vh",
             "90vh": "90vh",
             "screen-no-header": "calc(100vh - 72px)",
+            "screen-no-header-mobile": "calc(100vh - 82px)",
         },
         borderRadius: {
             0: "0",

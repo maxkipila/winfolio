@@ -1,6 +1,8 @@
+import { ModalsContext } from '@/Components/contexts/ModalsContext';
 import { t } from '@/Components/Translator';
 import Form from '@/Fragments/forms/Form';
 import TextField from '@/Fragments/forms/inputs/TextField';
+import { MODALS } from '@/Fragments/Modals';
 import ProductCard from '@/Fragments/ProductCard';
 import { Button } from '@/Fragments/UI/Button';
 import { useDebouncedCallback } from '@/hooks/useDebounceCallback';
@@ -8,7 +10,7 @@ import useLazyLoad from '@/hooks/useLazyLoad';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, router, useForm } from '@inertiajs/react';
 import { MagnifyingGlass, SlidersHorizontal, SpinnerGap, TrendUp, X } from '@phosphor-icons/react';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 interface ThemeCardProps extends Theme {
     selected: Theme
@@ -39,13 +41,20 @@ function Catalog(props: Props) {
     });
     const { data } = form;
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
+    const { open } = useContext(ModalsContext)
     // const [themes] = useLazyLoad<Theme>('themes');
     let [selected, setSelected] = useState<Theme>(null)
     let [themeChildren, setThemeChildren] = useState<Array<number>>([])
     let [type, setType] = useState(null)
     let [showTrending, setShowTrending] = useState(false)
+    let [priceRange, setPriceRange] = useState({ from: 0, to: 999999 })
+    let [priceTrend, setPriceTrend] = useState('ASC')
+    let [reviews, setReviews] = useState('ASC')
+    let [favourited, setFavourited] = useState('ASC')
+    let [status, setStatus] = useState('retail')
+    let [releaseYear, setReleaseYear] = useState(null as number)
     const search = useDebouncedCallback(() => {
-        router.post(route('catalog', { parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type }))
+        router.post(route('catalog', { parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type, price_range: priceRange, price_trend: priceTrend, reviews: reviews, favourited: favourited, status: status, release_year: releaseYear }))
     }, 700);
 
     useEffect(() => {
@@ -62,8 +71,9 @@ function Catalog(props: Props) {
         <AuthenticatedLayout>
             <Head title="Catalog | Winfolio" />
             <div className='max-w-[920px] mx-auto pb-24px'>
-                <Form className='pt-32px mob:px-24px' form={form}>
+                <Form className='pt-32px mob:px-24px flex gap-12px items-center nMob:max-w-1/3 nMob:mx-auto' form={form}>
                     <TextField placeholder={t("Vyhledat položku")} name="search" icon={<MagnifyingGlass size={24} />} />
+                    <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: priceRange, priceTrend: priceTrend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear, setPriceRange: setPriceRange, setPriceTrend: setPriceTrend, setReviews: setReviews, setFavourited: setFavourited, setStatus: setStatus, setReleaseYear: setReleaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} />
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
                     <div onClick={() => { setShowTrending((p) => !p) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${showTrending ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
