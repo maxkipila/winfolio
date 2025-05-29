@@ -130,9 +130,16 @@ function PointsGraph(props: Props) {
             return number
         }
     }
-    let osa1 = osaValues.map((g, i) => getOsaValues((graphValues[0] + OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
-    let osa2 = osaValues.map((g, i) => getOsaValues((graphValues[0] - OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
+    // let osa1 = osaValues.map((g, i) => getOsaValues((graphValues[0] + OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
+    // let osa2 = osaValues.map((g, i) => getOsaValues((graphValues[0] - OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
     // console.log( 'osa:', graphDates)
+
+    let prevOsaValues1 = graphValues.map((g, i) => getOsaValues(avarageValue + OsaDiff, min))
+    let prevOsaValues2 = graphValues.map((g, i) => getOsaValues(avarageValue - OsaDiff, min))
+    let nextOsaValues1 = nextValues.map((g, i) => getOsaValues(nextValues[i] + OsaDiff, min))
+    let nextOsaValues2 = nextValues.map((g, i) => getOsaValues(nextValues[i] - OsaDiff, min))
+    let osa1 = [...prevOsaValues1, ...nextOsaValues1]
+    let osa2 = [...prevOsaValues2, ...nextOsaValues2]
 
     let options = {
         responsive: true,
