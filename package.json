@@ -30,6 +30,8 @@
         "@phosphor-icons/react": "^2.1.7",
         "@zoon/puphpeteer": "git+https://git@github.com/zoonru/puphpeteer.git#zoon",
         "chart.js": "^4.4.8",
+        "mathjs": "^14.5.1",
+        "ml-regression": "^6.3.0",
         "moment": "^2.30.1",
         "puppeteer": "^24.8.2",
         "puppeteer-extra": "^3.3.6",

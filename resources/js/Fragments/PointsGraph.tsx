@@ -1,25 +1,12 @@
 import React from 'react'
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    PointElement,
-    LineElement,
-    Filler,
-    TimeScale,
-    TimeUnit,
-    TimeSeriesScale,
-    DateAdapter,
-
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, Filler, TimeScale, TimeUnit, TimeSeriesScale, DateAdapter, } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import { externalTooltipHandler } from '@/Pages/chest';
 import { callback } from 'chart.js/helpers';
+import * as math from 'mathjs';
+import { SimpleLinearRegression } from 'ml-regression';
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -46,10 +33,6 @@ while (day.isBefore(moment().add('days', "14"))) {
 
 let daysLabel = Object.keys(days ?? {}).map(d => moment(d, 'YYYY-MM-DD').format('D.'));
 let max = Math.max(...Object.values(days ?? {}), 1);
-
-
-
-
 
 
 interface Props {
@@ -79,67 +62,62 @@ function PointsGraph(props: Props) {
     let dates = prevValues.flatMap((pV) => pV.date)
     let values = prevValues.flatMap((pV) => pV.value) as Array<number>
 
-    let historicData = Array.isArray(priceHistory.history)
-        ? priceHistory.history
-        : Object.values(priceHistory.history).flat();
+    const times = dates.map(d => moment(d).toDate().getTime());
+    const t0 = Math.min(...times);
+    const t1 = Math.max(...times);
+    const t_days = Math.max(Math.round(((t1 - t0) / (1000 * 60 * 60 * 24 * 30)) * 0.2), 1);
 
-    /*  let dates = historicData.map(item => item.date);
-     let values = historicData.map(item => Number(item.value)) as Array<number>; */
+    const prediction = moment();
 
-    let avarageValue = values.reduce((p, c) => c + p, 0) / values?.length
-    let max = Math.max(...values)
-    let min = Math.min(...values)
-    let last = values[values.length - 1]
-    let isGrowing = last > avarageValue
-    let difference = (max - min) / values?.length
-    let seventh = isGrowing ? last + difference : last - difference
-    let nextMonth = moment(dates[dates?.length - 1]).add(1, 'M')
-    let untilYear = 11 - nextMonth.month()
-    let amountOfMonths = getMonths(prevValues.length)
-    let nextDates = [moment(dates[dates?.length - 1]).format('YYYY-MM-DD')]
-    let nextValues = [last]
+    const predictedDates = Array(t_days).fill(0).map((_, i) => prediction.clone().add(i, 'month').format('YYYY-MM-DD'));
 
-    for (let index = 0; index < amountOfMonths; index++) {
+    let graphDates = [...dates];
+    let graphValues = [...values];
 
-        nextDates.push(moment(nextDates[nextDates.length - 1]).add(1, 'M').format('YYYY-MM-DD'))
+    const generateBand = () => {
+        let dates = graphDates.map((date) => new Date(date))
+        const values = graphValues
+
+        // Turn dates into numeric: days since first observation
+        let t0 = Math.min(...dates.map(d => d.getTime()));
+        let t_days = dates.map(d => Math.round((d.getTime() - t0) / (1000 * 60 * 60 * 24)));
+
+        // === FIT LINEAR MODEL ===
+        let x = t_days;
+        let y = values;
+
+        const regression = new SimpleLinearRegression(x, y);
+        graphDates = [...graphDates, ...predictedDates];
+
+        dates = graphDates.map((date) => new Date(date))
+        t0 = Math.min(...dates.map(d => d.getTime()));
+        t_days = dates.map(d => Math.round((d.getTime() - t0) / (1000 * 60 * 60 * 24)));
+
+        // === FIT LINEAR MODEL ===
+        x = t_days;
+
+        const y_pred = x.map(xi => regression.predict(xi));
+
+
+        // === BAND ===
+        const coverage = 0.90;
+        const residuals = y.map((v, i) => v - y_pred[i]);
+        const low_pct = (1 - coverage) / 2 * 100;
+        const high_pct = (1 + coverage) / 2 * 100;
+
+        const r_lo = math.quantileSeq(residuals, low_pct / 100);
+        const r_hi = math.quantileSeq(residuals, high_pct / 100);
+
+        const y_lower = y_pred.map(v => v + r_lo);
+        const y_upper = y_pred.map(v => v + r_hi);
+
+        return { y_pred, y_lower, y_upper };
     }
 
-    for (let index = 0; index < amountOfMonths; index++) {
-        if (isGrowing) {
-            nextValues.push(nextValues[nextValues?.length - 1] + difference)
-        } else {
-            nextValues.push(nextValues[nextValues?.length - 1] - difference)
-        }
+    const { y_pred, y_lower, y_upper } = generateBand();
 
-    }
-
-
-    let graphDates = [...dates, ...nextDates]
-    let formatedGraphDates = graphDates.map((gD) => moment(gD).format('MM. YYYY'))
-    console.log('formatedDates', formatedGraphDates)
-    let graphValues = [...values]
-    let osaValues = [...values, ...nextValues]
-    let down = avarageValue - min
-    let up = max - avarageValue
-    let shouldRise = up > down
-    let OsaDiff = max - min
-    function getOsaValues(number: number, avarage: number) {
-        if (number < avarage) {
-            return avarage
-        } else {
-            return number
-        }
-    }
-    // let osa1 = osaValues.map((g, i) => getOsaValues((graphValues[0] + OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
-    // let osa2 = osaValues.map((g, i) => getOsaValues((graphValues[0] - OsaDiff) + (shouldRise ? (i * (OsaDiff / 100)) : (-i * (OsaDiff / 100))), OsaDiff))
-    // console.log( 'osa:', graphDates)
-
-    let prevOsaValues1 = graphValues.map((g, i) => getOsaValues(avarageValue + OsaDiff, min))
-    let prevOsaValues2 = graphValues.map((g, i) => getOsaValues(avarageValue - OsaDiff, min))
-    let nextOsaValues1 = nextValues.map((g, i) => getOsaValues(nextValues[i] + OsaDiff, min))
-    let nextOsaValues2 = nextValues.map((g, i) => getOsaValues(nextValues[i] - OsaDiff, min))
-    let osa1 = [...prevOsaValues1, ...nextOsaValues1]
-    let osa2 = [...prevOsaValues2, ...nextOsaValues2]
+    // Make sure these arrays are the same length as your dates
+    // const bandLabels = prevValues.map((pV) => pV.date); // or use your graphDates if you want to extend
 
     let options = {
         responsive: true,
@@ -197,10 +175,9 @@ function PointsGraph(props: Props) {
     const dummyData = {
         labels: graphDates,
         datasets: [
-
             {
                 label: 'Total: ',
-                data: osa2,
+                data: y_lower,
                 stack: 'Stack 2',
                 borderColor: 'transparent',
                 backgroundColor: 'rgba(196, 234, 178, 0.15)',
@@ -231,7 +208,7 @@ function PointsGraph(props: Props) {
             },
             {
                 label: 'Total: ',
-                data: osa1,
+                data: y_upper,
                 stack: 'Stack 3',
                 borderColor: 'transparent',
                 backgroundColor: 'rgba(196, 234, 178, 0.15)',
@@ -244,7 +221,19 @@ function PointsGraph(props: Props) {
                 pointRadius: 0,
 
                 fill: '-2'
-            }
+            },
+           /*  {
+                label: 'Linear Fit',
+                data: y_pred,
+                stack: 'Stack 4',
+                borderColor: '#16A049',
+                backgroundColor: 'rgba(22,160,73,0.1)',
+                fill: false,
+                pointRadius: 0,
+                borderWidth: 2,
+                order: 2,
+            }, */
+
             // {
             //     label: 'Filled',
             //     backgroundColor: 'rgba(196, 234, 178, 0.3)',
