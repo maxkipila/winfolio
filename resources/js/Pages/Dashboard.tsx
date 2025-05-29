@@ -91,9 +91,37 @@ function CardsDesktop(props: CardsProps) {
 function CardsMobile(props: CardsProps) {
     let [index, setIndex] = useState(0)
     const { portfolioValue, portfolioStats } = props
+    const { auth } = usePageProps<{ auth: { user: User } }>();
+    let wishlistValue = 0
+    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
+    wishListValues.map((wV) => wishlistValue += parseFloat(wV))
+    let [scrollStart, setScrollStart] = useState(0)
+    let [scrollEnd, setScrollEnd] = useState(0)
+    try {
+        let container = document?.getElementById('scrollable')
+        let first = container.clientWidth / 2
+        let second = container.clientWidth * 1.5
+
+        container.addEventListener('scrollend', (e) => {
+            setScrollEnd(container.scrollLeft)
+            if (container.scrollLeft > first && container.scrollLeft < second) {
+                container.scrollTo({ left: container.clientWidth - 24 })
+            } else if (container.scrollLeft > second) {
+                container.scrollTo({ left: (container.clientWidth - 24) * 2 })
+            } else {
+                container.scrollTo({ left: 0 })
+            }
+            // console.log('drag', e, container.scrollLeft, container.clientWidth)
+        })
+
+    } catch (error) {
+
+    }
+
+
     return (
-        <div className='nMob:hidden w-full px-24px py-16px'>
-            <div className='w-full'>
+        <div id="scrollable" className='nMob:hidden w-full px-24px py-16px flex overflow-auto gap-24px'>
+            <div className='w-full flex-shrink-0'>
                 <div className='flex items-center w-full justify-between'>
                     <div className='font-nunito font-semibold'>{t('Hodnota portfolia')}</div>
                     <div className='flex items-center gap-8px'>
@@ -116,6 +144,44 @@ function CardsMobile(props: CardsProps) {
                                 <ArrowDownRight color="white" />
                         }
                         <div className='text-white'>{Math.round(portfolioStats?.growth_percentage ?? 0 * 100) / 100} %</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className='w-full flex-shrink-0'>
+                <div className='flex items-center w-full justify-between'>
+                    <div className='font-nunito font-semibold'>{t('Hodnota wishlistu')}</div>
+                    <div className='flex items-center gap-8px'>
+                        <div className='w-8px h-8px rounded-sm bg-[#999999]'></div>
+                        <div className='w-8px h-8px rounded-sm bg-black'></div>
+                        <div className='w-8px h-8px rounded-sm bg-[#999999]'></div>
+                    </div>
+                </div>
+                <div className='flex items-center w-full justify-between'>
+                    <div className='flex items-center'>
+                        <div className='font-bold text-4xl'>$</div>
+                        <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
+                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className='w-full flex-shrink-0'>
+                <div className='flex items-center w-full justify-between'>
+                    <div className='font-nunito font-semibold'>{t("All time high portfolia")}</div>
+                    <div className='flex items-center gap-8px'>
+                        <div className='w-8px h-8px rounded-sm bg-[#999999]'></div>
+                        <div className='w-8px h-8px rounded-sm bg-[#999999]'></div>
+                        <div className='w-8px h-8px rounded-sm bg-black'></div>
+                    </div>
+                </div>
+                <div className='flex items-center w-full justify-between'>
+                    <div className='flex items-center'>
+                        <div className='font-bold text-4xl'>$</div>
+                        <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
+                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                     </div>
                 </div>
             </div>

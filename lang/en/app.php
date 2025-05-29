@@ -176,5 +176,7 @@ return [
     'Datum narození' => 'Birth date',
     'Odebírat Newsletter'=>'Subscribe to newsletter',
     'Subscribe'=>'Subscribe',
-    'Limited Offer'=>'Limited Offer'
+    'Limited Offer'=>'Limited Offer',
+    'Dobrý den' => 'Hi',
+    'Výsledky vyhledávání' => 'Search results'
 ];

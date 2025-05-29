@@ -196,13 +196,13 @@ function PortfolioModal(props: Props) {
                 <div className='h-full'>
                     {
                         (!createPortfolio && !hasProducts) ?
-                            <div className='h-full py-64px max-h-full flex flex-col'>
+                            <div className='h-full py-64px max-h-full flex flex-col mob:justify-between'>
                                 <div className='w-full flex flex-col items-center justify-center'>
                                     <Img className='w-[84px] h-[84px] rounded-full' src="/assets/img/user-fix.jpg" />
-                                    <div className='py-16px'>{t('Vítej ve Winfolio')}</div>
-                                    <div className='font-bold text-6xl text-center'>{auth?.user?.first_name}!</div>
+                                    <div className='py-16px'>{t('Dobrý den')}, {auth?.user?.first_name}!</div>
+                                    <div className='font-bold text-6xl text-center'>{t('Vítej ve Winfolio')}</div>
                                 </div>
-                                <div className='mx-auto relative h-full px-80px overflow-hidden mob:px-16px '>
+                                <div className='mx-auto relative h-full px-80px overflow-hidden mob:hidden '>
                                     <div className='absolute bottom-32px flex items-center w-full pr-32px gap-12px justify-center nMob:hidden'>
                                         {
                                             carouselTexts.map((ct, i) =>
@@ -236,7 +236,7 @@ function PortfolioModal(props: Props) {
                                 {
                                     selected ?
 
-                                        <div className='max-w-1/3 mob:max-w-max mx-auto grid'>
+                                        <div className='max-w-1/3 mob:max-w-max mx-auto grid mob:px-24px mob:pb-24px'>
                                             <div className='flex justify-between mt-48px'>
                                                 <div className='font-bold font-teko text-xl mb-24px'>{t('Nová položka')}</div>
                                                 <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>{t('Cancel')}</div>
@@ -398,7 +398,7 @@ function PortfolioModal(props: Props) {
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                     <div className='h-2px w-38px bg-[#999999]'></div>
                                                 </div>
-                                                <div className='max-w-1/3 mob:max-w-none mob:w-full mx-auto mob:px-16px'>
+                                                <div className='max-w-1/3 mob:max-w-none mob:w-full mx-auto mob:px-24px'>
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
                                                     <Search<Product>
                                                         // className="min-w-[400px]"
@@ -423,8 +423,8 @@ function PortfolioModal(props: Props) {
                                                                 search_products?.length > 0 ?
                                                                     <>
                                                                         <div className='flex justify-center items-center gap-12px mt-28px'>
-                                                                            <ArrowUpRight size={24} weight='bold' />
-                                                                            <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání ${data['search_products']?.length > 0 ? search_products?.length : ''}`}</div>
+                                                                            {/* <ArrowUpRight size={24} weight='bold' /> */}
+                                                                            <div className='font-bold font-teko text-xl'>{`Výsledky vyhledávání`} <span className='text-[#999999]'>{`(${search_products?.length > 0 ? search_products?.length : ""})`}</span></div>
                                                                         </div>
                                                                         <div className='grid grid-cols-2 mob:grid-cols-1 gap-16px p-24px'>
                                                                             {
@@ -445,14 +445,21 @@ function PortfolioModal(props: Props) {
                                                             }
                                                         </>
                                                         :
-                                                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px p-24px'>
-                                                            {
-                                                                trendingProducts?.map((s) =>
-                                                                    <PortfolioProductCard {...s.product} />
-                                                                )
-                                                            }
+                                                        <>
+                                                            <div className='flex justify-center items-center gap-12px mt-28px'>
+                                                                <ArrowUpRight size={24} weight='bold' />
+                                                                <div className='font-bold font-teko text-xl'>{`Momentálně trendují`}</div>
+                                                            </div>
+                                                            <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px p-24px'>
+                                                                {
+                                                                    trendingProducts?.map((s) =>
+                                                                        <PortfolioProductCard {...s.product} />
+                                                                    )
+                                                                }
 
-                                                        </div>
+                                                            </div>
+                                                        </>
+
                                                 }
                                                 <div className='flex justify-center mt-24px mb-48px'>
                                                     <Button className='max-w-[160px]' href="#" onClick={(e) => { e.preventDefault(); close(); }}>{t('Dokončit')}</Button>

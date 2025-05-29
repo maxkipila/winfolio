@@ -181,5 +181,7 @@ return [
     'Datum narození'=>'Datum narození',
     'Odebírat Newsletter'=>'Odebírat Newsletter',
     'Subscribe'=>'Předplatit',
-    'Limited Offer'=>'Omezená nabídka'
+    'Limited Offer'=>'Omezená nabídka',
+    'Dobrý den' => 'Dobrý den',
+    'Výsledky vyhledávání' => 'Výsledky vyhledávání'
 ];
