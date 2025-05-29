@@ -37,16 +37,16 @@ function Login(props: Props) {
         "countryCode",
         "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
     );
-    let prefixes = [] as Array<{value: string, text: any}>
-    let countries = [] as Array<{value: string, text: any}>
+    let prefixes = [] as Array<{ value: string, text: any }>
+    let countries = [] as Array<{ value: string, text: any }>
     for (const [key, value] of Object.entries(myCountryCodesObject)) {
         let str = String(value)
         let prefix = str.split(': ')[1];
         let name = str.split('] ')[1].split(': ')[0];
         let code = key
         let flag = countryFlagEmoji.get(code)?.code as string
-        prefixes.push({value: `${prefix}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {prefix}</div>})
-        countries.push({value: `${code}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {name}</div>})
+        prefixes.push({ value: `${prefix}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {prefix}</div> })
+        countries.push({ value: `${code}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {name}</div> })
 
     }
     const search = useDebouncedCallback((d: string) => {
@@ -144,7 +144,7 @@ function Login(props: Props) {
                             </>
                         }
                         {
-                            emailConfirmed &&
+                            (preRegistered && emailConfirmed) &&
                             <div className='overflow-y-auto flex-col flex gap-12px max-h-[80vh]'>
                                 <TextField name="first_name" placeholder={t('Jméno')} />
                                 <TextField name="last_name" placeholder={t('Příjmení')} />
