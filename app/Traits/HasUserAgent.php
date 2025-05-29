@@ -127,6 +127,7 @@ trait HasUserAgent
         "
             ]
         );
+        
         $browser = $puppeteer->launch([
             'args' => $launchArgs,
             'headless' => true,
