@@ -14,7 +14,7 @@ class ProductErrorController extends Controller
      */
     public function index(Request $request)
     {
-        $errors = _ProductError::collection(
+        $productErrors = _ProductError::collection(
             ProductError::when(
                 $request->codes ?? false,
                 fn($q) =>
@@ -28,7 +28,7 @@ class ProductErrorController extends Controller
                 ->when($request->product_id ?? false, fn($q) => $q->where('product_id', $request->product_id))
                 ->paginate($request->paginate ?? 10)
         );
-        return Inertia::render('Admin/ProductErrors/index', compact('errors'));
+        return Inertia::render('Admin/ProductErrors/index', compact('productErrors'));
     }
 
     /**

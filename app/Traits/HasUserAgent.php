@@ -74,6 +74,7 @@ trait HasUserAgent
         // });
 
         $process = new Process(['node', base_path('scripts/fetchHtml.cjs'), json_encode($urls), "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
+        $process->setTimeout(300);
         $process->run();
 
         if (!$process->isSuccessful()) {

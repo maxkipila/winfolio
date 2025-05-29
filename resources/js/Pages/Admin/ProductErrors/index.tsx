@@ -5,6 +5,7 @@ import Group from '@/Fragments/forms/Group'
 import Checkbox from '@/Fragments/forms/inputs/Checkbox'
 import OrderBy from '@/Fragments/forms/inputs/OrderBy'
 import Search from '@/Fragments/forms/inputs/Search'
+import Select from '@/Fragments/forms/inputs/Select'
 import Toggle from '@/Fragments/forms/inputs/Toggle'
 import { MetaBar } from '@/Fragments/MetaBar'
 import Table from '@/Fragments/Table/Table'
@@ -20,7 +21,7 @@ import React, { useContext, useEffect } from 'react'
 
 
 interface Props {
-    errors: Array<any>
+    productErrors: Array<any>
 }
 
 interface ProductError {
@@ -62,7 +63,7 @@ export function ProductErrorTable({ absolute_items, hide_meta }: { absolute_item
     const form = useForm({});
     const { data, setData } = form;
 
-    console.log(data);
+    const search = useForm({});
 
     return (
         <>
@@ -76,23 +77,37 @@ export function ProductErrorTable({ absolute_items, hide_meta }: { absolute_item
                     </Group>
                 </div>
                 <div className='flex flex-col gap-8px mb-16px'>
-                    <Search<Product>
-                        // className="min-w-[400px]"
-                        name="search_products"
-                        placeholder="Hledat položku"
-                        keyName="search_products"
-                        asInput
-                        optionsCallback={(r) => ({
-                            text: r.name,
-                            element: (
-                                <SearchCard name={`${r?.name}`} type={'App\\Models\\Product'} image={'thumbnail' in r ? r?.thumbnail : undefined} onClick={() => setData(d => ({ ...d, q: "", product_id: r.id }))} href={"#"} />
-                            ),
-                            value: r.id,
-                        })}
-                    />
+                    <div className='min-w-[150px]'>
+                        <Select name='paginate' label="Počet na stránku" options={[
+                            { text: '10', value: 10 },
+                            { text: '50', value: 50 },
+                            { text: '100', value: 100 },
+                            { text: '200', value: 200 },
+                            { text: '500', value: 500 },
+                            { text: '1000', value: 1000 },
+                        ]} />
+                    </div>
+                    <FormContext.Provider value={search}>
+                        <Search<Product>
+                            // className="min-w-[400px]"
+                            name="search_products"
+                            placeholder="Hledat položku"
+                            keyName="search_products"
+                            asInput
+                            useDifferentForm
+                            optionsCallback={(r) => ({
+                                text: r.name,
+                                element: (
+                                    <SearchCard name={`${r?.name}`} type={'App\\Models\\Product'} image={'thumbnail' in r ? r?.thumbnail : undefined} onClick={() => setData(d => ({ ...d, q: "", product_id: r.id }))} href={"#"} />
+                                ),
+                                value: r.id,
+                            })}
+                        />
+                    </FormContext.Provider>
+
                 </div>
             </Form>
-            <Table<ProductError> title="ProductErrory" item_key='errors' Row={Row} absolute_items={absolute_items} filters={data}>
+            <Table<ProductError> title="ProductErrory" item_key='productErrors' Row={Row} absolute_items={absolute_items} filters={data}>
                 <Th>ID</Th>
                 <Th>Kód</Th>
                 <Th>Produkt</Th>
@@ -106,13 +121,6 @@ export function ProductErrorTable({ absolute_items, hide_meta }: { absolute_item
 
 function Row(props: ProductError & { setItems: React.Dispatch<React.SetStateAction<ProductError[]>> }) {
     const { id, context, created_at, error, product, code, setItems } = props;
-
-    const { setData } = useContext(FormContext);
-
-
-    useEffect(() => {
-        setData(d => ({ ...d, [`status-${id}`]: status }))
-    }, [])
 
     return (
         <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
