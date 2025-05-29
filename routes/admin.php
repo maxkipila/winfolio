@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ProductErrorController;
 use Illuminate\Support\Facades\Route;
 
 //Admin Routes
@@ -25,6 +26,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['POST', 'GET'], '/edit/{user}', [UserController::class, 'edit'])->name('users.edit');
             Route::match(['POST', 'GET'], '/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        });
+
+        Route::group(['prefix' => 'errors'], function () {
+            Route::match(['POST', 'GET'], '/', [ProductErrorController::class, 'index'])->name('errors.index');
+            Route::match(['POST', 'GET'], '/create', [ProductErrorController::class, 'create'])->name('errors.create');
+
+            Route::match(['POST', 'GET'], '/show/{productError}', [ProductErrorController::class, 'show'])->name('errors.show');
+            Route::match(['POST', 'GET'], '/store', [ProductErrorController::class, 'store'])->name('errors.store');
+            Route::match(['POST', 'GET'], '/edit/{productError}', [ProductErrorController::class, 'edit'])->name('errors.edit');
+            Route::match(['POST', 'GET'], '/{productError}', [ProductErrorController::class, 'update'])->name('errors.update');
+            Route::delete('/{productError}', [ProductErrorController::class, 'destroy'])->name('errors.destroy');
         });
 
         Route::group(['prefix' => 'awards', 'as' => 'awards.'], function () {

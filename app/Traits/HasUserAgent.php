@@ -61,7 +61,7 @@ trait HasUserAgent
         'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)',
     ];
 
-    function proxyRequest($url)
+    function proxyRequest($urls)
     {
 
         // $API_KEY = env('PROXY_API_KEY');
@@ -73,7 +73,7 @@ trait HasUserAgent
         //     return Http::get("https://proxy-seller.com/personal/api/v1/{$API_KEY}/proxy/download/resident?listId=12268929")->body();
         // });
 
-        $process = new Process(['node', base_path('scripts/fetchHtml.cjs'), $url, "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
+        $process = new Process(['node', base_path('scripts/fetchHtml.cjs'), json_encode($urls), "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -127,7 +127,7 @@ trait HasUserAgent
         "
             ]
         );
-        
+
         $browser = $puppeteer->launch([
             'args' => $launchArgs,
             'headless' => true,

@@ -2,6 +2,7 @@ interface Product {
     id: number;
     // set_num: string;
     product_num: string;
+    product_type: string;
     name: string;
     year: number;
     num_parts: number;
