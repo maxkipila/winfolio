@@ -16,6 +16,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Lock } from '@phosphor-icons/react';
 import React, { useState } from 'react'
 import { useEffect } from 'react';
+import countryFlagEmoji from "country-flag-emoji";
+import * as countryCodes from "country-codes-list";
 
 interface Props { }
 
@@ -23,13 +25,30 @@ function Login(props: Props) {
     const { } = props
     const form = useForm({
         email: '',
-        prefix: '+420'
+        prefix: '+420',
+        country: 'CZ'
     });
     const { data, post, clearErrors } = form;
     let [inDB, setInDB] = useState(null)
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let [preRegistered, setPreRegistered] = useState(false)
-    let [emailConfirmed, setEmailConfirmed] = useState(false)
+    let [emailConfirmed, setEmailConfirmed] = useState(true)
+    const myCountryCodesObject = countryCodes.customList(
+        "countryCode",
+        "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
+    );
+    let prefixes = [] as Array<{value: string, text: any}>
+    let countries = [] as Array<{value: string, text: any}>
+    for (const [key, value] of Object.entries(myCountryCodesObject)) {
+        let str = String(value)
+        let prefix = str.split(': ')[1];
+        let name = str.split('] ')[1].split(': ')[0];
+        let code = key
+        let flag = countryFlagEmoji.get(code)?.code as string
+        prefixes.push({value: `${prefix}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {prefix}</div>})
+        countries.push({value: `${code}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {name}</div>})
+
+    }
     const search = useDebouncedCallback((d: string) => {
 
         if (d?.length > 0) {
@@ -133,10 +152,7 @@ function Login(props: Props) {
                                 <div className=''>{t('Telefonní číslo')}</div>
                                 <div className='flex gap-8px'>
                                     <div className='flex-shrink-0 min-w-[100px]'>
-                                        <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={[
-                                            { value: "+420", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/cz.png" />} +420</div> },
-                                            { value: "+421", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/sk.png" />} +421</div> }
-                                        ]} />
+                                        <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={prefixes} />
                                     </div>
                                     <TextField name="phone" placeholder={t('Telefon')} />
                                 </div>
@@ -274,9 +290,7 @@ function Login(props: Props) {
                                     </div>
                                     <TextField name="city" placeholder={t('Město')} />
                                 </div>
-                                <Select name="country" placeholder={t('Stát')} options={[
-                                    { text: 'Česká Republika', value: 'CZE' }
-                                ]} />
+                                <CSelect name="country" placeholder={t('Stát')} options={countries} />
                                 <div className='mt-12px flex gap-8px'>
                                     <Lock size={24} />
                                     <div>{t('Zabezpečení')}</div>

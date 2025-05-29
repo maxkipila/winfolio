@@ -88,3 +88,40 @@ p {
     transition: height 0.3s ease-in-out;
     height: auto;
 }
+
+
+.tagscrollbar {
+    /* width */
+    &::-webkit-scrollbar {
+        margin: 10px 0px;
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+        cursor: pointer;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: rgba($color: #000000, $alpha: 0.01);
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 9999px;
+        cursor: pointer;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #F7AA1A;
+        cursor: pointer;
+    }
+
+    &:hover {
+        /* Handle */
+        &::-webkit-scrollbar-thumb {
+            background: #F7AA1A;
+        }
+    }
+}

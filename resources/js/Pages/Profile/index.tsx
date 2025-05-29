@@ -11,6 +11,8 @@ import ProfileLayout from '@/Layouts/ProfileLayout'
 import { Head, useForm } from '@inertiajs/react';
 import { Lock } from '@phosphor-icons/react';
 import React from 'react'
+import countryFlagEmoji from "country-flag-emoji";
+import * as countryCodes from "country-codes-list";
 
 interface Props { }
 
@@ -34,6 +36,23 @@ function Index(props: Props) {
     });
     const { data } = form;
 
+    const myCountryCodesObject = countryCodes.customList(
+        "countryCode",
+        "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
+    );
+    let prefixes = [] as Array<{value: string, text: any}>
+    let countries = [] as Array<{value: string, text: any}>
+    for (const [key, value] of Object.entries(myCountryCodesObject)) {
+        let str = String(value)
+        let prefix = str.split(': ')[1];
+        let name = str.split('] ')[1].split(': ')[0];
+        let code = key
+        let flag = countryFlagEmoji.get(code)?.code as string
+        prefixes.push({value: `${prefix}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {prefix}</div>})
+        countries.push({value: `${code}`, text: <div className='flex items-center gap-8px'><Img className="" src={`https://flagcdn.com/24x18/${flag?.toLowerCase()}.png`} alt='flag' /> {name}</div>})
+
+    }
+
     return (
         <AuthenticatedLayout>
             <ProfileLayout>
@@ -46,11 +65,8 @@ function Index(props: Props) {
                         <TextField prefix="@" name="username" placeholder={t('@username')} />
                         <div className='mt-24px'>{t('Telefonní číslo')}</div>
                         <div className='flex gap-8px'>
-                            <div className='flex-shrink-0 min-w-[100px]'>
-                                <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={[
-                                    { value: "+420", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/cz.png" />} +420</div> },
-                                    { value: "+421", text: <div className='flex items-center gap-8px'>{<Img src="/assets/img/sk.png" />} +421</div> }
-                                ]} />
+                            <div className='flex-shrink-0 min-w-[120px]'>
+                                <CSelect name="prefix" placeholder={t('Prefix')} defaultValue={"+420"} options={prefixes} />
                             </div>
                             <TextField name="phone" placeholder={t('Telefon')} />
                         </div>
@@ -189,9 +205,7 @@ function Index(props: Props) {
 
                             <TextField className='w-full' name="city" placeholder={t('Město')} />
                         </div>
-                        <Select name="country" placeholder={t('Stát')} options={[
-                            { text: 'Česká Republika', value: 'CZE' }
-                        ]} />
+                        <CSelect name="country" placeholder={t('Stát')} options={countries} />
                         <div className='mt-24px flex gap-8px'>
                             <Lock size={24} />
                             <div>{t('Zabezpečení')}</div>
