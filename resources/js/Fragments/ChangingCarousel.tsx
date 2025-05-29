@@ -45,6 +45,7 @@ function ChangingCarousel(props: Props) {
         <div className='grid h-full'>
             <div className='row-start-1 col-start-1 w-full h-full flex max-h-screen justify-center relative'>
                 <Img className='w-[90%] object-cover' src={slides[slide == 1 ? 2 : 2 - slide].src} />
+                
                 <div className='absolute top-0 left-0 w-full h-full  text-white p-40px'>
                     <div className='font-bold text-3xl text-center'>{slides[slide == 1 ? 2 : 2 - slide].headline}</div>
                     <div className='text-center font-nunito'>{slides[slide == 1 ? 2 : 2 - slide].text}</div>
@@ -59,9 +60,14 @@ function ChangingCarousel(props: Props) {
                 </div>
 
             </div>
-            <div className={`row-start-1 col-start-1  w-full h-full max-h-screen flex justify-center relative`}>
-                <Img className='w-full object-cover mb-48px' src={slides[slide].src} />
-                <div className='absolute top-0 left-0 w-full h-[90%]  text-white p-40px'>
+            <div className={`row-start-1 col-start-1  w-full h-full max-h-screen flex justify-center relative overflow-hidden pb-48px`}>
+                <div className='w-full h-full grid overflow-hidden'>
+                    
+                    <Img className='w-full h-full object-cover col-start-1 row-start-1' src={slides[slide].src} />
+                    <div className='bg-black bg-opacity-30 col-start-1 row-start-1 w-full h-full'></div>
+                </div>
+                
+                <div className='absolute top-0 left-0 w-full h-full text-white p-40px'>
                     <div className='font-bold text-3xl text-center'>{slides[slide].headline}</div>
                     <div className='text-center font-nunito'>{slides[slide].text}</div>
                 </div>

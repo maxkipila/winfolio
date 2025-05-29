@@ -165,19 +165,19 @@ return [
     'Přidej své LEGO sety během pár minut a sleduj, jaká je jejich aktuální hodnota. Winfolio čerpá data z celosvětových trhů a automaticky ti ukáže, jak si tvoje sbírka vede.' => 'Add your LEGO sets in minutes and track their current value. Winfolio pulls data from global markets and automatically shows you how your collection is doing.',
     'Vytvoř si svou vlastní investiční truhlu' => 'Create your own investment chest',
     'Díky analýze tisíců cen a trendů ti Winfolio napoví, které sety mají investiční potenciál. Nakupuj ve správný čas a buduj sbírku, která získává na hodnotě.' => 'By analysing thousands of prices',
-    
+
     'Buduj své sběratelské impérium a bav se u toho' => 'Build your collecting empire and have fun doing it',
-    'Plň investiční mise, sbírej odměny a seznam se s dalšími sběrateli. Winfolio tě provede světem LEGO investic zábavným a hravým způsobem.' => 'Complete investment missions, collect rewards and meet other collectors. Winfolio guides you through the world of LEGO investments in a fun and playful way.',
-    'Dělej chytřejší nákupní rozhodnutí' => 'Make smarter shopping decisions',
+    'Plň investiční mise, sbírej odměny a seznam se s dalšími sběrateli. Winfolio tě provede světem LEGO investic zábavným a hravým způsobem.' => 'Complete investment missions, collect rewards and connect with fellow collectors. Winfolio navigates the LEGO investment world in a fun, playful way.',
+    'Dělej chytřejší nákupní rozhodnutí' => 'Make smarter buying decisions',
     'Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.' => 'Build your collection. Watch it grow. Improve and win.',
     'Vyber si, jak chceš stavět své portfolio' => 'Choose how you want to build your portfolio',
-    'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.' => 'Track the value of your LEGO collection, make smarter purchases, and have fun completing investment missions. All in one place.',
+    'Sleduj hodnotu své LEGO sbírky, dělej chytřejší nákupy a bav se při plnění investičních misí. Jednoduše a na jednom místě.' => 'Track your LEGO collection’s value, make smarter purchases and enjoy completing investment missions—all in one place.',
     'Hodnota wishlistu' => 'Wishlist value',
-    'All time high portfolia' => 'All time high portfolia',
+    'All time high portfolia' => 'Portfolio all‑time high',
     'Datum narození' => 'Birth date',
-    'Odebírat Newsletter'=>'Subscribe to newsletter',
-    'Subscribe'=>'Subscribe',
-    'Limited Offer'=>'Limited Offer',
-    'Dobrý den' => 'Hi',
+    'Odebírat Newsletter' => 'Subscribe to newsletter',
+    'Subscribe' => 'Subscribe',
+    'Limited Offer' => 'Limited offer',
+    'Dobrý den' => 'Hello',
     'Výsledky vyhledávání' => 'Search results'
 ];

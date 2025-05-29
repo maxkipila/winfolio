@@ -32,7 +32,7 @@ function Login(props: Props) {
     let [inDB, setInDB] = useState(null)
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let [preRegistered, setPreRegistered] = useState(false)
-    let [emailConfirmed, setEmailConfirmed] = useState(true)
+    let [emailConfirmed, setEmailConfirmed] = useState(false)
     const myCountryCodesObject = countryCodes.customList(
         "countryCode",
         "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
@@ -94,10 +94,10 @@ function Login(props: Props) {
         post(route('register.account'));
     };
     return (
-        <div className='flex items-center p-40px mob:p-16px h-screen font-teko'>
+        <div className='flex items-center p-40px mob:p-16px nMob:h-screen font-teko'>
             <Head title="Login | Winfolio" />
             <div className='w-full h-full flex flex-col'>
-                <div className='flex items-center justify-center'>
+                <div className='flex items-center justify-center mob:mb-36px'>
                     <Link href={route('welcome')}><Img src="/assets/img/logo.svg" /></Link>
                 </div>
                 <div className='h-full justify-center items-center flex p-80px mob:p-0'>
@@ -144,8 +144,8 @@ function Login(props: Props) {
                             </>
                         }
                         {
-                            (preRegistered && emailConfirmed) &&
-                            <div className='overflow-y-auto flex-col flex gap-12px max-h-[80vh]'>
+                            emailConfirmed &&
+                            <div className='overflow-y-auto flex-col flex gap-12px nMob:max-h-[80vh]'>
                                 <TextField name="first_name" placeholder={t('Jméno')} />
                                 <TextField name="last_name" placeholder={t('Příjmení')} />
                                 <TextField prefix='@' name="nickname" placeholder={t('@username')} />
@@ -297,8 +297,8 @@ function Login(props: Props) {
                                 </div>
                                 <PasswordField name="password" placeholder={t('Heslo')} />
                                 <PasswordField name="password_confirmation" placeholder={t('Heslo (znova)')} />
-                                <div className='flex gap-8px items-center font-nunito justify-between w-full '>
-                                    <Checkbox name="newsletter" label={t("Odebírat Newsletter")} />
+                                <div className='flex items-center font-nunito justify-between w-full '>
+                                    <Toggle noPadding name="newsletter" label={t("Odebírat Newsletter")} />
                                 </div>
                                 <Button className='flex-shrink-0' href="#" onClick={(e) => { e.preventDefault(); finishRegistration(e) }}>{t('Dokončit')}</Button>
                             </div>

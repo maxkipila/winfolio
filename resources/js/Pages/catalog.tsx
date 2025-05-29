@@ -21,8 +21,8 @@ function ThemeCard(props: ThemeCardProps) {
     const { name, selected, id, setSelected } = props
 
     return (
-        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]"}  flex items-center justify-center  flex-col p-12px gap-8px mob:min-w-[112px]`}>
-            <div className={`w-40px h-40px bg-white text-black flex items-center justify-center rounded-full  `}>
+        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]  hover:bg-white"} group  flex items-center justify-center  flex-col p-12px gap-8px mob:min-w-[112px]`}>
+            <div className={`w-40px h-40px bg-white group-hover:bg-[#F5F5F5] text-black flex items-center justify-center rounded-full  `}>
                 <TrendUp size={24} />
             </div>
             <div className='font-bold text-center font-nunito'>{name}</div>
@@ -73,7 +73,7 @@ function Catalog(props: Props) {
             <div className='max-w-[920px] mx-auto pb-24px'>
                 <Form className='pt-32px mob:px-24px flex gap-12px items-center nMob:max-w-1/3 nMob:mx-auto' form={form}>
                     <TextField placeholder={t("Vyhledat položku")} name="search" icon={<MagnifyingGlass size={24} />} />
-                    <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: priceRange, priceTrend: priceTrend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear, setPriceRange: setPriceRange, setPriceTrend: setPriceTrend, setReviews: setReviews, setFavourited: setFavourited, setStatus: setStatus, setReleaseYear: setReleaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} />
+                    {/* <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: priceRange, priceTrend: priceTrend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear, setPriceRange: setPriceRange, setPriceTrend: setPriceTrend, setReviews: setReviews, setFavourited: setFavourited, setStatus: setStatus, setReleaseYear: setReleaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} /> */}
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
                     <div onClick={() => { setShowTrending((p) => !p) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${showTrending ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
