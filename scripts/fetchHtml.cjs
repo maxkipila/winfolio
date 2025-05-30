@@ -147,7 +147,7 @@ const { execSync } = require("child_process");
         }
     } catch (error) {
         execSync(
-            `php artisan log:error ${0} "${JSON.stringify(error)}" 500 "${JSON.stringify(urls)}"`
+            `php artisan log:error ${0} "${JSON.stringify(error)}" 500 '${JSON.stringify(urls)}'`
         );
         await browser.close();
     }
