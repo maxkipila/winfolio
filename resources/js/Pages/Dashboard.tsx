@@ -8,7 +8,7 @@ import useLazyLoad from '@/hooks/useLazyLoad';
 import usePageProps from '@/hooks/usePageProps';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowDownRight, ArrowUpRight, Ranking, TelegramLogo } from '@phosphor-icons/react';
+import { ArrowDownRight, ArrowUpRight, LegoSmiley, Ranking, TelegramLogo } from '@phosphor-icons/react';
 import { useContext, useState } from 'react';
 
 function SmallBlogCard() {
@@ -44,40 +44,43 @@ function CardsDesktop(props: CardsProps) {
                     <div className='font-bold text-9xl'>{Math.round(portfolioValue * 100) / 100}</div>
                     <div className='text-[#999999] font-bold text-7xl'>.{((Math.round(portfolioValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
                 </div>
-                <div className={`${portfolioStats?.growth_percentage > 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
-                    {
-                        portfolioStats?.growth_percentage ?? 0 > 0 ?
-                            <ArrowUpRight color="white" />
-                            :
-                            <ArrowDownRight color="white" />
-                    }
-                    <div className='text-white'>{Math.round(portfolioStats?.growth_percentage * 100) / 100} %</div>
-                </div>
+                {
+                    portfolioValue > 0 &&
+                    <div className={`${portfolioStats?.growth_percentage > 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
+                        {
+                            portfolioStats?.growth_percentage ?? 0 > 0 ?
+                                <ArrowUpRight color="white" />
+                                :
+                                <ArrowDownRight color="white" />
+                        }
+                        <div className='text-white'>{Math.round(portfolioStats?.growth_percentage * 100) / 100} %</div>
+                    </div>
+                }
             </div>
-            <div className='flex-shrink-0 py-48px px-48px'>
-                <div className='font-nunito font-semibold'>{t('Hodnota wishlistu')}</div>
-                <div className='flex items-center py-34px'>
-                    <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
-                    <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+            {
+                wishlistValue > 0 &&
+                <div className='flex-shrink-0 py-48px px-48px'>
+                    <div className='font-nunito font-semibold'>{t('Hodnota wishlistu')}</div>
+                    <div className='flex items-center py-34px'>
+                        <div className='font-bold text-4xl'>$</div>
+                        <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
+                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                    </div>
+
                 </div>
-                {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
-                    <ArrowUpRight color="white" />
-                    <div className='text-white'>+4,1 %</div>
-                </div> */}
-            </div>
-            <div className='flex-shrink-0 py-48px px-48px'>
-                <div className='font-nunito font-semibold'>{t("All time high portfolia")}</div>
-                <div className='flex items-center py-34px'>
-                    <div className='font-bold text-4xl'>$</div>
-                    <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
-                    <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+            }
+            {
+                auth?.user?.highest_portfolio > 0 &&
+                <div className='flex-shrink-0 py-48px px-48px'>
+                    <div className='font-nunito font-semibold'>{t("All time high portfolia")}</div>
+                    <div className='flex items-center py-34px'>
+                        <div className='font-bold text-4xl'>$</div>
+                        <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
+                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                    </div>
                 </div>
-                {/* <div className='bg-[#46BD0F] flex items-center w-[78px] text-center py-2px rounded justify-center'>
-                    <ArrowUpRight color="white" />
-                    <div className='text-white'>+4,1 %</div>
-                </div> */}
-            </div>
+            }
+
             <div className='pl-48px py-48px'>
                 <div className='bg-[#FFD266] flex flex-col justify-center items-center w-full p-52px'>
                     <div className='font-bold text-xl mb-12px'>{t("Join signals community")}</div>
@@ -203,6 +206,7 @@ export default function Dashboard(props: DashBoardProps) {
     let [trendingProducts, trendButton, meta, setItems] = useLazyLoad<{ product: Product }>('trendingProducts');
 
     console.log('trendingProducts:', trendingProducts)
+    let { open } = useContext(ModalsContext)
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard | Winfolio" />
@@ -216,37 +220,65 @@ export default function Dashboard(props: DashBoardProps) {
                             <Ranking size={24} />
                             <div className='font-bold text-xl'>{t('Momentálně trendují')}</div>
                         </div>
-                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
-                            {
-                                trendingProducts?.map((s) =>
-                                    <ProductCard {...s.product} />
-                                )
-                            }
+                        {
+                            trendingProducts?.length > 0 ?
+                                <>
+                                    <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
+                                        {
+                                            trendingProducts?.map((s) =>
+                                                <ProductCard {...s.product} />
+                                            )
+                                        }
 
-                        </div>
-                        <div className='flex items-center justify-center w-full mt-24px'>
-                            <div>
-                                <Button {...trendButton}>{t('Zobrazit další')}</Button>
-                            </div>
-                        </div>
+                                    </div>
+                                    <div className='flex items-center justify-center w-full mt-24px'>
+                                        <div>
+                                            <Button {...trendButton}>{t('Zobrazit další')}</Button>
+                                        </div>
+                                    </div>
+                                </>
+                                :
+                                <div className='w-full flex items-center justify-center bg-[#EEEFF2] mt-12px p-32px'>
+                                    <div className=''>
+                                        <div className='font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
+                                        {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
+                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button>
+                                    </div>
+                                </div>
+                        }
+
                     </div>
                     <div className='py-24px pl-24px mob:pl-0 w-full'>
                         <div className='flex gap-8px items-center'>
                             <Ranking size={24} />
                             <div className='font-bold text-xl'>{t('Top Movers')}</div>
                         </div>
-                        <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
-                            {
-                                topMovers?.map((s) =>
-                                    <ProductCard {...s.product} />
-                                )
-                            }
-                        </div>
-                        <div className='flex items-center justify-center w-full mt-24px'>
-                            <div>
-                                <Button {...button}>{t('Zobrazit další')}</Button>
-                            </div>
-                        </div>
+                        {
+                            topMovers?.length > 0 ?
+                                <>
+                                    <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px'>
+                                        {
+                                            topMovers?.map((s) =>
+                                                <ProductCard {...s.product} />
+                                            )
+                                        }
+                                    </div>
+                                    <div className='flex items-center justify-center w-full mt-24px'>
+                                        <div>
+                                            <Button {...button}>{t('Zobrazit další')}</Button>
+                                        </div>
+                                    </div>
+                                </>
+                                :
+                                <div className='w-full flex items-center justify-center bg-[#EEEFF2] mt-12px p-32px'>
+                                    <div className=''>
+                                        <div className='font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
+                                        {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
+                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button>
+                                    </div>
+                                </div>
+                        }
+
                     </div>
 
                 </div>

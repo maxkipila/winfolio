@@ -3,7 +3,7 @@ import Form from '@/Fragments/forms/Form'
 import Toggle from '@/Fragments/forms/inputs/Toggle'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import ProfileLayout from '@/Layouts/ProfileLayout'
-import { useForm } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import React from 'react'
 
 interface Props { }
@@ -15,6 +15,7 @@ function Notifications(props: Props) {
     return (
         <AuthenticatedLayout>
             <ProfileLayout>
+                <Head title="Profile - Notifications | Winfolio" />
                 <div className='w-full p-24px'>
                     <div className='w-full text-center font-bold text-xl'>{t('Notifikace')}</div>
                     <Form className='mt-32px flex flex-col gap-16px' form={form}>

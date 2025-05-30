@@ -4,7 +4,7 @@ import ProductCard from '@/Fragments/ProductCard'
 import PublicHeader from '@/Fragments/PublicHeader'
 import { Button } from '@/Fragments/UI/Button'
 import useLazyLoad from '@/hooks/useLazyLoad'
-import { Link } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import { Check, CheckCircle, Ranking } from '@phosphor-icons/react'
 import React from 'react'
 
@@ -20,6 +20,7 @@ function Welcome(props: Props) {
 
     return (
         <div className='pt-[82px] font-teko relative'>
+            <Head title="Home | Winfolio" />
             <PublicHeader />
             <div className='w-full'>
                 <div className='grid'>
