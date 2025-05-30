@@ -21,8 +21,8 @@ function ThemeCard(props: ThemeCardProps) {
     const { name, selected, id, setSelected } = props
 
     return (
-        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${selected?.id == id ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]  hover:bg-white"} group  flex items-center justify-center  flex-col p-12px gap-8px mob:min-w-[112px]`}>
-            <div className={`w-40px h-40px bg-white group-hover:bg-[#F5F5F5] text-black flex items-center justify-center rounded-full  `}>
+        <div onClick={() => { setSelected({ ...props }) }} className={`cursor-pointer transform duration-300 w-full min-w-[120px] border-2 ${selected?.id == id ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]  hover:bg-white"} group  flex items-center justify-center  flex-col p-12px gap-8px mob:min-w-[112px]`}>
+            <div className={`w-40px h-40px transform duration-300  bg-white group-hover:bg-[#F5F5F5] text-black flex items-center justify-center rounded-full  `}>
                 <TrendUp size={24} />
             </div>
             <div className='font-bold text-center font-nunito'>{name}</div>
@@ -63,6 +63,7 @@ function Catalog(props: Props) {
 
     useEffect(() => {
         setThemeChildren([])
+        setShowTrending(false)
     }, [selected])
 
     let [trendingProducts, trendButton, TrendMeta, TrendsetItems] = useLazyLoad<{ product: Product }>('trending_products');
@@ -76,8 +77,8 @@ function Catalog(props: Props) {
                     {/* <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: priceRange, priceTrend: priceTrend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear, setPriceRange: setPriceRange, setPriceTrend: setPriceTrend, setReviews: setReviews, setFavourited: setFavourited, setStatus: setStatus, setReleaseYear: setReleaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} /> */}
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
-                    <div onClick={() => { setShowTrending((p) => !p) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${showTrending ? "border-[#FFB400]" : "border-black"}  flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
-                        <div className='w-40px h-40px bg-white flex items-center justify-center rounded-full  '>
+                    <div onClick={() => { setShowTrending((p) => !p) }} className={`cursor-pointer w-full min-w-[120px] border-2 ${showTrending ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]  hover:bg-white"}  group    flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>
+                        <div className='w-40px h-40px transform duration-300  bg-white group-hover:bg-[#F5F5F5] text-black flex items-center justify-center rounded-full  '>
                             <TrendUp size={24} />
                         </div>
                         <div className='font-bold text-center font-nunito'>Trending</div>

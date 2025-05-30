@@ -27,10 +27,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Paradigma\Pictura\Traits\HasFiles;
 
 class UserController extends Controller
 {
     protected $trendService;
+    use HasFiles;
 
     public function __construct(TrendService $trendService)
     {
@@ -459,5 +461,13 @@ class UserController extends Controller
             });
 
         return $portfolioValue;
+    }
+
+    public function change_profile_img(Request $request){
+        $user = Auth::user();
+        dd($user, $request->all());
+        $this->updateFile($request, $user, 'thumbnail', 'thumbnail', true);
+
+        return back();
     }
 }

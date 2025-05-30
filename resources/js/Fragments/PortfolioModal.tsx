@@ -202,7 +202,7 @@ function PortfolioModal(props: Props) {
                                     <div className='py-16px'>{t('Dobrý den')}, {auth?.user?.first_name}!</div>
                                     <div className='font-bold text-6xl text-center'>{t('Vítej ve Winfolio')}</div>
                                 </div>
-                                <div className='mx-auto relative h-full px-80px overflow-hidden mob:hidden '>
+                                {/* <div className='mx-auto relative h-full px-80px overflow-hidden mob:hidden '>
                                     <div className='absolute bottom-32px flex items-center w-full pr-32px gap-12px justify-center nMob:hidden'>
                                         {
                                             carouselTexts.map((ct, i) =>
@@ -224,7 +224,7 @@ function PortfolioModal(props: Props) {
                                     <div onClick={() => { nextCarousel() }} className='cursor-pointer h-40px w-40px bg-black rounded-full absolute flex items-center justify-center right-0 top-1/2  transform translate-y-1/2 mob:hidden'>
                                         <ArrowRight size={24} color='white' />
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className='flex items-center justify-center gap-12px max-w-[200px] mx-auto mt-40px'>
                                     <div className='cursor-pointer' onClick={() => { close(); }}>{t('Přeskočit')}</div>
                                     <Button href="#" icon={<HandPointing size={24} weight='bold' />} onClick={(e) => { e.preventDefault(); setCreatePortfolio(true); }}>{t('Vytvořit portfolio')}</Button>
