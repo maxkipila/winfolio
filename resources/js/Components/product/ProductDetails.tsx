@@ -27,39 +27,39 @@ function ProductDetails(props: Props) {
         <div className='border-2 border-black p-24px flex flex-col gap-12px mob:border-0 mob:p-0 mob:mt-36px'>
             <div className='font-bold text-xl'>{t('Set Details')}</div>
 
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Set number')}</div>
                 <div className='text-[#4D4D4D]'>{product?.product_num ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Name')}</div>
                 <div className='text-[#4D4D4D]'>{product?.name ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Theme')}</div>
                 <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.parent?.name : (product?.theme?.name ?? "---")}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Subtheme')}</div>
                 <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.name : "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Year')}</div>
                 <div className='text-[#4D4D4D]'>{product?.year ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Released')}</div>
                 <div className='text-[#4D4D4D]'>{product?.year ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Availability')}</div>
                 <div className='text-[#4D4D4D]'>{product?.latest_price?.condition ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Packaging')}</div>
                 <div className='text-[#4D4D4D]'>{product?.latest_price?.condition ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Pieces')}</div>
                 <div className='text-[#4D4D4D]'>{product?.num_parts ?? "---"}</div>
             </div>
@@ -78,7 +78,7 @@ function ProductDetails(props: Props) {
             }
             {
                 product?.minifigs?.length > 0 &&
-                <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px'>
+                <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                     <div className='text-[#4D4D4D]'>{t('Minifigs')}</div>
                     <div className='text-[#4D4D4D] flex gap-8px items-center'>
                         {
