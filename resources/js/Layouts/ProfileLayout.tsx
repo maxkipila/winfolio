@@ -85,7 +85,7 @@ function ProfileLayout(props: Props) {
                     </div>
                     <ArrowRight size={24} />
                 </a>
-                <a href="https://www.instagram.com/winfolio" traget="_blank" className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                <a href="https://www.instagram.com/winfolio" target="_blank" className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <InstagramLogo size={24} />
