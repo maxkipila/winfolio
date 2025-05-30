@@ -26,7 +26,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
-            if ($this->app->environment('local') || !!config('telescope.log_all', false)) {
+            if ($isLocal || !!config('telescope.log_all', false)) {
                 return true;
             }
 
@@ -37,6 +37,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                 $entry->isScheduledTask() ||
                 $entry->hasMonitoredTag();
         });
+        
         Telescope::afterStoring(function (array $entries, string $batchId) {
 
             if (config('app.env', 'local') == 'local')

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class DownloadProductImageJob implements ShouldQueue
@@ -26,18 +27,10 @@ class DownloadProductImageJob implements ShouldQueue
         $this->productId = $productId;
         $this->force = $force;
     } */
-    public function __construct($productId, $imageUrls = null, $force = false)
+    public function __construct($productId, $imageUrls = [], $force = false)
     {
         $this->productId = $productId;
-
-        // Zpracování vstupu - může jít o jedno URL nebo pole URL
-        if (is_string($imageUrls)) {
-            $this->imageUrls = [$imageUrls];
-        } elseif (is_array($imageUrls)) {
-            $this->imageUrls = $imageUrls;
-        } else {
-            $this->imageUrls = [];
-        }
+        $this->imageUrls = $imageUrls;
 
         $this->force = $force;
     }
@@ -46,7 +39,6 @@ class DownloadProductImageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        ini_set('memory_limit', '1536M');
         try {
             $product = Product::find($this->productId);
 
@@ -55,7 +47,7 @@ class DownloadProductImageJob implements ShouldQueue
                 return;
             }
 
-            // Vymazat existující obrázky, pokud je vyžadováno
+            //Vymazat existující obrázky, pokud je vyžadováno
             if ($this->force && $product->getMedia('images')->count() > 0) {
                 $product->clearMediaCollection('images');
             } else if (!$this->force && $product->getMedia('images')->count() > 0) {
@@ -63,30 +55,36 @@ class DownloadProductImageJob implements ShouldQueue
                 return;
             }
 
-            // Pokud nejsou zadána konkrétní URL, použijeme výchozí URL podle typu produktu
-            if (empty($this->imageUrls)) {
-                $imageUrl = $this->getDefaultImageUrl($product);
-                if ($imageUrl) {
-                    $this->imageUrls = [$imageUrl];
-                }
-            }
-
-            // Stažení a uložení všech obrázků
             foreach ($this->imageUrls as $imageUrl) {
-                if (!$imageUrl) continue;
+                try {
+                    // Download image through proxy
+                    $response = Http::withOptions([
+                        'verify' => false, // if you have SSL issues
+                        'timeout' => 60,
+                    ])->get($imageUrl);
 
-                $product->addMediaFromUrl($imageUrl)
-                    ->withResponsiveImages()
-                    ->toMediaCollection('images');
-
-                Log::info("Obrázek {$imageUrl} přidán k produktu {$product->product_num}");
+                    if ($response->successful()) {
+                        // Save to temp file
+                        $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                        $tmpPath = storage_path('app/tmp_' . uniqid() . '.' . $extension);
+                        file_put_contents($tmpPath, $response->body());
+                        Log::info("adding $tmpPath");
+                        // Add to media library
+                        $product->addMedia($tmpPath)
+                            ->withResponsiveImages()
+                            ->toMediaCollection('images');
+                    } else {
+                        Log::error("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());
+                        $this->fail("Nepodařilo se stáhnout obrázek {$imageUrl} pro produkt {$this->productId}: HTTP " . $response->status());
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Chyba při stahování nebo ukládání obrázku {$imageUrl} pro produkt {$this->productId}: " . $e->getMessage());
+                    $this->fail($e);
+                }
             }
         } catch (\Exception $e) {
             Log::error("Chyba při stahování obrázků pro produkt {$this->productId}: " . $e->getMessage());
-
-            if ($this->attempts() < 3) {
-                $this->release(30);
-            }
+            $this->fail($e);
         }
     }
 

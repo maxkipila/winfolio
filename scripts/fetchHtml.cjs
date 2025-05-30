@@ -2,138 +2,148 @@
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
+const fs = require("fs");
+const { execSync } = require("child_process");
 
 (async () => {
-    const url = process.argv[2];
-    if (!url) {
-        console.error("❌ Musíte předat URL jako první argument.");
-        process.exit(1);
-    }
+    const urls = JSON.parse(process.argv[2]);
+    const proxy = process.argv[3];
+    // Extract proxy host (without credentials) for --proxy-server
 
-    // Spustíme prohlížeč
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1366,768"],
-    });
-    
+    const proxyUrl = new URL(proxy);
+    const proxyHost = `${proxyUrl.hostname}:${proxyUrl.port}`;
+
+    const launchArgs = [`--no-sandbox`, `--proxy-server=${proxyHost}`];
+
+    const browser = await puppeteer.launch({ args: launchArgs });
     const page = await browser.newPage();
-    
-    await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-        "AppleWebKit/537.36 (KHTML, like Gecko) " +
-        "Chrome/115.0.0.0 Safari/537.36"
-    );
 
-    // Spouštíme JavaScript pro extrakci dat přímo na stránce
-    await page.evaluateOnNewDocument(() => {
-        // Vytvoříme globální objekt pro ukládání hodnot
-        window.scrapedData = {};
-        
-        // Přepíšeme některé metody pro zachycení hodnot během renderingu
-        const originalSetValue = Object.getOwnPropertyDescriptor(
-            Object.prototype, 'value'
-        );
-        
-        // Zachytíme nastavení hodnoty "value" u jakéhokoliv objektu
-        Object.defineProperty(Object.prototype, 'value', {
-            set: function(val) {
-                if (typeof val === 'number' && val > 0) {
-                    window.scrapedData.value = val;
-                }
-                if (originalSetValue && originalSetValue.set) {
-                    originalSetValue.set.call(this, val);
-                }
-            },
-            get: function() {
-                if (originalSetValue && originalSetValue.get) {
-                    return originalSetValue.get.call(this);
-                }
-                return undefined;
-            },
-            configurable: true
+    const successful = 0;
+
+    for (const [product_id, url] of Object.entries(urls)) {
+        const loopStart = Date.now();
+        await page.setCookie({
+            name: "Region",
+            value: "US",
+            domain: "www.brickeconomy.com",
+            path: "/",
+            httpOnly: false,
+            secure: true,
+            sameSite: "Lax",
         });
-        
-        // Zachytíme hodnoty při vykreslování grafu
-        const originalChart = window.Chart;
-        window.Chart = function(ctx, config) {
-            if (config && config.data && config.data.datasets) {
-                window.scrapedData.chartData = config.data.datasets;
-            }
-            return originalChart ? new originalChart(ctx, config) : null;
-        };
-    });
 
-    try {
-        // Načteme stránku
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
+        // If proxy requires authentication
+        if (proxyUrl.username && proxyUrl.password) {
+            await page.authenticate({
+                username: proxyUrl.username,
+                password: proxyUrl.password,
+            });
+        }
 
-        // Počkáme delší dobu
-        await new Promise(r => setTimeout(r, 5000));
-        
-        // Extrahujeme cenová data přímo ze stránky
-        const scrapedData = await page.evaluate(() => {
-            // Získáme data z našeho objektu
-            const data = window.scrapedData || {};
-            
-            // Zkusíme přímo přečíst hodnoty z DOM
-            if (!data.value) {
-                // Najdeme všechny elementy obsahující "$" a zkusíme extrahovat ceny
-                const priceRegex = /\$(\d+\.\d+)/;
-                const dollarElements = Array.from(document.querySelectorAll('*'))
-                    .filter(el => el.textContent.includes('$'));
-                
-                for (const el of dollarElements) {
-                    const match = el.textContent.match(priceRegex);
-                    if (match && match[1]) {
-                        const value = parseFloat(match[1]);
-                        
-                        // Je to hodnota?
-                        if (el.textContent.toLowerCase().includes('value')) {
-                            data.value = value;
-                        }
-                        // Je to retail cena?
-                        else if (el.textContent.toLowerCase().includes('retail')) {
-                            data.retail = value;
+        const response = await page.goto(url, {
+            waitUntil: "networkidle2",
+            timeout: 0,
+        });
+
+        let success = false;
+        const maxRetries = 3;
+        let attempt = 0;
+
+        while (!success && attempt < maxRetries) {
+            const timestamp = new Date();
+            const formatted = timestamp.toISOString().replace(/[:.]/g, "-");
+
+            try {
+                await page.waitForSelector(
+                    "#ContentPlaceHolder1_PanelSetPricing, #ContentPlaceHolder1_PanelMinifigPricing",
+                    { timeout: 7500 }
+                );
+
+                success = true;
+            } catch (error) {
+                attempt++;
+
+                if (attempt < maxRetries) {
+                    const errorSelector = "h3.text-center.mt-20";
+                    const errorElement = await page.$(errorSelector);
+
+                    if (errorElement) {
+                        const errorText = await page.evaluate(
+                            (el) => el.textContent,
+                            errorElement
+                        );
+                        if (
+                            errorText &&
+                            errorText.includes(
+                                "The page you are looking for could not be found."
+                            )
+                        ) {
+                            await page.screenshot({
+                                path: `storage/app/screenshots/not_found_${attempt}_${product_id}-${formatted}.png`,
+                                fullPage: true,
+                            });
+
+                            // throw new Error("Page not found error detected!");
+                            execSync(
+                                `php artisan log:error ${product_id} "Page not found error detected!" 404`
+                            );
+                            break;
                         }
                     }
-                }
-            }
-            
-            // Najdeme hodnoty přímo v HTML
-            const valueDiv = document.querySelector('div.col-xs-7 b');
-            if (valueDiv && valueDiv.textContent.includes('$')) {
-                const match = valueDiv.textContent.match(/\$(\d+\.\d+)/);
-                if (match && match[1]) {
-                    data.value = parseFloat(match[1]);
-                }
-            }
-            
-            // Najdeme hodnoty specificky pro set 71316-1
-            if (window.location.href.includes('71316')) {
-                data.value = 269.97;
-                data.retail = 24.99;
-            }
-            
-            return data;
-        });
-        
-        console.error('Extrahovaná data:', JSON.stringify(scrapedData));
 
-        // Vypíšeme DOM s přidanými daty
-        const html = await page.content();
-        
-        // Vložíme extrahovaná data přímo do HTML pro snazší načtení v PHP
-        const modifiedHtml = html + `
-        <!-- SCRAPED_DATA_START -->
-        ${JSON.stringify(scrapedData)}
-        <!-- SCRAPED_DATA_END -->
-        `;
-        
-        console.log(modifiedHtml);  // Toto jde do stdout, který je použit v PHP
-    } catch (error) {
-        console.error(`Chyba při zpracování stránky: ${error.message}`);
-    } finally {
-        // Zavřeme prohlížeč
-        await browser.close();
+                    await page.reload({ waitUntil: "networkidle2" });
+                } else {
+                    await page.screenshot({
+                        path: `storage/app/screenshots/error_${attempt}_${product_id}-${formatted}.png`,
+                        fullPage: true,
+                    });
+
+                    // throw new Error(
+                    //     `Failed to find selector after ${maxRetries} attempts`
+                    // );
+
+                    execSync(
+                        `php artisan log:error ${product_id} "Failed to find selector after ${maxRetries} attempts" 4290`
+                    );
+                }
+            }
+        }
+
+        if (success) {
+            if (attempt > 0) {
+                await page.screenshot({
+                    path: `storage/app/screenshots/success_${attempt}_${product_id}-${formatted}.png`,
+                    fullPage: true,
+                });
+            }
+
+            const content = await page.content();
+
+            if (content) {
+                fs.writeFileSync(
+                    `storage/app/html/tmp_scraped_${product_id}.html`,
+                    await page.content()
+                );
+
+                try {
+                    execSync(
+                        `php artisan process:scraped-pages storage/app/html/tmp_scraped_${product_id}.html ${product_id}`
+                    );
+
+                    successful++;
+                } catch (error) {}
+            } else {
+                execSync(
+                    `php artisan log:error ${product_id} "Page returned no content" 204`
+                );
+            }
+        }
+        const loopEnd = Date.now();
+        const durationSeconds = ((loopEnd - loopStart) / 1000).toFixed(2);
+        execSync(
+            `php artisan log:error ${product_id} "Scrape took ${durationSeconds} s" 999`
+        );
     }
+    console.log(successful);
+    await browser.close();
 })();

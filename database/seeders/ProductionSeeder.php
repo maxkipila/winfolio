@@ -24,7 +24,7 @@ class ProductionSeeder extends Seeder
         ]);
 
 
-        User::factory()->updateOrCreate([
+        User::updateOrCreate([
             'email' => 'tester@tester.com',
         ], [
             'first_name' => 'Test',
@@ -45,8 +45,8 @@ class ProductionSeeder extends Seeder
         ]);
 
 
-        Artisan::call('import:lego-data');
-        Artisan::call('app:assign-themes-to-minifigs');
+        // Artisan::call('import:lego-data');
+        // Artisan::call('app:assign-themes-to-minifigs');
         /*  Artisan::call('db:seed', ['--class' => 'PriceSeeder']); */
     }
 }

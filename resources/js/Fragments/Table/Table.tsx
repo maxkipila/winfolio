@@ -1,4 +1,4 @@
-import React, { Dispatch, ReactNode, SetStateAction } from 'react'
+import React, { Dispatch, ReactNode, SetStateAction, useEffect } from 'react'
 import { FormContext } from '../forms/FormContext'
 import { useForm } from '@inertiajs/react';
 import useLazyLoad from '@/hooks/useLazyLoad';
@@ -15,16 +15,22 @@ interface Props<T> {
     absolute_items?: Array<T>
     hide_meta?: boolean
     custom?: string
+    filters?: Record<string, string>
 }
 
 function Table<T>(props: Props<T>) {
-    const { children, Row, custom, title, item_key, id_key = 'id', absolute_items, hide_meta } = props
+    const { children, Row, custom, title, item_key, id_key = 'id', absolute_items, hide_meta, filters = {} } = props
 
     const [_itms, button, meta, form, setItems] = useLazyLoad<T>(item_key);
 
     const search = useForm<any>();
 
     const items = absolute_items ?? _itms;
+
+    useEffect(() => {
+        form.setData(d => ({ ...d, ...(filters ?? {}) }));
+    }, [filters])
+
 
 
     return (

@@ -114,6 +114,7 @@ class _Product extends JsonResource
             'news'        => _News::collection($this->whenLoaded('news')),
             'minifigs' => _Product::collection($this->whenLoaded('minifigs')),
             'sets' => _Product::collection($this->whenLoaded('sets')),
+            'images' => $this->images,
         ];
     }
     private function calculateGrowth(int $days): ?float
