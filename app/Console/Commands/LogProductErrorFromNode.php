@@ -29,7 +29,7 @@ class LogProductErrorFromNode extends Command
         $message = $this->argument('message');
         $context = $this->argument('context');
         $code = $this->argument('code');
-        $productId = $this->argument('productId');
+        $productId = $this->argument('productId') ?: NULL;
 
         ProductError::create([
             'error' => $message,

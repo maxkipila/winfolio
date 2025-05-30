@@ -26,7 +26,7 @@ interface Props {
 
 interface ProductError {
     id: number,
-    product: Product
+    product?: Product
     error: string,
     created_at: string
     context: Record<any, any>
@@ -74,6 +74,7 @@ export function ProductErrorTable({ absolute_items, hide_meta }: { absolute_item
                         <Checkbox name={'404'} label={"Not found (404)"} />
                         <Checkbox name={'999'} label={"Time taken (999)"} />
                         <Checkbox name={'4290'} label={"All attempts failed (4290)"} />
+                        <Checkbox name={'500'} label={"Error (500)"} />
                     </Group>
                 </div>
                 <div className='flex flex-col gap-8px mb-16px'>
@@ -126,7 +127,7 @@ function Row(props: ProductError & { setItems: React.Dispatch<React.SetStateActi
         <tr className='group hover:outline hover:outline-2 hover:outline-offset-[-2px] outline-black'>
             <Td><Link className='hover:underline' href={route('admin.errors.edit', { productError: id })}>{id}</Link></Td>
             <Td>{code}</Td>
-            <Td><Link className='hover:underline' href={route(`admin.products.show.${product.product_type}`, { product: product.id })}> <div className='underline'>{product?.name}</div> </Link></Td>
+            <Td>{product && <Link className='hover:underline' href={route(`admin.products.show.${product.product_type}`, { product: product.id })}> <div className='underline'>{product?.name}</div> </Link>}</Td>
             <Td>{error}</Td>
             <Td>{JSON.stringify(context, undefined, 3)}</Td>
             <Td>{created_at}</Td>

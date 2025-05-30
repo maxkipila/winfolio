@@ -15,7 +15,7 @@ const { execSync } = require("child_process");
 
     const launchArgs = [`--no-sandbox`, `--proxy-server=${proxyHost}`];
 
-    const browser = await puppeteer.launch({ args: launchArgs });
+    const browser = await puppeteer.launch({ args: launchArgs, protocolTimeout: 120000 });
     const page = await browser.newPage();
 
     const successful = 0;
@@ -147,7 +147,7 @@ const { execSync } = require("child_process");
         }
     } catch (error) {
         execSync(
-            `php artisan log:error ${product_id} ${JSON.stringify(error)} 500`
+            `php artisan log:error ${0} ${JSON.stringify(error)} 500 ${JSON.stringify(urls)}`
         );
         await browser.close();
     }
