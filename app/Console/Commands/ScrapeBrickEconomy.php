@@ -34,7 +34,7 @@ class ScrapeBrickEconomy extends Command
         $length = $chunks->count() - 1;
 
         foreach ($chunks as $key => $chunk) {
-            JobsScrapeBrickEconomy::dispatch($chunk, true, false, true);
+            JobsScrapeBrickEconomy::dispatch($chunk, true, false, true)->onQueue('scraping');
             $this->info("Chunk $key/{$length} dispatched");
         }
 

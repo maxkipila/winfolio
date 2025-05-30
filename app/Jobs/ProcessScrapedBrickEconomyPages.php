@@ -48,7 +48,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 // Array of all src attributes
                 $srcs = collect($imgMatches[1])->map(fn($url) => "https://www.brickeconomy.com{$url}");
                 Log::info("Dispatching download of {$srcs->count()} images", ['urls' => $srcs]);
-                DownloadProductImageJob::dispatch($product_id, $srcs)/* ->onQueue('images') */;
+                DownloadProductImageJob::dispatch($product_id, $srcs)->onQueue('scraping');
                 return;
             }
         }
@@ -60,7 +60,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             // Optionally prepend the domain if needed
             $fullUrl = str_starts_with($src, 'http') ? $src : "https://www.brickeconomy.com{$src}";
             Log::info("Dispatching download of modal image $fullUrl", ['url' => $fullUrl]);
-            DownloadProductImageJob::dispatch($product_id, collect([$fullUrl]))/* ->onQueue('images') */;
+            DownloadProductImageJob::dispatch($product_id, collect([$fullUrl]))->onQueue('scraping');
         }
     }
 
