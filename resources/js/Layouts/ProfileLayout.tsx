@@ -76,7 +76,7 @@ function ProfileLayout(props: Props) {
 
 
                 <div className='mt-40px text-xl font-bold'>{t('Sociální sítě')}</div>
-                <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                <a href="https://www.facebook.com/people/Winfolio/61576678209102/" target="_blank" className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <FacebookLogo size={24} />
@@ -84,8 +84,8 @@ function ProfileLayout(props: Props) {
                         <div className='font-bold'>Facebook</div>
                     </div>
                     <ArrowRight size={24} />
-                </div>
-                <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                </a>
+                <a href="https://www.instagram.com/winfolio" target="_blank" className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <InstagramLogo size={24} />
@@ -93,8 +93,8 @@ function ProfileLayout(props: Props) {
                         <div className='font-bold'>Instagram</div>
                     </div>
                     <ArrowRight size={24} />
-                </div>
-                <div className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
+                </a>
+                <a href="https://x.com/winfolio_" target='_blank' className='w-full bg-[#F5F5F5] flex items-center justify-between px-8px py-12px mt-12px rounded-sm'>
                     <div className='flex gap-16px items-center'>
                         <div className='bg-white w-40px h-40px flex items-center justify-center rounded-full'>
                             <XLogo size={24} />
@@ -102,7 +102,7 @@ function ProfileLayout(props: Props) {
                         <div className='font-bold'>X</div>
                     </div>
                     <ArrowRight size={24} />
-                </div>
+                </a>
 
 
                 <div className='mt-40px text-xl font-bold'>{t('Podpora')}</div>
