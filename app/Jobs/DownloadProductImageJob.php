@@ -82,6 +82,11 @@ class DownloadProductImageJob implements ShouldQueue
                     $this->fail($e);
                 }
             }
+
+
+            $product?->update([
+                'media_count' => $product->media()->count(),
+            ]);
         } catch (\Exception $e) {
             Log::error("Chyba při stahování obrázků pro produkt {$this->productId}: " . $e->getMessage());
             $this->fail($e);

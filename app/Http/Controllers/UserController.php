@@ -170,64 +170,62 @@ class UserController extends Controller
     public function catalog(Request $request, TrendService $trendService)
     {
         $query = $request->search;
+        $trending = !!($request->trending ?? false);
         $column = 'name';
+        $products = collect();
 
-        $latestDate = Trend::where('type', 'trending')->max('calculated_at');
-        $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
-            ->where('type', 'trending')
-            ->where('calculated_at', $latestDate)
-            ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
-
-        if ($trendingQuery->count() === 0) {
-            $trendService->calculateTrendingProducts(8, 30);
+        if ($trending) {
             $latestDate = Trend::where('type', 'trending')->max('calculated_at');
-
             $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
                 ->where('type', 'trending')
                 ->where('calculated_at', $latestDate)
                 ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
-        }
 
-        $trending_products = _Trend::collection(
-            $trendingQuery->paginate($request->paginate ?? 4)
-        );
+            if ($trendingQuery->count() === 0) {
+                $trendService->calculateTrendingProducts(8, 30);
+                $latestDate = Trend::where('type', 'trending')->max('calculated_at');
 
-        $productsQuery = Product::with(['media', 'latest_price', 'theme'])
-            ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
-            ->when(
-                $request->parent_theme || $request->theme_children,
-                fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+                $trendingQuery = Trend::with(['product.latest_price', 'product.theme', 'product'])
+                    ->where('type', 'trending')
+                    ->where('calculated_at', $latestDate)
+                    ->orderByRelation($request->sort ?? ['favorites_count' => 'desc'], ['id', 'asc'], App::getLocale());
+            }
+
+            $products = _Trend::collection(
+                $trendingQuery->paginate($request->paginate ?? 4)
             );
-
-        if ($query) {
-            $productsQuery->where($column, 'LIKE', "%{$query}%")
-                ->orderByRaw("
-                CASE WHEN $column LIKE '" . e($query) . "' THEN 1
-                    WHEN $column LIKE '" . e($query) . "%' THEN 2
-                    WHEN $column LIKE '%" . e($query) . "%' THEN 3
-                    WHEN $column LIKE '%" . e($query) . "' THEN 4
-                    ELSE 5
-                END");
         } else {
 
-            $productsQuery->selectRaw('products.*, 
-            (SELECT COUNT(*) FROM media WHERE model_id = products.id AND model_type = "App\\\\Models\\\\Product" AND collection_name = "images") as has_images,
-            (SELECT COUNT(*) FROM prices WHERE product_id = products.id) as has_prices')
-                ->orderByRaw('has_images DESC, has_prices DESC');
+
+            $productsQuery = Product::with(['media', 'latest_price', 'theme'])
+                ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
+                ->when(
+                    $request->parent_theme || $request->theme_children,
+                    fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+                );
+
+            if ($query) {
+                $productsQuery->search(['name', 'id', 'brickeconomy_id', 'product_num'], $query);
+            }
+
+            $productsQuery->orderBy('media_count', 'DESC')
+                ->orderBy('prices_count', 'DESC');
+
+
+            $products = _Product::collection(
+                $productsQuery->latest()->paginate($request->paginate ?? 16)
+            );
         }
 
-        $products = _Product::collection(
-            $productsQuery->latest()->paginate($request->paginate ?? 16)
-        );
-
         $themes = _Theme::collection(
-            Theme::with('children')
-                ->where('parent_id', NULL)
+            Theme::where('parent_id', NULL)
+                /* ->with('children') */
                 ->get()
         );
 
-        return Inertia::render('catalog', compact('products', 'themes', 'trending_products'));
+        return Inertia::render('catalog', compact('products', 'themes'));
     }
+
     /*   public function catalog(Request $request, TrendService $trendService)
     {
         $query = $request->search;
@@ -449,7 +447,7 @@ class UserController extends Controller
 
     private function dashboardPortfolioValue()
     {
-        if (!auth()->check()) return 0; 
+        if (!auth()->check()) return 0;
 
         $portfolioValue = auth()->user()->products()
             ->with('latest_price')

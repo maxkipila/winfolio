@@ -129,7 +129,7 @@ function Row(props: ProductError & { setItems: React.Dispatch<React.SetStateActi
             <Td>{code}</Td>
             <Td>{product && <Link className='hover:underline' href={route(`admin.products.show.${product.product_type}`, { product: product.id })}> <div className='underline'>{product?.name}</div> </Link>}</Td>
             <Td>{error}</Td>
-            <Td>{JSON.stringify(context, undefined, 3)}</Td>
+            <Td><pre className='max-w-[450px] overflow-auto'>{JSON.stringify(context, undefined, 3)}</pre></Td>
             <Td>{created_at}</Td>
         </tr>
     );

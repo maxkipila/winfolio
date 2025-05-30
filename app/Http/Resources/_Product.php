@@ -31,8 +31,6 @@ class _Product extends JsonResource
         $yearlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 365);
 
         $annualGrowth = $this->calculateAnnualGrowth();
-        $isAdminContext = Gate::allows('admin');
-
 
         $userOwns = [];
         $favourited = false;
@@ -80,6 +78,7 @@ class _Product extends JsonResource
         return [
             'id'          => $this->id,
             'product_num' => $this->product_num,
+            'brickeconomy_id' => $this->brickeconomy_id,
             'product_type' => $this->product_type,
             'name'        => $this->name,
             'year'        => $this->year,

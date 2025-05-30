@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ProductError;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class LogProductErrorFromNode extends Command
 {
@@ -31,11 +32,13 @@ class LogProductErrorFromNode extends Command
         $code = $this->argument('code');
         $productId = $this->argument('productId') ?: NULL;
 
+        Log::error((base64_decode($context)), ['decoded' => base64_decode($context), 'context' => $context]);
+
         ProductError::create([
             'error' => $message,
             'product_id' => $productId,
             'code' => $code ?? 500,
-            'context' => $context ? json_decode($context) : [],
+            'context' => $context ? json_decode(base64_decode($context)) : [],
         ]);
     }
 }

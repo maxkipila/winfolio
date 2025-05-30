@@ -166,5 +166,11 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 }
             }
         }
+
+        if ($product) {
+            $product?->update([
+                'prices_count' => $product->prices()->count()
+            ]);
+        }
     }
 }

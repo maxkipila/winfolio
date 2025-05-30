@@ -42,7 +42,7 @@ function Catalog(props: Props) {
     const { data } = form;
     const [products, button, meta, setItems] = useLazyLoad<Product>('products');
     const { open } = useContext(ModalsContext)
-    // const [themes] = useLazyLoad<Theme>('themes');
+
     let [selected, setSelected] = useState<Theme>(null)
     let [themeChildren, setThemeChildren] = useState<Array<number>>([])
     let [type, setType] = useState(null)
@@ -53,19 +53,20 @@ function Catalog(props: Props) {
     let [favourited, setFavourited] = useState('ASC')
     let [status, setStatus] = useState('retail')
     let [releaseYear, setReleaseYear] = useState(null as number)
+
     const search = useDebouncedCallback(() => {
-        router.post(route('catalog', { parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type, price_range: priceRange, price_trend: priceTrend, reviews: reviews, favourited: favourited, status: status, release_year: releaseYear }))
+        router.post(route('catalog', { trending: showTrending, parent_theme: selected?.id ?? null, theme_children: themeChildren, search: data['search'], type: type, price_range: priceRange, price_trend: priceTrend, reviews: reviews, favourited: favourited, status: status, release_year: releaseYear }))
     }, 700);
 
     useEffect(() => {
         search()
-    }, [selected, themeChildren, data['search'], type])
+    }, [selected, showTrending, themeChildren, data['search'], type])
 
     useEffect(() => {
         setThemeChildren([])
     }, [selected])
 
-    let [trendingProducts, trendButton, TrendMeta, TrendsetItems] = useLazyLoad<{ product: Product }>('trending_products');
+    // let [trendingProducts, trendButton, TrendMeta, TrendsetItems] = useLazyLoad<{ product: Product }>('trending_products');
 
     return (
         <AuthenticatedLayout>
@@ -112,7 +113,7 @@ function Catalog(props: Props) {
                 </div>
 
                 {
-                    showTrending ?
+/*                     showTrending ?
                         <>
                             <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-24px mob:px-24px'>
                                 {
@@ -128,7 +129,7 @@ function Catalog(props: Props) {
                                 </div>
                             </div>
                         </>
-                        :
+                        : */
                         <>
                             <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
 

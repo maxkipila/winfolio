@@ -30,12 +30,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
         $middleware->redirectUsersTo(function (Request $request) {
-            $guard = Auth::guard('web')->check() ? 'web' : 'admins';
+            $guard = !(Route::currentRouteNamed('admin.*') || $request->is('admin*')) ? 'web' : 'admins';
             return Auth::guard($guard)->user() instanceof \App\Models\Admin ? RouteServiceProvider::ADMIN_HOME : RouteServiceProvider::HOME;
         });
 
         $middleware->redirectGuestsTo(function (Request $request) {
-            return Route::currentRouteNamed('admin.*') ? RouteServiceProvider::ADMIN_LOGIN : RouteServiceProvider::LOGIN;
+            return (Route::currentRouteNamed('admin.*') || $request->is('admin*')) ? RouteServiceProvider::ADMIN_LOGIN : RouteServiceProvider::LOGIN;
         });
     })
     ->withExceptions(function (Exceptions $exceptions) {
