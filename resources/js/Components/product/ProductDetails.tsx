@@ -130,7 +130,7 @@ function ProductDetails(props: Props) {
                         }
                     </div>
                     :
-                    <Button className='mob:hidden' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
+                    <Button className='mob:hidden' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
             }
         </div>
     )

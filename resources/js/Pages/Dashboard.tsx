@@ -242,7 +242,7 @@ export default function Dashboard(props: DashBoardProps) {
                                     <div className=''>
                                         <div className='font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
                                         {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
-                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button>
+                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO, false, { create_portfolio: true }) }}>{t('Vytvořit portfolio')}</Button>
                                     </div>
                                 </div>
                         }
@@ -274,7 +274,7 @@ export default function Dashboard(props: DashBoardProps) {
                                     <div className=''>
                                         <div className='font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
                                         {/* <div className='my-16px font-nunito text-[#4D4D4D] text-center'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
-                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO) }}>{t('Vytvořit portfolio')}</Button>
+                                        <Button className='max-w-150px mx-auto mt-24px' href={"#"} onClick={(e) => { e.preventDefault(); open(MODALS.PORTFOLIO, false, { create_portfolio: true }) }}>{t('Vytvořit portfolio')}</Button>
                                     </div>
                                 </div>
                         }

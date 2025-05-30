@@ -51,7 +51,7 @@ function Product(props: Props) {
                     <ProductHeadline product={product} form={form} />
                     {
                         !(product?.user_owns?.length > 0) &&
-                        <Button className='nMob:hidden mt-12px' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
+                        <Button className='nMob:hidden mt-12px' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
                     }
                     <div className='mt-24px font-bold text-xl'>{t('Forecast')}</div>
                     {/* <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
@@ -86,7 +86,7 @@ function Product(props: Props) {
                 <ProductGalery product={product} />
                 {
                     !(product?.user_owns?.length > 0) &&
-                    <Button className='nMob:hidden mt-12px' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
+                    <Button className='nMob:hidden mt-12px' href={"#"} onClick={(e) => { e.preventDefault(); setSelected({ ...product }); open(MODALS.PORTFOLIO, false, { create_portfolio: true }) }} icon={<Plus size={24} />}>{t('Add to portfolio')}</Button>
                 }
                 <div className='mt-24px font-bold text-xl'>{t('Forecast')}</div>
                 {/* <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
