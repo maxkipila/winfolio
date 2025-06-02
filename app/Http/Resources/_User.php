@@ -45,6 +45,7 @@ class _User extends JsonResource
             'is_admin' => $this->is_admin,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'thumbnail' => $this->thumbnail,
             'news' => _News::collection($this->whenLoaded('news')),
             'reviews' => _Review::collection($this->whenLoaded('reviews')),
             'subscriptions' => _Subscription::collection($this->whenLoaded('subscriptions')),

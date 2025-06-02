@@ -3,17 +3,21 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Paradigma\Pictura\Traits\HasWebp;
+use Spatie\MediaLibrary\HasMedia;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasWebp;
 
     /**
      * The attributes that are mass assignable.
@@ -145,5 +149,13 @@ class User extends Authenticatable
         )
             ->withPivot(['earned_at', 'claimed_at', 'notified', 'user_description', 'count', 'value', 'percentage'])
             ->withTimestamps();
+    }
+
+    public function thumbnail(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->getFirstFile('thumbnail'),
+            set: fn($value) => $this->replaceImages($value ?? []),
+        );
     }
 }

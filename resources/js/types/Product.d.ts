@@ -8,7 +8,8 @@ interface Product {
     num_parts: number;
     theme_id: number;
     thumbnail: string;
-    img_url: string;
+    img_url: ResponsiveImage;
+    images: Array<ResponsiveImage>
     latest_price?: Prices;
     prices?: Array<Prices>
     theme?: Theme

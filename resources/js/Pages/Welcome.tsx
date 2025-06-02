@@ -23,9 +23,10 @@ function Welcome(props: Props) {
             <Head title="Home | Winfolio" />
             <PublicHeader />
             <div className='w-full'>
-                <div className='grid'>
-                    <Img className='w-full col-start-1 row-start-1 object-cover h-full' src={'/assets/img/lading-bg.png'} />
-                    <div className='w-full col-start-1 row-start-1 p-24px flex items-center z-10'>
+                <div className='grid nMob:max-h-screen-no-header'>
+                    <Img className='w-full col-start-1 row-start-1 object-cover h-full  nMob:max-h-screen-no-header' src={'/assets/img/harry-potter-welcome.png'} />
+                    <div className='w-full col-start-1 row-start-1 object-cover h-full  nMob:max-h-screen-no-header bg-opacity-30 bg-black'></div>
+                    <div className='w-full col-start-1 row-start-1 p-24px flex items-center z-10  nMob:max-h-screen-no-header'>
                         <div className='text-white z-max'>
                             <Img className='w-[164px] mb-18px' src="/assets/img/logo-yellow.svg" />
                             <div className='font-bold text-6xl'>{t(('Stav si sbírku. Sleduj její růst.'))}</div>
@@ -60,7 +61,9 @@ function Welcome(props: Props) {
                 <div className='font-nunito text-lg text-center'>{t('Sleduj hodnotu svých setů v reálném čase, analyzuj vývoj cen, získej predikce a tipy na nákup nebo prodej.')}</div>
 
                 <div className='mt-48px flex items-center gap-64px mob:flex-col'>
-                    <Img className='w-full' src="/assets/img/architect.png" />
+                    <div className='w-full'>
+                        <Img className='w-full' src="/assets/img/architect.png" />
+                    </div>
                     <div className='w-full'>
                         <div className='font-bold text-3xl'>{t('Rozhoduj se na základě dat, ne pocitů')}</div>
                         <div className='font-nunito my-32px'>{t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.')}</div>
@@ -68,17 +71,21 @@ function Welcome(props: Props) {
                     </div>
                 </div>
 
-                <div className='mt-48px flex items-center gap-64px mob:flex-col-reverse'>
+                <div className='mt-48px flex items-center gap-64px mob:flex-col-reverse w-full'>
                     <div className='w-full'>
                         <div className='font-bold text-3xl'>{t('Hraj, plň mise a staň se LEGO šampionem')}</div>
                         <div className='font-nunito my-32px'>{t('Investování může být i zábava. Winfolio je nejen analytický nástroj, ale i herní platforma – s výzvami, misemi a odměnami, které tě provedou světem LEGO investic. Získej odznaky, postupuj úrovněmi a buduj si reputaci investora, kterého bude komunita sledovat.')}</div>
                         <Button className='max-w-[140px]' href={route('login')}>{t('Vytvořit účet')}</Button>
                     </div>
-                    <Img className='w-full' src="/assets/img/harry-potter-welcome.png" />
+                    <div className='w-full'>
+                        <Img className='w-full' src="/assets/img/landing-star-new.png" />
+                    </div>
                 </div>
 
                 <div className='mt-48px flex items-center gap-64px mob:flex-col'>
-                    <Img className='w-full' src="/assets/img/friends.png" />
+                    <div className='w-full'>
+                        <Img className='w-full' src="/assets/img/friends.png" />
+                    </div>
                     <div className='w-full'>
                         <div className='font-bold text-3xl'>{t('Komunita, která staví na stejných základech')}</div>
                         <div className='font-nunito my-32px'>{t('Správné investice nejsou náhoda. Winfolio ti nabízí přehled o hodnotě LEGO setů v reálném čase, sleduje jejich cenový vývoj a poskytuje predikce založené na datech z desítek ověřených zdrojů. Díky chytrým grafům a cenovým alertům budeš vždy vědět, kdy nakoupit a kdy prodat.')}</div>
