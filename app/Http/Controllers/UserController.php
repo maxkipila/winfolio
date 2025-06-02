@@ -172,9 +172,20 @@ class UserController extends Controller
     public function catalog(Request $request, TrendService $trendService)
     {
         $query = $request->search;
-        $trending = !!($request->trending ?? false);
-        $column = 'name';
+        $search = $request->search;
+        $trending = $request->trending === "1";
+        $type = $request->type ?? NULL;
+        $favourited = $request->favourited ?? "ASC";
+        $price_range = $request->price_range ?? ["from" => 0, "to" => 9999999];
+        $price_trend = $request->price_trend ?? "ASC";
+        $parent_theme = $request->parent_theme;
+        $theme_children = $request->theme_children ?? [];
+        $reviews = $request->reviews ?? "ASC";
+        $status = $request->status ?? "retail";
+        $releaseYear = $request->releaseYear;
         $products = collect();
+
+
 
         if ($trending) {
             $latestDate = Trend::where('type', 'trending')->max('calculated_at');
@@ -202,12 +213,15 @@ class UserController extends Controller
             $productsQuery = Product::with(['media', 'latest_price', 'theme'])
                 ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
                 ->when(
-                    $request->parent_theme || $request->theme_children,
-                    fn($q) => $q->where('theme_id', [array_merge($request->theme_children ?? [], [$request->parent_theme])])
+                    $request->parent_theme && count($request->theme_children ?? []) > 0,
+                    fn($q) => $q->whereIn('theme_id', $request->theme_children ?? [])
+                )
+                ->when(
+                    $request->parent_theme && count($request->theme_children ?? []) == 0,
+                    fn($q) => $q->where('theme_id', $request->parent_theme)
                 );
-
             if ($query) {
-                $productsQuery->search(['name', 'id', 'brickeconomy_id', 'product_num'], $query);
+                $productsQuery->search(['name', 'brickeconomy_id'], $query);
             }
 
             $productsQuery->orderBy('media_count', 'DESC')
@@ -225,7 +239,7 @@ class UserController extends Controller
                 ->get()
         );
 
-        return Inertia::render('catalog', compact('products', 'themes'));
+        return Inertia::render('catalog', compact('products', 'themes', 'favourited', 'price_range', 'price_trend', 'reviews', 'search', 'status', 'trending', 'releaseYear', 'parent_theme', 'theme_children', 'type'))/* ->with('key', md5(json_encode($request->all()))) */;
     }
 
     /*   public function catalog(Request $request, TrendService $trendService)
@@ -461,7 +475,8 @@ class UserController extends Controller
         return $portfolioValue;
     }
 
-    public function change_profile_img(Request $request){
+    public function change_profile_img(Request $request)
+    {
         $user = Auth::user();
         dd($user, $request->all());
         $this->updateFile($request, $user, 'thumbnail', 'thumbnail', true);
