@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Product;
+use App\Traits\HasUserAgent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class DownloadProductImageJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasUserAgent;
 
     protected $productId;
     protected $imageUrls;
@@ -42,6 +43,8 @@ class DownloadProductImageJob implements ShouldQueue
         try {
             $product = Product::find($this->productId);
 
+            $API_CREDENTIALS = env('PROXY_CREDENTIALS');
+
             if (!$product) {
                 Log::info("Produkt s ID {$this->productId} nenalezen");
                 return;
@@ -60,8 +63,13 @@ class DownloadProductImageJob implements ShouldQueue
                     // Download image through proxy
                     $response = Http::withOptions([
                         'verify' => false, // if you have SSL issues
-                        'timeout' => 60,
-                    ])->get($imageUrl);
+                        'timeout' => 600,
+                        'proxy' => "https://{$API_CREDENTIALS}@217.30.10.33:43587"
+                    ])
+                        ->withHeaders([
+                            'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
+                        ])
+                        ->get($imageUrl);
 
                     if ($response->successful()) {
                         // Save to temp file

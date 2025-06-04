@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\PriceType;
 use App\Models\Product;
+use App\Models\Theme;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,12 +15,14 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
 {
     use Queueable;
 
+    public Product $product;
+
     /**
      * Create a new job instance.
      */
     public function __construct(public $file_path, public $product_id)
     {
-        //
+        $this->product = Product::find($product_id);
     }
 
     /**
@@ -28,13 +31,221 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
     public function handle(): void
     {
         $html = file_get_contents($this->file_path);
+        $this->parseSetInfo($html, $this->product_id);
+        $this->parseMinifigInfo($html, $this->product_id);
         $this->parsePrices($html, $this->product_id);
         $this->parseImages($html, $this->product_id);
 
-        if (file_exists($this->file_path))
-            unlink($this->file_path);
+        // if (file_exists($this->file_path))
+        //     unlink($this->file_path);
     }
 
+    public function parseSetInfo($html, $product_id)
+    {
+        $product = $this->product;
+
+        if ($product->product_type == 'set') {
+            $crawler = new Crawler($html);
+            $details = [];
+            // Find the Set Details panel
+            $panel = $crawler->filter('#ContentPlaceHolder1_SetDetails');
+            if ($panel->count() > 0) {
+                $panel->filter('.row.rowlist')->each(function ($row) use (&$details) {
+                    $label = trim($row->filter('.col-xs-5.text-muted')->text(''));
+                    $valueNode = $row->filter('.col-xs-7');
+
+                    // Get the value as HTML (to preserve links, spans, etc.)
+                    $valueHtml = $valueNode->count() ? $valueNode->html() : '';
+                    // Or as plain text:
+                    $valueText = $valueNode->count() ? trim($valueNode->text('')) : '';
+
+                    // Save both, or just one as needed
+                    $details[$label] = [
+                        'label' => $label,
+                        'value' => $valueText,
+                        'value_html' => $valueHtml,
+                    ];
+                });
+            }
+
+            $product->update(array_filter([
+                'name' => $details['Name']['value'] ?? NULL,
+                'year' => ($details['Year']['value'] ?? ($details['Years']['value'] ? strtok($details['Years']['value'], ' -') : NULL)) ?? NULL,
+                'released_at' => ($details['Released']['value'] ?? NULL) ? Carbon::parse($details['Released']['value']) : NULL,
+                'availability' => $details['Availability']['value'] ?? NULL,
+                'num_parts' => ($details['Pieces']['value'] ?? NULL) ? intval($details['Pieces']['value']) : NULL,
+            ]));
+
+            if ($details['Themes']['value_html'] ?? NULL) {
+                if (preg_match_all('#/minifigs/theme/([^"]+)#', $details['Themes']['value_html'], $matches)) {
+                    $themeIds = $matches[1];
+                    $ts = [];
+                    foreach ($themeIds as $key => $tid) {
+                        if ($id = Theme::where('brickeconomy_id', $tid)->first()?->id)
+                            $ts[] = $id;
+                    }
+                    $product->update([
+                        'theme_id' => $ts[0] ?? NULL
+                    ]);
+                    $product->themes()->sync($ts);
+                }
+            } else if ($details['Subtheme']['value_html'] ?? NULL) {
+                if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
+                    $href = $hrefMatch[1];
+                    // Now extract the subtheme from the href
+                    if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                        $subthemeId = $subthemeMatch[1];
+                        $theme = Theme::where('brickeconomy_id', $subthemeId)->first();
+                        $product->update([
+                            'theme_id' => $theme->id
+                        ]);
+                        $product->themes()->sync([$theme->id]);
+                    }
+                }
+            } else if ($details['Theme']['value_html'] ?? NULL) {
+                if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
+                    $theme = Theme::where('brickeconomy_id', $m[1])->first();
+                    $product->update([
+                        'theme_id' => $theme->id
+                    ]);
+                    $product->themes()->sync([$theme->id]);
+                }
+            }
+
+
+            $panel = $crawler->filter('#Minifigs');
+            $minifigIds = [];
+            if ($panel->count() > 0) {
+                // Find all <a> tags with href matching /minifig/{id}/
+                $panel->filter('a[href^="/minifig/"]')->each(function ($node) use (&$minifigIds) {
+                    $href = $node->attr('href');
+                    if (preg_match('#/minifig/([^/]+)/#', $href, $m)) {
+                        if ($id = Product::where('brickeconomy_id', $m[1])->first()?->id)
+                            $minifigIds[] = $id;
+                    }
+                });
+            }
+
+            $product->minifigs()->sync($minifigIds);
+
+            $facts = [
+                'facts' => [],
+                'regional_prices' => [],
+                'barcodes' => [],
+            ];
+
+            $panel = $crawler->filter('#ContentPlaceHolder1_PanelSetFacts');
+            if ($panel->count() > 0) {
+                // Extract facts from <ul>
+                $panel->filter('.set-facts ul li')->each(function ($node) use (&$facts) {
+                    $facts['facts'][] = trim($node->text());
+                });
+            }
+
+            if ($facts['facts']) {
+                $this->product->update([
+                    'facts' => $facts['facts']
+                ]);
+            }
+
+            // Log::info("Parsed set details", ['product_id' => $product_id, 'details' => $details]);
+        }
+    }
+
+    public function parseMinifigInfo($html, $product_id)
+    {
+        $product = $this->product;
+
+        if ($product->product_type == 'minifig') {
+            $crawler = new Crawler($html);
+            $details = [];
+            // Find the Set Details panel
+            $panel = $crawler->filter('#ContentPlaceHolder1_MinifigDetails');
+            if ($panel->count() > 0) {
+                $panel->filter('.row.rowlist')->each(function ($row) use (&$details) {
+                    $label = trim($row->filter('.col-xs-5.text-muted')->text(''));
+                    $valueNode = $row->filter('.col-xs-7');
+
+                    // Get the value as HTML (to preserve links, spans, etc.)
+                    $valueHtml = $valueNode->count() ? $valueNode->html() : '';
+                    // Or as plain text:
+                    $valueText = $valueNode->count() ? trim($valueNode->text('')) : '';
+
+                    // Save both, or just one as needed
+                    $details[$label] = [
+                        'label' => $label,
+                        'value' => $valueText,
+                        'value_html' => $valueHtml,
+                    ];
+                });
+            }
+
+            $product->update(array_filter([
+                'name' => $details['Name']['value'] ?? NULL,
+                'year' => ($details['Year']['value'] ?? (($details['Years']['value'] ?? NULL) ? strtok($details['Years']['value'], ' -') : NULL)) ?? NULL,
+                'released_at' => ($details['Released']['value'] ?? NULL) ? Carbon::parse($details['Released']['value']) : NULL,
+                'availability' => $details['Availability']['value'] ?? NULL,
+            ]));
+
+
+            if ($details['Themes']['value_html'] ?? NULL) {
+                if (preg_match_all('#/minifigs/theme/([^"]+)#', $details['Themes']['value_html'], $matches)) {
+                    $themeIds = $matches[1];
+                    $ts = [];
+                    foreach ($themeIds as $key => $tid) {
+                        if ($id = Theme::where('brickeconomy_id', $tid)->first()?->id)
+                            $ts[] = $id;
+                    }
+                    $product->update([
+                        'theme_id' => $ts[0] ?? NULL
+                    ]);
+                    $product->themes()->sync($ts);
+                }
+            } else if ($details['Subtheme']['value_html'] ?? NULL) {
+                if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
+                    $href = $hrefMatch[1];
+                    // Now extract the subtheme from the href
+                    if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                        $subthemeId = $subthemeMatch[1];
+                        $theme = Theme::where('brickeconomy_id', $subthemeId)->first();
+                        $product->update([
+                            'theme_id' => $theme->id
+                        ]);
+                        $product->themes()->sync([$theme->id]);
+                    }
+                }
+            } else if ($details['Theme']['value_html'] ?? NULL) {
+                if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
+                    $theme = Theme::where('brickeconomy_id', $m[1])->first();
+                    $product->update([
+                        'theme_id' => $theme->id
+                    ]);
+                    $product->themes()->sync([$theme->id]);
+                }
+            }
+
+            $facts = [
+                'fact' => null,
+                'common_description' => null,
+            ];
+
+            $panel = $crawler->filter('#ContentPlaceHolder1_PanelMinifigFacts');
+
+            if ($panel->count() > 0) {
+                // The main fact is in the first .pt-10.pr-20.pl-20.pb-20 div
+                $factDiv = $panel->filter('.pt-10.pr-20.pl-20.pb-20');
+                if ($factDiv->count()) {
+                    $facts['fact'] = trim($factDiv->text());
+                }
+            }
+
+            if ($facts['fact']) {
+                $this->product->update([
+                    'facts' => [$facts['fact']]
+                ]);
+            }
+        }
+    }
 
     public function parseImages($html, $product_id)
     {
@@ -48,6 +259,9 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 // Array of all src attributes
                 $srcs = collect($imgMatches[1])->map(fn($url) => "https://www.brickeconomy.com{$url}");
                 Log::info("Dispatching download of {$srcs->count()} images", ['urls' => $srcs]);
+                $this->product->update([
+                    'scraped_imgs' => $srcs
+                ]);
                 DownloadProductImageJob::dispatch($product_id, $srcs)->onQueue('scraping');
                 return;
             }
@@ -60,13 +274,16 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             // Optionally prepend the domain if needed
             $fullUrl = str_starts_with($src, 'http') ? $src : "https://www.brickeconomy.com{$src}";
             Log::info("Dispatching download of modal image $fullUrl", ['url' => $fullUrl]);
+            $this->product->update([
+                'scraped_imgs' => [$fullUrl]
+            ]);
             DownloadProductImageJob::dispatch($product_id, collect([$fullUrl]))->onQueue('scraping');
         }
     }
 
     public function parsePrices($html, $product_id)
     {
-        $product = Product::find($product_id);
+        $product = $this->product;
 
         $has_daily = $product->prices()->where('type', PriceType::SCRAPED)->where('date', now()->format('Y-m-d'))->exists();
         $has_historical = $product->prices()->where('type', PriceType::AGGREGATED)->exists();
@@ -104,6 +321,36 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                                 'currency' => 'USD',
                                 'type' => PriceType::SCRAPED
                             ]);
+                        }
+                    }
+
+                    $usedHeader = $pricingDiv->filter('.semibold.bdr-b-l.pb-2')->reduce(function (Crawler $node) {
+                        return stripos($node->text(''), 'Used') !== false;
+                    });
+
+                    if ($usedHeader->count() > 0) {
+                        $usedValue = NULL;
+                        $usedRange = NULL;
+                        // Get all following siblings
+                        $nextRows = $usedHeader->nextAll()->filter('.row.rowlist');
+                        foreach ($nextRows as $row) {
+                            $rowCrawler = new Crawler($row);
+                            $label = trim($rowCrawler->filter('.col-xs-5.text-muted')->text(''));
+                            $value = trim($rowCrawler->filter('.col-xs-7')->text(''));
+                            if ($label === 'Value') {
+                                $usedValue = $value;
+                            }
+                            if (stripos($label, 'Range') !== false) {
+                                $usedRange = $value;
+                            }
+                            // Stop if both found
+                            if ($usedValue && $usedRange) {
+                                $product->update([
+                                    'used_price' => (float) preg_replace('/[^\d.]/', '', $usedValue),
+                                    'used_range' => $usedRange,
+                                ]);
+                                break;
+                            };
                         }
                     }
                 }
@@ -169,7 +416,8 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
 
         if ($product) {
             $product?->update([
-                'prices_count' => $product->prices()->count()
+                'prices_count' => $product->prices()->count(),
+                // 'scraped_at' => now()
             ]);
         }
     }

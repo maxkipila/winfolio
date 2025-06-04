@@ -47,10 +47,12 @@ class ScrapeBrickEconomy implements ShouldQueue
         try {
             $pages = $this->proxyRequest($urls);
             Log::info('finished the scraping', ['pages' => ($pages ?? 0)]);
+            Product::whereIn('id', $this->products)
+                ->update([
+                    'scraped_at' => now()
+                ]);
         } catch (\Exception $e) {
             $this->fail($e);
         }
     }
-
-    
 }

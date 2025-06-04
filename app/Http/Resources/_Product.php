@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\Theme;
 use App\Models\User;
 use App\Services\TrendService;
 use App\Traits\HasTrends;
@@ -85,6 +86,7 @@ class _Product extends JsonResource
             'num_parts'   => $this->num_parts,
             'img_url'      => $this->getFirstMediaUrl('images') ?: null,
             'theme'       => new _Theme($this->theme),
+            'themes' => _Theme::collection($this->themes),
             'availability' => $this->availability,
             'user_owns'   => $userOwns,
             'created_at'  => $this->created_at,
@@ -114,6 +116,10 @@ class _Product extends JsonResource
             'minifigs' => _Product::collection($this->whenLoaded('minifigs')),
             'sets' => _Product::collection($this->whenLoaded('sets')),
             'images' => $this->images,
+            'facts' => $this->facts,
+            'used_price' => $this->used_price,
+            'used_range' => $this->used_range,
+            'released_at' => $this->released_at,
         ];
     }
     private function calculateGrowth(int $days): ?float
