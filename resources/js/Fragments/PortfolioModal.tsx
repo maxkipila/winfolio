@@ -239,7 +239,7 @@ function PortfolioModal(props: Props) {
                                         <div className='max-w-1/3 mob:max-w-max mx-auto grid mob:px-24px mob:pb-24px'>
                                             <div className='flex justify-between mt-48px'>
                                                 <div className='font-bold font-teko text-xl mb-24px'>{t('Nová položka')}</div>
-                                                <div onClick={() => { setSelected(undefined); }} className='cursor-pointer font-bold'>{t('Cancel')}</div>
+                                                <div onClick={() => { setSelected(undefined); close(); }} className='cursor-pointer font-bold'>{t('Cancel')}</div>
                                             </div>
                                             <ProductCard wide {...selected} />
                                             <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>{t('Datum nákupu')}</div>
@@ -393,10 +393,14 @@ function PortfolioModal(props: Props) {
                                         :
                                         <div className='flex divide-x-2 divide-[#DEDFE5] mob:flex-col'>
                                             <div className='w-full mt-48px'>
-                                                <div className='flex gap-8px items-center mx-auto w-full justify-center mb-48px'>
-                                                    <div className='h-2px w-38px bg-[#666666]'></div>
-                                                    <div className='h-2px w-38px bg-[#999999]'></div>
-                                                    <div className='h-2px w-38px bg-[#999999]'></div>
+                                                <div className='flex items-center justify-between mb-48px px-40px mob:px-24px'>
+                                                    <ArrowLeft onClick={() => { close() }} className='cursor-pointer' size={24} />
+                                                    <div className='flex gap-8px items-center mx-auto w-full justify-center '>
+                                                        <div className='h-2px w-38px bg-[#666666]'></div>
+                                                        <div className='h-2px w-38px bg-[#999999]'></div>
+                                                        <div className='h-2px w-38px bg-[#999999]'></div>
+                                                    </div>
+                                                    <div></div>
                                                 </div>
                                                 <div className='max-w-1/3 mob:max-w-none mob:w-full mx-auto mob:px-24px'>
                                                     {/* <TextField icon={<MagnifyingGlass size={24} weight='bold' />} placeholder={"Vyhledat položku"} label={"Vyhledat položku"} name="search" /> */}
