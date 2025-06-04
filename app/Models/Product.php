@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PriceType;
 use App\Traits\HasResource;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,10 @@ class Product extends Model implements HasMedia
 
 
     protected $guarded = [];
+    protected $casts = [
+        "scraped_imgs" => "array",
+        "facts" => "array",
+    ];
 
     public function theme()
     {
@@ -78,7 +83,7 @@ class Product extends Model implements HasMedia
     }
     public function latest_price(): HasOne
     {
-        return $this->hasOne(Price::class)->latestOfMany();
+        return $this->hasOne(Price::class)->where('type', PriceType::SCRAPED)->latestOfMany();
     }
 
     public function images(): Attribute
@@ -137,5 +142,15 @@ class Product extends Model implements HasMedia
         return $this->belongsToMany(Product::class, 'set_minifigs', 'minifig_id', 'parent_id')
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    /**
+     * The themes that belong to the Product
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function themes(): BelongsToMany
+    {
+        return $this->belongsToMany(Theme::class);
     }
 }
