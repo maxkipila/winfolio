@@ -13,6 +13,7 @@ interface ButtonProps extends InertiaLinkProps {
     disableWhenProcessing?: boolean
     color?: string,
     disabledWhite?: boolean
+    wider?: boolean
 
 }
 
@@ -20,7 +21,7 @@ export function Button(props: ButtonProps) {
 
     const [processing, setProcessing] = useState(false)
 
-    const { icon, children, primary, outlined, className, mini, color, disabledWhite, disableWhenProcessing, ...rest } = props
+    const { icon, children, primary, outlined, wider = false, className, mini, color, disabledWhite, disableWhenProcessing, ...rest } = props
 
     useEffect(() => {
         let removeListener = router.on('finish', function (e) {
@@ -35,7 +36,7 @@ export function Button(props: ButtonProps) {
 
 
     return (
-        <Link onClick={_ => setProcessing(true)} {...rest} className={getButtonStyles({ disabled: (props?.disabled || (disableWhenProcessing && processing)), primary, outlined, className, mini, color, disabledWhite })}>
+        <Link onClick={_ => setProcessing(true)} {...rest} className={getButtonStyles({ disabled: (props?.disabled || (disableWhenProcessing && processing)), primary, outlined, className, mini, color, disabledWhite, wider })}>
             {icon}
             {children}{/*  */}
         </Link>
@@ -50,11 +51,12 @@ interface ButtonStylesProps {
     mini?: boolean,
     color?: string,
     disabledWhite?: boolean,
+    wider?: boolean
 
 }
 
-function getButtonStyles({ disabled, primary, className, outlined = false, mini, color, disabledWhite = false }: ButtonStylesProps) {
-    return `${mini ? "h-32px px-16px rounded-full" : "h-48px px-24px mob:px-8px"}
+function getButtonStyles({ disabled, primary, className, wider = false, outlined = false, mini, color, disabledWhite = false }: ButtonStylesProps) {
+    return `${mini ? "h-32px px-16px rounded-full" : `h-48px ${wider ? "px-32px" : "px-24px"}  mob:px-8px`}
      flex whitespace-nowrap justify-center items-center ${disabled ? `${disabledWhite ? "bg-app-yellow border border-app-yellow text-black opacity-40" : "bg-app-lighter/20"}
       pointer-events-none text-app-lighter cursor-not-allowed ` :
             (primary ? (outlined ? " hover:bg-app-lighter text-app hover:text-white border-app border cursor-pointer" : " bg-[#539648]  hover:bg-app-lighter text-white cursor-pointer") :

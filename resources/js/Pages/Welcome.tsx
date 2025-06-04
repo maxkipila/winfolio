@@ -136,7 +136,7 @@ function Welcome(props: Props) {
 
             </div>
             <div id="howItWorks" className='mt-64px grid h-80vh mob:h-auto'>
-                <Img className='col-start-1 row-start-1 w-full  h-80vh mob:h-full object-cover ' src="/assets/img/storm-landing.jpg" />
+                <Img className='col-start-1 row-start-1 w-full  h-80vh mob:h-full object-cover' src="/assets/img/storm-landing.jpg" />
                 <div className='col-start-1 row-start-1 w-full  h-80vh mob:h-auto px-24px flex items-center  mob:py-24px'>
                     <div className='bg-white p-24px max-w-1/2 mob:max-w-max'>
                         <div className='text-4xl font-bold'>{t('Jak to funguje?')}</div>
@@ -228,8 +228,8 @@ function Welcome(props: Props) {
             <div className='bg-white w-full h-[272px] max-h-[272px] relative'>
                 <div className='transform -translate-y-1/2 px-24px'>
                     <div className='w-full bg-black grid '>
-                        {/* <Img className='w-full col-start-1 row-start-1' src="/assets/img/john-landing.png" /> */}
-                        <div className='bg-black px-24px h-[400px] items-center flex gap-[58px] text-white mob:flex-col mob:justify-center'>
+                        <Img className='w-full col-start-1 row-start-1 h-[400px] object-cover' src="/assets/img/babayaga.png" />
+                        <div className=' px-24px h-[400px] items-center flex gap-[58px] text-white mob:flex-col mob:justify-center col-start-1 row-start-1'>
                             <div className='w-full'>
                                 <Img src="/assets/img/logo-white.svg" />
                                 <div className='font-nunito text-lg my-24px'>{t('Stav si sbírku. Sleduj její růst. Zlepšuj se a vyhrávej.')}</div>
