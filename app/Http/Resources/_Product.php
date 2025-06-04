@@ -120,6 +120,7 @@ class _Product extends JsonResource
             'used_price' => $this->used_price,
             'used_range' => $this->used_range,
             'released_at' => $this->released_at,
+            'prices_count' => $this->prices_count
         ];
     }
     private function calculateGrowth(int $days): ?float
