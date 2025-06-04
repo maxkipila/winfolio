@@ -13,8 +13,8 @@
     <tr>
         <td>
             <p> Dobrý den,</p>
-            <p>... vas@email.cz.</p>
-            <p style="padding-top: 16px;">Pro ověření e-mailu zadejte následující kód:</p>
+            <p>pro dokončení registrace prosím ověřte svou e-mailovou adresu {{$data['email']}} zadáním následujícího kódu:</p>
+            {{-- <p style="padding-top: 16px;">Pro ověření e-mailu zadejte následující kód:</p> --}}
         </td>
     </tr>
 
@@ -65,8 +65,8 @@
 
     <tr>
         <td>
-            <p>Pokud jste o změnu hesla nežádali, můžete tento e-mail jednoduše ignorovat – vaše heslo zůstane beze změny.</p>
-            <p style="padding-top: 16px;">Krásný den přeje</p>
+            <p>Pokud jste se neregistrovali, tento e-mail můžete bezpečně ignorovat.</p>
+            <p style="padding-top: 16px;">Děkujeme, že jste s námi,</p>
             <p style="font-weight: 700;">winfolio</p>
         </td>
     </tr>

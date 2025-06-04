@@ -18,7 +18,7 @@ function ProductDetails(props: Props) {
     let { open } = useContext(ModalsContext)
     let { setSelected } = useContext(PortfolioContext)
     const { data, post } = form;
-    
+
 
     function remove_from_portfolio(my_product: Product) {
         post(route('remove_product_from_user', { product: my_product.id }))
@@ -33,15 +33,25 @@ function ProductDetails(props: Props) {
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Name')}</div>
-                <div className='text-[#4D4D4D]'>{product?.name ?? "---"}</div>
+                <div className='text-[#4D4D4D] max-w-1/2'>{product?.name ?? "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Theme')}</div>
-                <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.parent?.name : (product?.theme?.name ?? "---")}</div>
+                {
+                    product?.themes?.filter((t) => t.parent_id == null).map((th) =>
+                        <Link href={route('catalog', { parent_theme: th.id })} className='text-[#4D4D4D]'>{th.name}</Link>
+                    )
+                }
+
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Subtheme')}</div>
-                <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.name : "---"}</div>
+                {
+                    product?.themes?.filter((t) => t.parent_id != null).map((th) =>
+                        <Link href={route('catalog', { parent_theme: th.parent_id, theme_children: [th.id] })} className='text-[#4D4D4D]'>{th.name}</Link>
+                    )
+                }
+                {/* <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.name : "---"}</div> */}
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Year')}</div>

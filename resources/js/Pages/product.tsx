@@ -41,6 +41,8 @@ function Product(props: Props) {
     function remove_from_portfolio(my_product: Product) {
         post(route('remove_product_from_user', { product: my_product.id }))
     }
+
+    // local testing 25042
     return (
         <AuthenticatedLayout>
             <Head title={`${product?.name} | Winfolio`} />

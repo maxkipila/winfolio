@@ -45,20 +45,20 @@ function ProductPricing(props: Props) {
                 <div>{product?.growth?.annual}%</div>
             </div>
 
-            <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px font-nunito'>
+            {/* <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px font-nunito'>
                 <div className='flex items-center gap-4px '>
                     <div>{t('Rolling growth')}</div>
                     <Question size={20} color="#4D4D4D" />
                 </div>
                 <div></div>
-            </div>
+            </div> */}
 
             <div className='flex items-center justify-between w-full border-t  border-[#D0D4DB] pt-12px font-nunito'>
                 <div className='flex items-center gap-4px '>
                     <div>{t('1-year growth')}</div>
                     <Question size={20} color="#4D4D4D" />
                 </div>
-                <div></div>
+                <div>{product?.growth?.yearly}%</div>
             </div>
 
             {/* <div className='flex items-center justify-between w-full border-t border-b border-[#D0D4DB] pt-12px pb-12px font-nunito'>

@@ -179,5 +179,9 @@ return [
     'Subscribe' => 'Subscribe',
     'Limited Offer' => 'Limited offer',
     'Dobrý den' => 'Hello',
-    'Výsledky vyhledávání' => 'Search results'
+    'Výsledky vyhledávání' => 'Search results',
+
+    'Zabalený' => 'Packed',
+    'Rozbalený' => 'Unpacked',
+    'Použitý' => 'Used'
 ];

@@ -21,6 +21,9 @@ interface Product {
     monthly_growth: number,
     weekly_growth: number,
     availability: any,
+    used_range?: string,
+    used_price?: number,
+    themes?: Array<Theme>
     user_owns?: Array<{
         condition: string,
         currency: string,
@@ -35,4 +38,5 @@ interface Product {
         yearly: number,
         annual: number
     }
+    prices_count: number
 }
