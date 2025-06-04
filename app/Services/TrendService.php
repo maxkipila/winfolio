@@ -619,8 +619,8 @@ class TrendService
     } */
     public function getPriceHistoryWithMedian(int $productId, int $months = 24): array
     {
-        $endDate = now();
-        $startDate = $endDate->copy()->subMonths($months);
+        // $endDate = now();
+        // $startDate = $endDate->copy()->subMonths($months);
 
         // všechny cenové body 
         $pricePoints = Price::where('product_id', $productId)

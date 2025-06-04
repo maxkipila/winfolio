@@ -314,14 +314,18 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         })->filter('.col-xs-7 b')->text('');
 
                         if ($sealedValue != '') {
-                            $product->prices()->create([
-                                'date' => now()->format('Y-m-d'),
-                                'value' =>  (float) preg_replace('/[^\d.]/', '', $sealedValue),
-                                'retail' => $retailPrice != '' ? ((float) preg_replace('/[^\d.]/', '', $retailPrice)) : NULL,
-                                'currency' => 'USD',
-                                'type' => PriceType::SCRAPED
-                            ]);
                         }
+                    }
+
+                    if($sealedValue || $retailPrice)
+                    {
+                        $product->prices()->create([
+                            'date' => now()->format('Y-m-d'),
+                            'value' =>  (float) preg_replace('/[^\d.]/', '', $sealedValue ?? $retailPrice),
+                            'retail' => $retailPrice != '' ? ((float) preg_replace('/[^\d.]/', '', $retailPrice)) : NULL,
+                            'currency' => 'USD',
+                            'type' => PriceType::SCRAPED
+                        ]);
                     }
 
                     $usedHeader = $pricingDiv->filter('.semibold.bdr-b-l.pb-2')->reduce(function (Crawler $node) {
