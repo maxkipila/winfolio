@@ -624,7 +624,6 @@ class TrendService
 
         // všechny cenové body 
         $pricePoints = Price::where('product_id', $productId)
-            ->whereBetween('date', [$startDate, $endDate])
             ->orderBy('date')
             ->get(['value', 'date']);
 
