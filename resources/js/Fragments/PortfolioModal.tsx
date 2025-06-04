@@ -376,10 +376,10 @@ function PortfolioModal(props: Props) {
                                                 ]} />
                                             </div>
                                             <div className='mt-8px'>
-                                                <Select name="status" placeholder='Stav' options={[
-                                                    { text: 'Zabalený', value: 'packed' },
-                                                    { text: 'Rozbalený', value: 'unpacked' },
-                                                    { text: 'Použitý', value: 'used' },
+                                                <Select name="status" placeholder={t('Stav')} options={[
+                                                    { text: t('Zabalený'), value: 'packed' },
+                                                    { text: t('Rozbalený'), value: 'unpacked' },
+                                                    { text: t('Použitý'), value: 'used' },
                                                 ]} />
                                             </div>
                                             <div className='mt-40px font-nunito mb-8px text-[#4D4D4D]'>{t('Nahrát fotografie')}</div>
@@ -452,7 +452,7 @@ function PortfolioModal(props: Props) {
                                                         <>
                                                             <div className='flex justify-center items-center gap-12px mt-28px'>
                                                                 <ArrowUpRight size={24} weight='bold' />
-                                                                <div className='font-bold font-teko text-xl'>{`Momentálně trendují`}</div>
+                                                                <div className='font-bold font-teko text-xl'>{t('Momentálně trendují')}</div>
                                                             </div>
                                                             <div className='grid grid-cols-2 mob:grid-cols-1 gap-24px mt-12px p-24px'>
                                                                 {

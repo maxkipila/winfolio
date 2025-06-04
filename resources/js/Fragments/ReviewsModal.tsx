@@ -77,7 +77,7 @@ function ReviewsModal(props: Props) {
     let [collected, setCollected] = useState(true)
     const { auth } = usePageProps<{ auth: { user: User } }>();
     const form = useForm({
-        rating: 0,
+        rating: 1,
         role: "collector",
         product_id: product?.id,
         user_id: auth?.user?.id

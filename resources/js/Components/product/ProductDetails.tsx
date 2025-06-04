@@ -33,7 +33,7 @@ function ProductDetails(props: Props) {
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Name')}</div>
-                <div className='text-[#4D4D4D]'>{product?.name ?? "---"}</div>
+                <div className='text-[#4D4D4D] max-w-1/2'>{product?.name ?? "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Theme')}</div>
