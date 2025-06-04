@@ -19,8 +19,8 @@ class _Price extends JsonResource
         return [
             'id' => $this->id,
             'retail' => $this->retail,
-            'wholesale' => $this->wholesale,
             'value' => $this->value,
+            'type' => $this->type,
             'condition' => $this->condition,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

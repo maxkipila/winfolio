@@ -22,7 +22,6 @@ class AwardCheckerService
                 return !in_array($award->id, $userAwardIds);
             });
 
-
             foreach ($awards as $award) {
                 $meetsConditions = true;
                 $count = null;

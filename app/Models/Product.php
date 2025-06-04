@@ -83,7 +83,7 @@ class Product extends Model implements HasMedia
     }
     public function latest_price(): HasOne
     {
-        return $this->hasOne(Price::class)->where('type', PriceType::SCRAPED)->latestOfMany();
+        return $this->hasOne(Price::class)->where('type', PriceType::SCRAPED)->latest()->take(1);
     }
 
     public function images(): Attribute

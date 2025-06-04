@@ -42,7 +42,7 @@ class _Product extends JsonResource
         }
 
 
-        if (Auth::check() && Auth::user() instanceof User && !Gate::allows('admin')) {
+        if (Auth::check() && Auth::user() instanceof User /* && !Gate::allows('admin') */) {
             $user = Auth::user();
 
             $userProductRelations = $user->products()

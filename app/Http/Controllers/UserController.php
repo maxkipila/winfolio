@@ -131,7 +131,7 @@ class UserController extends Controller
             ->where('calculated_at', $latestDateMovers)
             ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
-        /*  if ($topMoversQuery->count() === 0) {
+         if ($topMoversQuery->count() === 0) {
             $this->trendService->calculateTopMovers();
             $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
@@ -139,7 +139,7 @@ class UserController extends Controller
                 ->where('type', 'top_mover')
                 ->where('calculated_at', $latestDateMovers)
                 ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
-        } */
+        }
 
         $top_movers = _Trend::collection(
             $topMoversQuery->paginate($request->paginate ?? 2)

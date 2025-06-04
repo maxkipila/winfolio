@@ -21,7 +21,7 @@ class ScrapeBrickEconomy implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public $products = [], public $daily = false, public $historical = false, public $images = false)
+    public function __construct(public $products = [], public $daily = false, public $historical = false, public $images = false) 
     {
         //
     }
