@@ -6,7 +6,7 @@ use App\Jobs\ProcessScrapedBrickEconomyPages;
 use App\Jobs\ProcessScrapedBrickEconomyThemes;
 use Illuminate\Console\Command;
 
-class ProcessScrapedBrickEconomyPagesCommand extends Command
+class ProcessScrapedBrickEconomyThemesCommand extends Command
 {
     /**
      * The name and signature of the console command.
