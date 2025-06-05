@@ -31,7 +31,6 @@ class ScrapeBrickEconomy extends Command
      */
     public function handle()
     {
-
         $sitemapPath = storage_path('app/html/sitemap.xml'); // Adjust path if needed
 
         try {
@@ -119,15 +118,30 @@ class ScrapeBrickEconomy extends Command
             foreach ($theme['subthemes'] ?? [] as $key => $subtheme) {
                 Theme::updateOrCreate(
                     [
-                        'brickeconomy_id' => $subtheme
+                        'brickeconomy_id' => $subtheme,
+                        'parent_id' => $t->id
                     ],
                     [
                         'name' => unslug($subtheme),
-                        'parent_id' => $t->id
                     ]
                 );
             }
         });
+
+        $this->info("Scraping themes not in sitemap");
+
+        $not_in_sitemap = [
+            'gear'
+        ];
+
+        foreach ($not_in_sitemap as $key => $theme) {
+            try {
+                $this->info("Getting theme $theme");
+                $this->getTheme("https://www.brickeconomy.com/$theme", $theme);
+            } catch (\Throwable $th) {
+                $this->info("Theme $theme couldn't be scraped: " . $th->getMessage());
+            }
+        }
 
         $this->info("\nCreating sets");
 
@@ -164,7 +178,7 @@ class ScrapeBrickEconomy extends Command
         file_put_contents(storage_path('app/html/sets.json'), json_encode($sets, JSON_PRETTY_PRINT));
         file_put_contents(storage_path('app/html/minifigs.json'), json_encode($minifigs, JSON_PRETTY_PRINT));
 
-        $products = Product::whereNull('scraped_at')->orWhere('scraped_at', '<', now()->startOfDay())->pluck('id');
+        $products = Product::whereNull('scraped_at')->orWhere('scraped_at', '<', now()->startOfMonth())->pluck('id');
 
         $chunkSize = 10; // Number of products per batch
         $chunks = $products->chunk($chunkSize); // Split products into chunks
