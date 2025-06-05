@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Admin;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\Theme;
@@ -42,7 +43,7 @@ class _Product extends JsonResource
         }
 
 
-        if (Auth::check() && Auth::user() instanceof User /* && !Gate::allows('admin') */) {
+        if (Auth::check() && !Auth::user() instanceof Admin /* && !Gate::allows('admin') */) {
             $user = Auth::user();
 
             $userProductRelations = $user->products()
