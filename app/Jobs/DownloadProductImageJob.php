@@ -62,9 +62,8 @@ class DownloadProductImageJob implements ShouldQueue
                 try {
                     // Download image through proxy
                     $response = Http::withOptions([
-                        'verify' => false, // if you have SSL issues
                         'timeout' => 600,
-                        'proxy' => "https://{$API_CREDENTIALS}@217.30.10.33:43587"
+                        'proxy' => "http://{$API_CREDENTIALS}@217.30.10.33:43587"
                     ])
                         ->withHeaders([
                             'User-Agent' => $this->userAgents[rand(0, count($this->userAgents) - 1)],
