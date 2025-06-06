@@ -92,7 +92,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                             $themeId = $m[1];
                             $subthemeId = $m[2] ?? null;
 
-                             //$output->writeln("<info> MULTIPLE $product_id => $themeId, $subthemeId</info>");
+                            //$output->writeln("<info> MULTIPLE $product_id => $themeId, $subthemeId</info>");
 
                             $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
                             $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
@@ -144,7 +144,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                } 
+                }
                 /* else {
                     $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
                 } */
@@ -255,6 +255,10 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                     }
                 }
             } else {
+
+                $themeId = NULL;
+                $subthemeId = NULL;
+
                 if ($details['Subtheme']['value_html'] ?? NULL) {
                     if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
                         $href = $hrefMatch[1];
@@ -289,7 +293,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                } 
+                }
                 /* else {
                     $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
                 } */
