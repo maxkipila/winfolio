@@ -31,6 +31,10 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
      */
     public function handle(): void
     {
+
+        if(!file_exists($this->file_path))
+            $this->fail("HTML for product {$this->product_id} doesn't exist.");
+
         $html = file_get_contents($this->file_path);
         $this->parseSetInfo($html, $this->product_id);
         $this->parseMinifigInfo($html, $this->product_id);
