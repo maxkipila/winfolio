@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\PriceType;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\Theme;
 use Carbon\Carbon;
@@ -76,40 +77,76 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 'num_parts' => ($details['Pieces']['value'] ?? NULL) ? intval($details['Pieces']['value']) : NULL,
             ]));
 
+            $themeId = NULL;
+            $subthemeId = NULL;
+
+            //$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+
             if ($details['Themes']['value_html'] ?? NULL) {
-                if (preg_match_all('#/minifigs/theme/([^"]+)#', $details['Themes']['value_html'], $matches)) {
-                    $themeIds = $matches[1];
-                    $ts = [];
-                    foreach ($themeIds as $key => $tid) {
-                        if ($id = Theme::where('brickeconomy_id', $tid)->first()?->id)
-                            $ts[] = $id;
+                //$output->writeln("<info> $product_id => Themes: " . json_encode($details['Themes']) . "</info>");
+                if (preg_match_all('#href="([^"]+)"#', $details['Themes']['value_html'], $hrefMatches)) {
+                    foreach ($hrefMatches[1] as $href) {
+                        // Try to match theme and subtheme
+                        if (preg_match('#/sets/theme/([^/]+)(?:/subtheme/([^"/]+))?#', $href, $m)) {
+                            $themeId = $m[1];
+                            $subthemeId = $m[2] ?? null;
+
+                             //$output->writeln("<info> MULTIPLE $product_id => $themeId, $subthemeId</info>");
+
+                            $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                            $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+                            if ($theme && $subtheme) {
+                                $product->update([
+                                    'theme_id' => $subtheme->id
+                                ]);
+                                $product->themes()->sync([$subtheme->id]);
+                            } else if ($theme && !$subtheme) {
+                                $product->update([
+                                    'theme_id' => $theme->id
+                                ]);
+                                $product->themes()->sync([$theme->id]);
+                            }
+                        }
                     }
+                }
+            } else {
+                if ($details['Subtheme']['value_html'] ?? NULL) {
+                    if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
+                        $href = $hrefMatch[1];
+                        // Now extract the subtheme from the href
+                        if (preg_match('#/([^/]+)/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                            $themeId = $subthemeMatch[1];
+                            $subthemeId = $subthemeMatch[2];
+                        }
+                    }
+                }
+
+                if (!$themeId && $details['Theme']['value_html'] ?? NULL) {
+                    if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
+                        $themeId = $m[1];
+                    }
+                }
+
+                //$output->writeln("<info> $product_id => $themeId, $subthemeId</info>");
+
+                $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+                if ($theme && $subtheme) {
                     $product->update([
-                        'theme_id' => $ts[0] ?? NULL
+                        'theme_id' => $subtheme->id
                     ]);
-                    $product->themes()->sync($ts);
-                }
-            } else if ($details['Subtheme']['value_html'] ?? NULL) {
-                if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
-                    $href = $hrefMatch[1];
-                    // Now extract the subtheme from the href
-                    if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
-                        $subthemeId = $subthemeMatch[1];
-                        $theme = Theme::where('brickeconomy_id', $subthemeId)->first();
-                        $product->update([
-                            'theme_id' => $theme->id
-                        ]);
-                        $product->themes()->sync([$theme->id]);
-                    }
-                }
-            } else if ($details['Theme']['value_html'] ?? NULL) {
-                if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
-                    $theme = Theme::where('brickeconomy_id', $m[1])->first();
+                    $product->themes()->sync([$subtheme->id]);
+                } else if ($theme && !$subtheme) {
                     $product->update([
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                }
+                } 
+                /* else {
+                    $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
+                } */
             }
 
 
@@ -187,41 +224,73 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 'availability' => $details['Availability']['value'] ?? NULL,
             ]));
 
+            //$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+
 
             if ($details['Themes']['value_html'] ?? NULL) {
-                if (preg_match_all('#/minifigs/theme/([^"]+)#', $details['Themes']['value_html'], $matches)) {
-                    $themeIds = $matches[1];
-                    $ts = [];
-                    foreach ($themeIds as $key => $tid) {
-                        if ($id = Theme::where('brickeconomy_id', $tid)->first()?->id)
-                            $ts[] = $id;
+                if (preg_match_all('#href="([^"]+)"#', $details['Themes']['value_html'], $hrefMatches)) {
+                    foreach ($hrefMatches[1] as $href) {
+                        // Try to match theme and subtheme
+                        if (preg_match('#/([^/]+)(?:/subtheme/([^"/]+))?#', $href, $m)) {
+                            $themeId = $m[1];
+                            $subthemeId = $m[2] ?? null;
+
+                            $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                            $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+                            if ($theme && $subtheme) {
+                                $product->update([
+                                    'theme_id' => $subtheme->id
+                                ]);
+                                $product->themes()->sync([$subtheme->id]);
+                            } else if ($theme && !$subtheme) {
+                                $product->update([
+                                    'theme_id' => $theme->id
+                                ]);
+                                $product->themes()->sync([$theme->id]);
+                            }
+                        }
                     }
+                }
+            } else {
+                if ($details['Subtheme']['value_html'] ?? NULL) {
+                    if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
+                        $href = $hrefMatch[1];
+                        // Now extract the subtheme from the href
+                        if (preg_match('#/([^/]+)/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                            $themeId = $subthemeMatch[1];
+                            $subthemeId = $subthemeMatch[2];
+                        }
+                    }
+                }
+
+                if (!$themeId && $details['Theme']['value_html'] ?? NULL) {
+                    if (preg_match('#/minifigs/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
+                        $themeId = $m[1];
+                    }
+                }
+
+                //$output->writeln("<info> $product_id => $themeId, $subthemeId</info>");
+
+                $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+
+
+                if ($theme && $subtheme) {
                     $product->update([
-                        'theme_id' => $ts[0] ?? NULL
+                        'theme_id' => $subtheme->id
                     ]);
-                    $product->themes()->sync($ts);
-                }
-            } else if ($details['Subtheme']['value_html'] ?? NULL) {
-                if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
-                    $href = $hrefMatch[1];
-                    // Now extract the subtheme from the href
-                    if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
-                        $subthemeId = $subthemeMatch[1];
-                        $theme = Theme::where('brickeconomy_id', $subthemeId)->first();
-                        $product->update([
-                            'theme_id' => $theme->id
-                        ]);
-                        $product->themes()->sync([$theme->id]);
-                    }
-                }
-            } else if ($details['Theme']['value_html'] ?? NULL) {
-                if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
-                    $theme = Theme::where('brickeconomy_id', $m[1])->first();
+                    $product->themes()->sync([$subtheme->id]);
+                } else if ($theme && !$subtheme) {
                     $product->update([
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                }
+                } 
+                /* else {
+                    $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
+                } */
             }
 
             $facts = [
@@ -258,7 +327,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             if (preg_match_all($imgRegex, $ulContent, $imgMatches)) {
                 // Array of all src attributes
                 $srcs = collect($imgMatches[1])->map(fn($url) => "https://www.brickeconomy.com{$url}");
-                Log::info("Dispatching download of {$srcs->count()} images", ['urls' => $srcs]);
+                // Log::info("Dispatching download of {$srcs->count()} images", ['urls' => $srcs]);
                 $this->product->update([
                     'scraped_imgs' => $srcs
                 ]);
@@ -273,7 +342,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             $src = $imgMatch[1];
             // Optionally prepend the domain if needed
             $fullUrl = str_starts_with($src, 'http') ? $src : "https://www.brickeconomy.com{$src}";
-            Log::info("Dispatching download of modal image $fullUrl", ['url' => $fullUrl]);
+            // Log::info("Dispatching download of modal image $fullUrl", ['url' => $fullUrl]);
             $this->product->update([
                 'scraped_imgs' => [$fullUrl]
             ]);
@@ -287,6 +356,45 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
 
         $has_daily = $product->prices()->where('type', PriceType::SCRAPED)->where('date', now()->format('Y-m-d'))->exists();
         $has_historical = $product->prices()->where('type', PriceType::AGGREGATED)->exists();
+
+        if (!$has_historical) {
+
+            preg_match_all('/data\.addRows\(\[\s*(.*?)\s*\]\);/s', $html, $rowsMatches, PREG_SET_ORDER);
+            $dataRows = '';
+
+            foreach ($rowsMatches as $match) {
+                $rowsContent = $match[1];
+                if (strpos($rowsContent, "'Released'") !== false) {
+                    $dataRows = $rowsContent;
+                    break;
+                }
+            }
+
+            if (!$dataRows && !empty($rowsMatches)) {
+                $dataRows = $rowsMatches[0][1] ?? '';
+            }
+
+            if ($dataRows && preg_match_all('/\[new Date\((\d+),\s*(\d+),\s*(\d+)\),\s*([\d.]+)/s', $dataRows, $matches, PREG_SET_ORDER)) {
+                $minYear = 1900;
+                $maxYear = now()->year;
+                foreach ($matches as $match) {
+                    $year = (int)$match[1];
+                    $month = (int)$match[2];
+                    $day = (int)$match[3];
+                    $price = (float)$match[4];
+
+                    if ($year >= $minYear && $year <= $maxYear) {
+                        $date = Carbon::create($year, $month, $day)->format('Y-m-d');
+                        $product->prices()->create([
+                            'date' => $date,
+                            'value' => $price,
+                            'currency' => 'USD',
+                            'type' => PriceType::AGGREGATED
+                        ]);
+                    }
+                }
+            }
+        }
 
         if (!$has_daily) {
             $crawler = new Crawler($html);
@@ -308,20 +416,18 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         return stripos($node->text(''), 'New/Sealed') !== false;
                     });
 
+                    $sealedValue = NULL;
+
                     if ($newSealedSection->count() > 0) {
                         $sealedValue = $newSealedSection->nextAll()->filter('.row.rowlist')->reduce(function (Crawler $node) {
                             return $node->filter('.col-xs-5.text-muted')->text('') === 'Value';
                         })->filter('.col-xs-7 b')->text('');
-
-                        if ($sealedValue != '') {
-                        }
                     }
 
-                    if($sealedValue || $retailPrice)
-                    {
+                    if ($sealedValue || $retailPrice) {
                         $product->prices()->create([
                             'date' => now()->format('Y-m-d'),
-                            'value' =>  (float) preg_replace('/[^\d.]/', '', $sealedValue ?? $retailPrice),
+                            'value' =>  (float) preg_replace('/[^\d.]/', '', $sealedValue ?? $product->prices()->latest('date')?->value ?? $retailPrice),
                             'retail' => $retailPrice != '' ? ((float) preg_replace('/[^\d.]/', '', $retailPrice)) : NULL,
                             'currency' => 'USD',
                             'type' => PriceType::SCRAPED
@@ -379,44 +485,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             }
         }
 
-        if (!$has_historical) {
 
-            preg_match_all('/data\.addRows\(\[\s*(.*?)\s*\]\);/s', $html, $rowsMatches, PREG_SET_ORDER);
-            $dataRows = '';
-
-            foreach ($rowsMatches as $match) {
-                $rowsContent = $match[1];
-                if (strpos($rowsContent, "'Released'") !== false) {
-                    $dataRows = $rowsContent;
-                    break;
-                }
-            }
-
-            if (!$dataRows && !empty($rowsMatches)) {
-                $dataRows = $rowsMatches[0][1] ?? '';
-            }
-
-            if ($dataRows && preg_match_all('/\[new Date\((\d+),\s*(\d+),\s*(\d+)\),\s*([\d.]+)/s', $dataRows, $matches, PREG_SET_ORDER)) {
-                $minYear = 1900;
-                $maxYear = now()->year;
-                foreach ($matches as $match) {
-                    $year = (int)$match[1];
-                    $month = (int)$match[2];
-                    $day = (int)$match[3];
-                    $price = (float)$match[4];
-
-                    if ($year >= $minYear && $year <= $maxYear) {
-                        $date = Carbon::create($year, $month, $day)->format('Y-m-d');
-                        $product->prices()->create([
-                            'date' => $date,
-                            'value' => $price,
-                            'currency' => 'USD',
-                            'type' => PriceType::AGGREGATED
-                        ]);
-                    }
-                }
-            }
-        }
 
         if ($product) {
             $product?->update([
