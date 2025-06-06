@@ -55,7 +55,7 @@ function Catalog(props: Props) {
     });
 
     const { data, post } = form;
-    const [products, button, meta, setItems] = useLazyLoad<Product>('products');
+    const [prods, button, meta, setItems] = useLazyLoad<Product | { product: Product }>('products');
     const selected = themes.find(t => `${t.id}` == parent_theme);
     const { open } = useContext(ModalsContext);
 
@@ -72,6 +72,7 @@ function Catalog(props: Props) {
         doSearch();
     }, [data?.search])
 
+    const products = trending ? (prods as Array<{ product: Product }>) : prods as Array<Product>
 
     return (
         <AuthenticatedLayout>
@@ -135,9 +136,13 @@ function Catalog(props: Props) {
                         <div className='grid grid-cols-2 mob:grid-cols-1 mt-24px gap-24px mob:px-24px'>
 
                             {
-                                products?.map((s) =>
-                                    <ProductCard wide {...s} />
-                                )
+                                (trending && (products?.[0] as any)?.product) ?
+                                    (products as any).map(p => p.product)?.map((s) =>
+                                        <ProductCard wide {...s} />
+                                    )
+                                    : products?.map((s) =>
+                                        <ProductCard wide {...s} />
+                                    )
                             }
                         </div>
                         <div className='flex items-center justify-center w-full mt-24px'>

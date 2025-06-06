@@ -67,6 +67,12 @@ class AwardCheckerService
                                 $percentage = $portfolioGrowth;
                             }
                             break;
+                        case 'specific_category':
+                            $meetsConditions = $this->checkSpecificCategory($user, $condition->category_id, 1);
+                            break;
+                        case 'category_items_count':
+                            $meetsConditions = $this->checkSpecificCategory($user, $condition->category_id, $condition->required_count);
+                            break;
 
                         default:
                             $meetsConditions = false;

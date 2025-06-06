@@ -112,7 +112,7 @@ class UpdateUserRecords extends Command
             $currentValue = $product->price->value;
             $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
 
-            if (!$foundNegativeGrowth || $growth < $worstGrowth) {
+            if ($growth < $worstGrowth) {
                 $worstGrowth = $growth;
                 $worstProductId = $product->id;
                 $foundNegativeGrowth = true;

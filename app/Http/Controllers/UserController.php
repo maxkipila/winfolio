@@ -21,6 +21,7 @@ use App\Services\TrendService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -131,7 +132,7 @@ class UserController extends Controller
             ->where('calculated_at', $latestDateMovers)
             ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
-         if ($topMoversQuery->count() === 0) {
+        if ($topMoversQuery->count() === 0) {
             $this->trendService->calculateTopMovers();
             $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
@@ -208,8 +209,6 @@ class UserController extends Controller
                 $trendingQuery->paginate($request->paginate ?? 4)
             );
         } else {
-
-
             $productsQuery = Product::with(['media', 'latest_price', 'theme'])
                 ->when($request->type && $request->type !== 'all', fn($k) => $k->where('product_type', $request->type === 'minifigs' ? 'minifig' : $request->type))
                 ->when(
@@ -423,6 +422,13 @@ class UserController extends Controller
 
         $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
         // $user->products()->sync([$product->id]);
+
+        try {
+            Artisan::call('app:update-user-records');
+            Artisan::call('app:check-awards');
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage(), [$th->__toString()]);
+        }
         return back();
     }
 

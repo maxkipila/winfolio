@@ -13,7 +13,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('telescope:prune --hours=48')->daily();
 
-Schedule::command('app:check-awards')->everyFiveMinutes()->timezone('Europe/Prague'); //kontrola odznaku
+Schedule::command('app:check-awards')->daily()->timezone('Europe/Prague'); //kontrola odznaku
 Schedule::command('app:calculate-trends')->dailyAt('02:00')->timezone('Europe/Prague'); //vypocet trendu
 Schedule::command('app:update-user-records')->daily()->timezone('Europe/Prague'); //aktualizace uzivatelskych recordu
 
