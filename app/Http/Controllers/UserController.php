@@ -416,9 +416,16 @@ class UserController extends Controller
             'status' => 'required',
 
         ]);
+        $locale = App::getLocale();
+        // dd($locale);
+        if (($product->year > $request->year)) {
+            if ($locale == "en") {
+                throw ValidationException::withMessages(['year' => 'Date before product release.']);
+            } else {
+                throw ValidationException::withMessages(['year' => 'Datum před vydáním produktu.']);
+            }
+        }
 
-        if (($product->year > $request->year))
-            throw ValidationException::withMessages(['year' => 'Datum před vydáním produktu.']);
 
         $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
         // $user->products()->sync([$product->id]);

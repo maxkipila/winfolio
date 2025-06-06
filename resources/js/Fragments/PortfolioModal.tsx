@@ -368,7 +368,7 @@ function PortfolioModal(props: Props) {
 
                                             </div>
                                             <div className='flex gap-8px mt-8px'>
-                                                <TextField name="price" placeholder={"Nákupní cena"} label={"Nákupní cena"} />
+                                                <TextField name="price" placeholder={t("Nákupní cena")} label={t("Nákupní cena")} />
                                                 <Select name="currency" placeholder={t('currency')} options={[
                                                     { text: 'CZK', value: 'CZK' },
                                                     { text: 'EUR', value: 'EUR' },

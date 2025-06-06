@@ -68,13 +68,20 @@ function Product(props: Props) {
                 <div className='w-full'>
                     <ProductDetails product={product} form={form} />
                     <ProductPricing product={product} />
-                    <div className='mt-32px border-2 border-black p-32px'>
-                        <div className='font-bold font-teko'>{t('Set Facts')}</div>
-                        <div className='mt-16px flex gap-16px'>
-                            <div className='w-8px h-8px rounded-full bg-black flex-shrink-0 mt-8px'></div>
-                            <div className='text-[#4D4D4D]'>The Make & Take event were be available in UK and selected European stores on March 9th between 10:00 – 12:00 and on March 10th between 12:00 – 14:00.</div>
+                    {
+                        product?.facts?.length > 0 &&
+                        <div className='mt-32px border-2 border-black p-32px'>
+                            <div className='font-bold font-teko'>{t('Set Facts')}</div>
+                            {
+                                product?.facts?.map((f) =>
+                                    <div className='mt-16px flex gap-16px'>
+                                        <div className='w-8px h-8px rounded-full bg-black flex-shrink-0 mt-8px'></div>
+                                        <div className='text-[#4D4D4D]'>{f}</div>
+                                    </div>
+                                )
+                            }
                         </div>
-                    </div>
+                    }
                     <ReviewCard product={product} />
                 </div>
             </div>
@@ -95,7 +102,7 @@ function Product(props: Props) {
                 <PointsGraph product={product} priceHistory={priceHistory} />
                 <ProductDetails product={product} form={form} />
                 {/* <ProductForecast product={product} /> */}
-                 <ProductPricing product={product} />
+                <ProductPricing product={product} />
                 {/* <ProductPredictions product={product} /> */}
                 <div className='mt-40px font-bold text-xl'>{t('Claim')}</div>
                 {/* <div className='mt-16px font-nunito text-[#4D4D4D]'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Vestibulum erat nulla, ullamcorper nec, rutrum non.</div> */}
@@ -103,8 +110,8 @@ function Product(props: Props) {
                 <ProductSimilarProducts product={product} similiar_products={similiar_products} />
 
 
-                
-               
+
+
                 {/* <div className='mt-32px border-2 border-black p-32px'>
                     <div className='font-bold font-teko'>{t('Set Facts')}</div>
                     <div className='mt-16px flex gap-16px'>

@@ -39,4 +39,5 @@ interface Product {
         annual: number
     }
     prices_count: number
+    facts: Array<string>
 }

@@ -80,7 +80,7 @@ function Catalog(props: Props) {
             <div className='max-w-[920px] mx-auto pb-24px'>
                 <Form className='pt-32px mob:px-24px flex gap-12px items-center nMob:max-w-1/3 nMob:mx-auto' form={form}>
                     <TextField placeholder={t("Vyhledat položku")} name="search" icon={<MagnifyingGlass size={24} />} />
-                    {/* <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: priceRange, priceTrend: priceTrend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear, setPriceRange: setPriceRange, setPriceTrend: setPriceTrend, setReviews: setReviews, setFavourited: setFavourited, setStatus: setStatus, setReleaseYear: setReleaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} /> */}
+                    {/* <SlidersHorizontal onClick={() => { open(MODALS.CATALOG_FILTERS, false, { priceRange: filtered.price_range, priceTrend: filtered.price_trend, reviews: reviews, favourited: favourited, status: status, releaseYear: releaseYear }) }} className='cursor-pointer flex-shrink-0' size={24} /> */}
                 </Form>
                 <div className='mt-24px w-full flex gap-12px overflow-x-auto mob:px-24px'>
                     <Link href={route(route().current(), { ...filtered, trending: !trending, parent_theme: null, theme_children: [] })} as='button' method='post' className={`cursor-pointer w-full min-w-[120px] border-2 ${trending ? "border-black nMob:hover:border-[#FFB400] bg-black text-white" : "border-black nMob:hover:border-[#FFB400] bg-[#F5F5F5]  hover:bg-white"}  group    flex items-center justify-center bg-[#F5F5F5] flex-col p-12px gap-8px mob:min-w-[112px]`}>

@@ -105,7 +105,7 @@ function ProductDetails(props: Props) {
                         </div> */}
             {
                 product?.availability != null &&
-                <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{t('Availible at retail')}</div>
+                <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{product?.availability}</div>
             }
 
             {
