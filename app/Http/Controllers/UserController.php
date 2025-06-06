@@ -131,7 +131,7 @@ class UserController extends Controller
             ->where('calculated_at', $latestDateMovers)
             ->orderByRelation($request->sort ?? ['weekly_growth' => 'desc'], ['id', 'asc'], App::getLocale());
 
-         if ($topMoversQuery->count() === 0) {
+        if ($topMoversQuery->count() === 0) {
             $this->trendService->calculateTopMovers();
             $latestDateMovers = Trend::where('type', 'top_mover')->max('calculated_at');
 
@@ -417,9 +417,16 @@ class UserController extends Controller
             'status' => 'required',
 
         ]);
+        $locale = App::getLocale();
+        // dd($locale);
+        if (($product->year > $request->year)) {
+            if ($locale == "en") {
+                throw ValidationException::withMessages(['year' => 'Date before product release.']);
+            } else {
+                throw ValidationException::withMessages(['year' => 'Datum před vydáním produktu.']);
+            }
+        }
 
-        if (($product->year > $request->year))
-            throw ValidationException::withMessages(['year' => 'Datum před vydáním produktu.']);
 
         $user->products()->syncWithoutDetaching([$product->id => ['purchase_year' => $request->year, 'purchase_month' => $request->month, 'purchase_day' => $request->day, 'purchase_price' => $request->price, 'currency' => $request->currency, 'condition' => $request->status]]);
         // $user->products()->sync([$product->id]);
