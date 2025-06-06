@@ -26,6 +26,7 @@ class ProcessScrapedBrickEconomyThemes implements ShouldQueue
         $this->theme = Theme::firstOrCreate(
             [
                 'brickeconomy_id' => $theme_id,
+                'parent_id' => NULL
             ],
             [
                 'name' => ucwords(str_replace('-', ' ', $theme_id))

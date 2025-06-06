@@ -80,7 +80,10 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
             $themeId = NULL;
             $subthemeId = NULL;
 
+            //$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+
             if ($details['Themes']['value_html'] ?? NULL) {
+                //$output->writeln("<info> $product_id => Themes: " . json_encode($details['Themes']) . "</info>");
                 if (preg_match_all('#href="([^"]+)"#', $details['Themes']['value_html'], $hrefMatches)) {
                     foreach ($hrefMatches[1] as $href) {
                         // Try to match theme and subtheme
@@ -88,8 +91,10 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                             $themeId = $m[1];
                             $subthemeId = $m[2] ?? null;
 
+                             //$output->writeln("<info> MULTIPLE $product_id => $themeId, $subthemeId</info>");
+
                             $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
-                            $subtheme = $theme->children()->where('brickeconomy_id', $subthemeId)->first();
+                            $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
 
                             if ($theme && $subtheme) {
                                 $product->update([
@@ -110,20 +115,23 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                     if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
                         $href = $hrefMatch[1];
                         // Now extract the subtheme from the href
-                        if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
-                            $subthemeId = $subthemeMatch[1];
+                        if (preg_match('#/([^/]+)/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                            $themeId = $subthemeMatch[1];
+                            $subthemeId = $subthemeMatch[2];
                         }
                     }
                 }
 
-                if ($details['Theme']['value_html'] ?? NULL) {
+                if (!$themeId && $details['Theme']['value_html'] ?? NULL) {
                     if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
                         $themeId = $m[1];
                     }
                 }
 
+                //$output->writeln("<info> $product_id => $themeId, $subthemeId</info>");
+
                 $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
-                $subtheme = $theme->children()->where('brickeconomy_id', $subthemeId)->first();
+                $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
 
                 if ($theme && $subtheme) {
                     $product->update([
@@ -135,10 +143,11 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                }
+                } 
+                /* else {
+                    $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
+                } */
             }
-
-
 
 
             $panel = $crawler->filter('#Minifigs');
@@ -215,41 +224,73 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 'availability' => $details['Availability']['value'] ?? NULL,
             ]));
 
+            //$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+
 
             if ($details['Themes']['value_html'] ?? NULL) {
-                if (preg_match_all('#/minifigs/theme/([^"]+)#', $details['Themes']['value_html'], $matches)) {
-                    $themeIds = $matches[1];
-                    $ts = [];
-                    foreach ($themeIds as $key => $tid) {
-                        if ($id = Theme::where('brickeconomy_id', $tid)->first()?->id)
-                            $ts[] = $id;
+                if (preg_match_all('#href="([^"]+)"#', $details['Themes']['value_html'], $hrefMatches)) {
+                    foreach ($hrefMatches[1] as $href) {
+                        // Try to match theme and subtheme
+                        if (preg_match('#/([^/]+)(?:/subtheme/([^"/]+))?#', $href, $m)) {
+                            $themeId = $m[1];
+                            $subthemeId = $m[2] ?? null;
+
+                            $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                            $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+                            if ($theme && $subtheme) {
+                                $product->update([
+                                    'theme_id' => $subtheme->id
+                                ]);
+                                $product->themes()->sync([$subtheme->id]);
+                            } else if ($theme && !$subtheme) {
+                                $product->update([
+                                    'theme_id' => $theme->id
+                                ]);
+                                $product->themes()->sync([$theme->id]);
+                            }
+                        }
                     }
+                }
+            } else {
+                if ($details['Subtheme']['value_html'] ?? NULL) {
+                    if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
+                        $href = $hrefMatch[1];
+                        // Now extract the subtheme from the href
+                        if (preg_match('#/([^/]+)/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
+                            $themeId = $subthemeMatch[1];
+                            $subthemeId = $subthemeMatch[2];
+                        }
+                    }
+                }
+
+                if (!$themeId && $details['Theme']['value_html'] ?? NULL) {
+                    if (preg_match('#/minifigs/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
+                        $themeId = $m[1];
+                    }
+                }
+
+                //$output->writeln("<info> $product_id => $themeId, $subthemeId</info>");
+
+                $theme = Theme::where('brickeconomy_id', $themeId)->whereNull('parent_id')->first();
+                $subtheme = $theme?->children()?->where('brickeconomy_id', $subthemeId)?->first();
+
+
+
+                if ($theme && $subtheme) {
                     $product->update([
-                        'theme_id' => $ts[0] ?? NULL
+                        'theme_id' => $subtheme->id
                     ]);
-                    $product->themes()->sync($ts);
-                }
-            } else if ($details['Subtheme']['value_html'] ?? NULL) {
-                if (preg_match('#href="([^"]+)"#', $details['Subtheme']['value_html'], $hrefMatch)) {
-                    $href = $hrefMatch[1];
-                    // Now extract the subtheme from the href
-                    if (preg_match('#/sets/theme/[^/]+/subtheme/([^"/]+)#', $href, $subthemeMatch)) {
-                        $subthemeId = $subthemeMatch[1];
-                        $theme = Theme::where('brickeconomy_id', $subthemeId)->first();
-                        $product->update([
-                            'theme_id' => $theme->id
-                        ]);
-                        $product->themes()->sync([$theme->id]);
-                    }
-                }
-            } else if ($details['Theme']['value_html'] ?? NULL) {
-                if (preg_match('#/sets/theme/([^"/]+)#', $details['Theme']['value_html'], $m)) {
-                    $theme = Theme::where('brickeconomy_id', $m[1])->first();
+                    $product->themes()->sync([$subtheme->id]);
+                } else if ($theme && !$subtheme) {
                     $product->update([
                         'theme_id' => $theme->id
                     ]);
                     $product->themes()->sync([$theme->id]);
-                }
+                } 
+                /* else {
+                    $output->writeln("<error> $product_id => $themeId, $subthemeId</error>");
+                } */
             }
 
             $facts = [
@@ -375,13 +416,12 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                         return stripos($node->text(''), 'New/Sealed') !== false;
                     });
 
+                    $sealedValue = NULL;
+
                     if ($newSealedSection->count() > 0) {
                         $sealedValue = $newSealedSection->nextAll()->filter('.row.rowlist')->reduce(function (Crawler $node) {
                             return $node->filter('.col-xs-5.text-muted')->text('') === 'Value';
                         })->filter('.col-xs-7 b')->text('');
-
-                        if ($sealedValue != '') {
-                        }
                     }
 
                     if ($sealedValue || $retailPrice) {

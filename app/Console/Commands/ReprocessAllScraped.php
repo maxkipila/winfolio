@@ -28,8 +28,9 @@ class ReprocessAllScraped extends Command
      */
     public function handle()
     {
-        $this->withProgressBar(Product::pluck('id'), function ($product_id) {
-            ProcessScrapedBrickEconomyPages::dispatch("storage/app/html/tmp_scraped_{$product_id}.html", $product_id);
+        ini_set('memory_limit', '1G');
+        $this->withProgressBar(Product::orderBy('id')->pluck('id'), function ($product_id) {
+            ProcessScrapedBrickEconomyPages::dispatch("storage/app/html/tmp_scraped_{$product_id}.html", $product_id);     
         });
     }
 }

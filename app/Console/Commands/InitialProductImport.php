@@ -99,7 +99,8 @@ class InitialProductImport extends Command
         $this->withProgressBar($themes, function ($theme) {
             $t = Theme::firstOrCreate(
                 [
-                    'brickeconomy_id' => $theme['name']
+                    'brickeconomy_id' => $theme['name'],
+                    'parent_id' => NULL
                 ],
                 [
                     'name' => unslug($theme['name']),
