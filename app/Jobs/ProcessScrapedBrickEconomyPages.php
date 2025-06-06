@@ -75,6 +75,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 'released_at' => ($details['Released']['value'] ?? NULL) ? Carbon::parse($details['Released']['value']) : NULL,
                 'availability' => $details['Availability']['value'] ?? NULL,
                 'num_parts' => ($details['Pieces']['value'] ?? NULL) ? intval($details['Pieces']['value']) : NULL,
+                'packaging' => $details['Packaging']['value'] ?? NULL,
             ]));
 
             $themeId = NULL;
@@ -222,6 +223,7 @@ class ProcessScrapedBrickEconomyPages implements ShouldQueue
                 'year' => ($details['Year']['value'] ?? (($details['Years']['value'] ?? NULL) ? strtok($details['Years']['value'], ' -') : NULL)) ?? NULL,
                 'released_at' => ($details['Released']['value'] ?? NULL) ? Carbon::parse($details['Released']['value']) : NULL,
                 'availability' => $details['Availability']['value'] ?? NULL,
+                'packaging' => $details['Packaging']['value'] ?? NULL,
             ]));
 
             //$output = new \Symfony\Component\Console\Output\ConsoleOutput();

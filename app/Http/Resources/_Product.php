@@ -28,11 +28,10 @@ class _Product extends JsonResource
     public function toArray(Request $request): array
     {
         $trendService = app(TrendService::class);
-        $weeklyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 7);
-        $monthlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 30);
-        $yearlyGrowth = $trendService->calculateGrowthForProductOptimized($this->id, 365);
-
-        $annualGrowth = $this->calculateAnnualGrowth();
+        $weeklyGrowth = $trendService->getSimpleGrowth($this->id, 7);
+        $monthlyGrowth = $trendService->getSimpleGrowth($this->id, 30);
+        $yearlyGrowth =  $trendService->getSimpleGrowth($this->id, 365);
+        $annualGrowth = $trendService->getAnnualizedGrowth($this->id);
 
         $userOwns = [];
         $favourited = false;
@@ -87,7 +86,7 @@ class _Product extends JsonResource
             'num_parts'   => $this->num_parts,
             'img_url'      => $this->getFirstMediaUrl('images') ?: null,
             'theme'       => new _Theme($this->theme),
-            'themes' => _Theme::collection($this->themes),
+            'themes' => _Theme::collection($this->themes()->with(['parent'])->get()),
             'availability' => $this->availability,
             'user_owns'   => $userOwns,
             'created_at'  => $this->created_at,
@@ -121,70 +120,8 @@ class _Product extends JsonResource
             'used_price' => $this->used_price,
             'used_range' => $this->used_range,
             'released_at' => $this->released_at,
-            'prices_count' => $this->prices_count
+            'prices_count' => $this->prices_count,
+            'packaging' => $this->packaging,
         ];
-    }
-    private function calculateGrowth(int $days): ?float
-    {
-        $trendService = app(TrendService::class);
-        return $trendService->getProductGrowth($this->id, $days);
-    }
-
-    /**
-     * Vypočítá roční růst s ošetřením chybějících dat
-     */
-    private function calculateAnnualGrowth(): ?float
-    {
-        $trendService = app(TrendService::class);
-
-        // Standartni rust
-        $annualGrowth = $trendService->getProductGrowth($this->id, 365);
-
-        if ($annualGrowth !== null) {
-
-            if ($annualGrowth > 100) {
-                return 100.0;
-            } elseif ($annualGrowth < -75) {
-                return -75.0;
-            }
-            return $annualGrowth;
-        }
-
-        $oldestPrice = Price::where('product_id', $this->id)
-            ->orderBy('created_at', 'asc')
-            ->first();
-
-        $latestPrice = Price::where('product_id', $this->id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        if (!$oldestPrice || !$latestPrice || $oldestPrice->id === $latestPrice->id) {
-            return null;
-        }
-
-        $oldValue = $oldestPrice->value;
-        $newValue = $latestPrice->value;
-
-
-        if ($oldValue < 0.5) {
-            return null;
-        }
-
-        $growthPercentage = (($newValue - $oldValue) / $oldValue) * 100;
-
-        $daysDiff = Carbon::parse($oldestPrice->created_at)->diffInDays(Carbon::parse($latestPrice->created_at));
-
-
-        if ($daysDiff < 30) {
-            return min(100, max(-75, round($growthPercentage, 1)));
-        }
-
-        if ($daysDiff <= 0) {
-            return min(100, max(-75, round($growthPercentage, 1)));
-        }
-
-        $annualizedGrowth = (pow(1 + ($growthPercentage / 100), 365 / $daysDiff) - 1) * 100;
-
-        return min(100, max(-75, round($annualizedGrowth, 1)));
     }
 }

@@ -431,8 +431,8 @@ class UserController extends Controller
         // $user->products()->sync([$product->id]);
 
         try {
-            Artisan::call('app:update-user-records');
-            Artisan::call('app:check-awards');
+            Artisan::call('app:update-user-records', ['user_id' => $user->id]);
+            Artisan::call('app:check-awards', ['user_id' => $user->id]);
         } catch (\Throwable $th) {
             Log::error($th->getMessage(), [$th->__toString()]);
         }

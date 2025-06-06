@@ -30,7 +30,12 @@ class ReprocessAllScraped extends Command
     {
         ini_set('memory_limit', '1G');
         $this->withProgressBar(Product::orderBy('id')->pluck('id'), function ($product_id) {
-            ProcessScrapedBrickEconomyPages::dispatch("storage/app/html/tmp_scraped_{$product_id}.html", $product_id);     
+            try {
+                //code...
+                ProcessScrapedBrickEconomyPages::dispatchSync("storage/app/html/tmp_scraped_{$product_id}.html", $product_id);     
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
         });
     }
 }
