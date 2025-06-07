@@ -21,7 +21,7 @@ function ProductHeadline(props: Props) {
                     <div className='relative group'>
                         <div className={`h-16px w-16px  ${product.availability != null ? "bg-[#46BD0F]" : "bg-[#FEB34A]"} rounded-full`}></div>
                         <div className='hidden group-hover:block  absolute translate-x-1/2 p-4px bg-white border-2 border-black -mt-8px top-0 left-0 whitespace-nowrap'>
-                            {product?.availability == null ? "Non-avilable" : "Available"}
+                            {product?.availability == null ? "Non-avilable" : product?.availability}
                         </div>
                     </div>
                 </div>

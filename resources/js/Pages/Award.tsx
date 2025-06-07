@@ -105,7 +105,7 @@ function Award(props: Props) {
                             :
                             <div className='bg-[#FEF4E1] p-16px flex items-center gap-12px mt-12px w-full'>
                                 <LegoSmiley className='mb-4px' size={24} />
-                                <div>{t('Zatím nemáte žádné rekordy…')}</div>
+                                <div className='font-nunito'>{t('Zatím nemáte žádné rekordy…')}</div>
                             </div>
                     }
 
@@ -123,7 +123,7 @@ function Award(props: Props) {
                         :
                         <div className='bg-[#FEF4E1] p-16px flex items-center gap-12px mt-12px px-24px'>
                             <LegoSmiley className='mb-4px' size={24} />
-                            <div>{t('Zatím nemáte žádné odznaky…')}</div>
+                            <div className='font-nunito'>{t('Zatím nemáte žádné odznaky…')}</div>
                         </div>
                 }
             </div>

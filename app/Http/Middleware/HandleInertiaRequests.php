@@ -9,6 +9,7 @@ use App\Http\Resources\_Set;
 use App\Http\Resources\_Theme;
 use App\Http\Resources\_Trend;
 use App\Http\Resources\_User;
+use App\Models\Admin;
 use App\Models\Minifig;
 use App\Models\Product;
 use App\Models\Set;
@@ -65,7 +66,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
 
-        $is_admin_section = Str::startsWith(Route::currentRouteName(), 'admin.');
+
         $users = fn(): AnonymousResourceCollection => _User::collection(User::search(['first_name', 'last_name', DB::raw("(CONCAT(first_name,' ', last_name))"), 'email', 'id'], $request->q ?? '', 6, App::getLocale())->get());
         $themes = fn(): AnonymousResourceCollection => _Theme::collection(Theme::search(['id', 'name'], $request->q ?? '', 6, App::getLocale())->get());
         $products = fn(): AnonymousResourceCollection => _Product::collection(Product::search(['id', 'name', 'product_num'], $request->q ?? '', 6, App::getLocale())->get());
@@ -97,11 +98,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => fn() => (
-                    Gate::allows('admin')
-                    ? ($is_admin_section ? _Admin::make($request->user()) : null)
-                    : _User::make($request->user()?->load('products'))
-                ),
+                'user' => fn() => ($request->user() instanceof Admin ? _Admin::make($request->user()) : _User::make($request->user()?->load('products'))),
             ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),

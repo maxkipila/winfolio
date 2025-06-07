@@ -183,5 +183,9 @@ return [
     'Subscribe'=>'Předplatit',
     'Limited Offer'=>'Omezená nabídka',
     'Dobrý den' => 'Dobrý den',
-    'Výsledky vyhledávání' => 'Výsledky vyhledávání'
+    'Výsledky vyhledávání' => 'Výsledky vyhledávání',
+
+    'Zabalený' => 'Zabalený',
+    'Rozbalený' => 'Rozbalený',
+    'Použitý' => 'Použitý'
 ];

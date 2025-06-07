@@ -5,6 +5,7 @@ interface Product {
     product_type: string;
     name: string;
     year: number;
+    released_at: string
     num_parts: number;
     theme_id: number;
     thumbnail: string;
@@ -21,6 +22,10 @@ interface Product {
     monthly_growth: number,
     weekly_growth: number,
     availability: any,
+    used_range?: string,
+    used_price?: number,
+    packaging?: string
+    themes?: Array<Theme>
     user_owns?: Array<{
         condition: string,
         currency: string,
@@ -35,4 +40,6 @@ interface Product {
         yearly: number,
         annual: number
     }
+    prices_count: number
+    facts: Array<string>
 }

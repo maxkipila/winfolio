@@ -55,21 +55,31 @@ function NotificationsModal(props: Props) {
                 </div>
                 <div onClick={(e) => { e.stopPropagation() }} className="bg-white p-24px max-w-sm mob:w-full border-2 border-black">
                     <div className='font-bold text-xl'>{t('Nové')}</div>
-                    <div className='flex flex-col gap-16px'>
-                        {
-                            notifications?.filter((no) => no.read_at == null).map((n) =>
-                                <NotifCard {...n} />
-                            )
-                        }
-                    </div>
+                    {
+                        notifications?.filter((no) => no.read_at == null)?.length > 0 ?
+                            <div className='flex flex-col gap-16px'>
+                                {
+                                    notifications?.filter((no) => no.read_at == null).map((n) =>
+                                        <NotifCard {...n} />
+                                    )
+                                }
+                            </div>
+                            :
+                            <div className='font-bold font-nunito text-center'>{t('Zatím neexistují žádná data')}</div>
+                    }
                     <div className='font-bold text-xl mt-40px'>{t('Starší')}</div>
-                    <div className='flex flex-col gap-16px'>
-                        {
-                            notifications?.filter((no) => no.read_at != null).map((n) =>
-                                <NotifCard {...n} />
-                            )
-                        }
-                    </div>
+                    {
+                        notifications?.filter((no) => no.read_at != null)?.length > 0 ?
+                            <div className='flex flex-col gap-16px'>
+                                {
+                                    notifications?.filter((no) => no.read_at != null).map((n) =>
+                                        <NotifCard {...n} />
+                                    )
+                                }
+                            </div>
+                            :
+                            <div className='font-bold font-nunito  text-center'>{t('Zatím neexistují žádná data')}</div>
+                    }
                 </div>
             </div>
         </div>

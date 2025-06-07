@@ -61,6 +61,33 @@ trait HasUserAgent
         'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)',
     ];
 
+
+    function getSitemap()
+    {
+
+        $API_CREDENTIALS = env('PROXY_CREDENTIALS');
+        $process = new Process(['node', base_path('scripts/fetchSitemap.cjs'), "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
+        $process->setTimeout(600);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \Exception($process->getErrorOutput());
+        }
+    }
+
+    function getTheme($url, $theme)
+    {
+
+        $API_CREDENTIALS = env('PROXY_CREDENTIALS');
+        $process = new Process(['node', base_path('scripts/fetchTheme.cjs'), $url, $theme, "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
+        $process->setTimeout(600);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \Exception($process->getErrorOutput());
+        }
+    }
+
     function proxyRequest($urls)
     {
 
@@ -74,7 +101,7 @@ trait HasUserAgent
         // });
 
         $process = new Process(['node', base_path('scripts/fetchHtml.cjs'), json_encode($urls), "https://{$API_CREDENTIALS}@217.30.10.33:43587"]);
-        $process->setTimeout(300);
+        $process->setTimeout(600);
         $process->run();
 
         if (!$process->isSuccessful()) {

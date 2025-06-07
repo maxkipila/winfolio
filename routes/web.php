@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-
 Route::middleware('guest:web')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
@@ -86,10 +85,6 @@ Route::match(['POST', 'GET'], '/', function (Request $request, TrendService $tre
 })->name('welcome');
 
 Route::match(['POST', 'GET'], '/', [UserController::class, 'welcome'])->name('welcome');
-
-Route::get('/dashboard-two', function () {
-    return 'xxx';
-})->name('dashboard-two');
 
 
 Route::middleware('auth:web')->group(function () {

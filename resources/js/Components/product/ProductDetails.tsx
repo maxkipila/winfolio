@@ -18,7 +18,7 @@ function ProductDetails(props: Props) {
     let { open } = useContext(ModalsContext)
     let { setSelected } = useContext(PortfolioContext)
     const { data, post } = form;
-    
+
 
     function remove_from_portfolio(my_product: Product) {
         post(route('remove_product_from_user', { product: my_product.id }))
@@ -33,31 +33,62 @@ function ProductDetails(props: Props) {
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Name')}</div>
-                <div className='text-[#4D4D4D]'>{product?.name ?? "---"}</div>
+                <div className='text-[#4D4D4D] max-w-1/2'>{product?.name ?? "---"}</div>
             </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
-                <div className='text-[#4D4D4D]'>{t('Theme')}</div>
-                <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.parent?.name : (product?.theme?.name ?? "---")}</div>
-            </div>
-            <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
-                <div className='text-[#4D4D4D]'>{t('Subtheme')}</div>
-                <div className='text-[#4D4D4D]'>{product?.theme?.parent?.name ? product?.theme?.name : "---"}</div>
-            </div>
+            {
+                product?.themes?.length == 1 &&
+                <>
+                    <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
+                        <div className='text-[#4D4D4D]'>{t('Theme')}</div>
+                        {
+                            <Link href={route('catalog', { parent_theme: product?.themes[0]?.parent_id ?? product?.themes[0]?.id })} className='text-[#4D4D4D]'>{product?.themes[0]?.parent?.name ?? product?.themes[0]?.name}</Link>
+                        }
+
+                    </div>
+                    {
+                        product?.themes[0]?.parent_id &&
+                        <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
+                            <div className='text-[#4D4D4D]'>{t('Subtheme')}</div>
+                            {
+                                <Link href={route('catalog', { parent_theme: product?.themes[0]?.parent_id, theme_children: [product?.themes[0]?.id] })} className='text-[#4D4D4D]'>{product?.themes[0]?.name}</Link>
+                            }
+                        </div>
+                    }
+                </>
+            }
+            {
+                product?.themes?.length > 1 &&
+                <>
+                    <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
+                        <div className='text-[#4D4D4D]'>{t('Themes')}</div>
+                        <div className='flex flex-col items-end'>
+                            {
+                                product?.themes?.map(th =>
+                                    th?.parent_id
+                                        ? <Link href={route('catalog', { parent_theme: th?.parent_id, theme_children: [th?.id] })} className='text-[#4D4D4D] '>{th?.name}</Link>
+                                        : <Link href={route('catalog', { parent_theme: th?.id })} className='text-[#4D4D4D] '>{th?.name}</Link>
+                                )
+                            }
+                        </div>
+
+                    </div>
+                </>
+            }
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Year')}</div>
                 <div className='text-[#4D4D4D]'>{product?.year ?? "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Released')}</div>
-                <div className='text-[#4D4D4D]'>{product?.year ?? "---"}</div>
+                <div className='text-[#4D4D4D]'>{product?.released_at ? moment(product?.released_at).format('MMM YYYY') : "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Availability')}</div>
-                <div className='text-[#4D4D4D]'>{product?.latest_price?.condition ?? "---"}</div>
+                <div className='text-[#4D4D4D]'>{product?.availability ?? "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Packaging')}</div>
-                <div className='text-[#4D4D4D]'>{product?.latest_price?.condition ?? "---"}</div>
+                <div className='text-[#4D4D4D]'>{product?.packaging ?? "---"}</div>
             </div>
             <div className='flex justify-between items-center border-t border-[#D0D4DB] py-12px font-nunito'>
                 <div className='text-[#4D4D4D]'>{t('Pieces')}</div>
@@ -95,7 +126,7 @@ function ProductDetails(props: Props) {
                         </div> */}
             {
                 product?.availability != null &&
-                <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{t('Availible at retail')}</div>
+                <div className='text-white font-bold px-12px py-8px bg-[#46BD0F] max-w-[136px]'>{product?.availability}</div>
             }
 
             {

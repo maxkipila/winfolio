@@ -31,7 +31,7 @@ function CardsDesktop(props: CardsProps) {
     const { portfolioValue, portfolioStats } = props
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let wishlistValue = 0
-    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
+    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite?.latest_price?.value)
     wishListValues.map((wV) => wishlistValue += parseFloat(wV))
     // console.log('wishlist values',auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value))
     let { open } = useContext(ModalsContext)
@@ -96,7 +96,7 @@ function CardsMobile(props: CardsProps) {
     const { portfolioValue, portfolioStats } = props
     const { auth } = usePageProps<{ auth: { user: User } }>();
     let wishlistValue = 0
-    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value)
+    let wishListValues = auth?.user?.favourites?.flatMap((f) => f.favourite?.latest_price?.value)
     wishListValues.map((wV) => wishlistValue += parseFloat(wV))
     let [scrollStart, setScrollStart] = useState(0)
     let [scrollEnd, setScrollEnd] = useState(0)
@@ -233,7 +233,7 @@ export default function Dashboard(props: DashBoardProps) {
                                     </div>
                                     <div className='flex items-center justify-center w-full mt-24px'>
                                         <div>
-                                            <Button {...trendButton}>{t('Zobrazit další')}</Button>
+                                            <Button wider {...trendButton}>{t('Zobrazit další')}</Button>
                                         </div>
                                     </div>
                                 </>
@@ -265,7 +265,7 @@ export default function Dashboard(props: DashBoardProps) {
                                     </div>
                                     <div className='flex items-center justify-center w-full mt-24px'>
                                         <div>
-                                            <Button {...button}>{t('Zobrazit další')}</Button>
+                                            <Button wider {...button}>{t('Zobrazit další')}</Button>
                                         </div>
                                     </div>
                                 </>
