@@ -160,7 +160,7 @@ export const externalTooltipHandler = (context) => {
 
             td.style.borderWidth = '0';
 
-            const text = document.createTextNode(body);
+            const text = document.createTextNode(`$ ${body}`);
 
             // td.appendChild(span);
             td.appendChild(text);
