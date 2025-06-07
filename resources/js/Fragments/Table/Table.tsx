@@ -1,6 +1,6 @@
-import React, { Dispatch, ReactNode, SetStateAction, useEffect } from 'react'
+import React, { Dispatch, ReactNode, SetStateAction, useCallback, useEffect } from 'react'
 import { FormContext } from '../forms/FormContext'
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import useLazyLoad from '@/hooks/useLazyLoad';
 import { MetaBar } from '../MetaBar';
 
@@ -21,14 +21,29 @@ interface Props<T> {
 function Table<T>(props: Props<T>) {
     const { children, Row, custom, title, item_key, id_key = 'id', absolute_items, hide_meta, filters = {} } = props
 
-    const [_itms, button, meta, form, setItems] = useLazyLoad<T>(item_key);
+    const [_itms, button, meta, form, setItems, setTransform] = useLazyLoad<T>(item_key, undefined, filters);
 
     const search = useForm<any>();
 
     const items = absolute_items ?? _itms;
 
+    const updateFilters = () => {
+        router.visit(button.href, {
+            preserveState: true,
+            preserveScroll: true,
+            method: button.method,
+            data: {
+                ...button.data,
+                page: 1,
+                ...filters,
+            },
+            only: button.only
+        });
+    }
+
     useEffect(() => {
-        form.setData(d => ({ ...d, ...(filters ?? {}) }));
+        if (Object.keys(filters ?? {}).length > 0)
+            updateFilters();
     }, [filters])
 
 

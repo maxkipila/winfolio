@@ -347,7 +347,7 @@ function Chest(props: Props) {
                                         }
                                     </div>
                                     :
-                                    <div className='w-full flex items-center justify-center h-full min-h-full mt-[180px]'>
+                                    <div className='w-full flex items-center justify-center h-full min-h-full mob:mt-24px mt-[180px]'>
                                         <div className='h-full w-full flex-shrink-0'>
                                             <LegoSmiley className='mx-auto' size={64} />
                                             <div className='mt-24px font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>
@@ -369,7 +369,7 @@ function Chest(props: Props) {
                                         }
                                     </div>
                                     :
-                                    <div className='w-full flex items-center justify-center h-full min-h-full mt-[180px]'>
+                                    <div className='w-full flex items-center justify-center h-full min-h-full mob:mt-24px mt-[180px]'>
                                         <div className='h-full w-full flex-shrink-0'>
                                             <LegoSmiley className='mx-auto' size={64} />
                                             <div className='mt-24px font-bold text-xl text-center'>{t('Zatím neexistují žádná data')}</div>

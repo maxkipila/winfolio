@@ -7,15 +7,22 @@ use Illuminate\Console\Command;
 
 class UpdateUserRecords extends Command
 {
-    protected $signature = 'app:update-user-records';
+    protected $signature = 'app:update-user-records {--user_id}';
     protected $description = 'Aktualizace rekordů uživatelů';
 
     public function handle()
     {
-        $users = User::all();
-        foreach ($users as $user) {
+        $userId = $this->option('user_id');
+
+        if ($userId) {
+            $user = User::find($userId);
             $updated = $this->updateUserRecords($user);
-            $this->info("Updated records for user {$user->id}: " . json_encode($updated));
+        } else {
+            $users = User::all();
+            foreach ($users as $user) {
+                $updated = $this->updateUserRecords($user);
+                $this->info("Updated records for user {$user->id}: " . json_encode($updated));
+            }
         }
     }
 
@@ -112,7 +119,7 @@ class UpdateUserRecords extends Command
             $currentValue = $product->price->value;
             $growth = ($currentValue - $purchasePrice) / $purchasePrice * 100;
 
-            if (!$foundNegativeGrowth || $growth < $worstGrowth) {
+            if ($growth < $worstGrowth) {
                 $worstGrowth = $growth;
                 $worstProductId = $product->id;
                 $foundNegativeGrowth = true;

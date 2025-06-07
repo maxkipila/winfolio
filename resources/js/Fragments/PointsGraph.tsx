@@ -6,6 +6,7 @@ import { externalTooltipHandler } from '@/Pages/chest';
 import { callback } from 'chart.js/helpers';
 import * as math from 'mathjs';
 import { SimpleLinearRegression } from 'ml-regression';
+import { t } from '@/Components/Translator';
 
 ChartJS.register(
     CategoryScale,
@@ -43,8 +44,8 @@ interface Props {
 function PointsGraph(props: Props) {
     const { product, priceHistory } = props
 
-    if (!priceHistory || !priceHistory.history) {
-        return <div className='mt-32px'>Není dostatek dat pro zobrazení grafu</div>;
+    if (!priceHistory || !priceHistory.history || (priceHistory?.history?.length < 1)) {
+        return <div className='mt-32px font-nunito font-bold text-xl'>{t('Zatím neexistují žádná data')}</div>;
     }
 
     // console.log(priceHistory, 'priceHistory')

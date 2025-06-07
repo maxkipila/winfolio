@@ -52,23 +52,23 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-        Artisan::call('import:lego-data');
+        // Artisan::call('import:lego-data');
 
-        $this->call(DataSeeder::class);
-        $this->call(PriceSeeder::class);
-        $this->call(ReviewSeeder::class);
-        $this->call(NewsSeeder::class);
+        // $this->call(DataSeeder::class);
+        // $this->call(PriceSeeder::class);
+        // $this->call(ReviewSeeder::class);
+        // $this->call(NewsSeeder::class);
 
-        // Agregace cen
-        Artisan::call('prices:aggregate');
+        // // Agregace cen
+        // Artisan::call('prices:aggregate');
 
-        // Aktualizace historických cen
-        Artisan::call('prices:update-historical');
+        // // Aktualizace historických cen
+        // Artisan::call('prices:update-historical');
 
-        Artisan::call('import:lego-images');
+        // Artisan::call('import:lego-images');
 
-        // Přiřazení témat k minifigurkám
-        Artisan::call('app:assign-themes-to-minifigs');
+        // // Přiřazení témat k minifigurkám
+        // Artisan::call('app:assign-themes-to-minifigs');
 
 
         /*    

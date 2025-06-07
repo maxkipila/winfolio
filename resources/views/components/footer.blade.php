@@ -36,8 +36,13 @@
                     <td>
                         <p>
                             @if (!($data['no_subscribe'] ?? false))
-                            Tento e-mail jsem Vám zaslali na základě Vaší objednávky. V případě, že si nepřejete, aby Vám společnost winfolio zasílala jakákoli reklamní, propagační či obchodní sdělení, můžete se z odběru těchto e-mailů odhlásit kliknutím na tlačítko níže. Vaše e-mailová adresa bude okamžitě odstraněna z našeho centrálního seznamu pro zasílání obchodních sdělení, a jakmile budou provedeny nezbytné úpravy v našem systému pro zasílání obchodních sdělení, budou veškerá obchodní sdělení od winfolio označená jako reklamní či propagační automaticky blokována. 
+                            Tento e-mail jsme Vám zaslali na základě Vaší registrace nebo aktivity na platformě winfolio. Pokud si nepřejete, aby Vám winfolio nadále zasílalo jakákoli reklamní, informační nebo investičně orientovaná sdělení (včetně novinek, cenových upozornění či tipů na sety), můžete se z odběru kdykoli odhlásit kliknutím na tlačítko níže.
+                            <br>
+                            <br>
+                            Vaše e-mailová adresa bude neprodleně odstraněna z našeho seznamu pro zasílání marketingových sdělení. Jakmile proběhnou potřebné změny v našem systému, veškerá sdělení označená jako obchodní nebo propagační budou automaticky blokována.
                             @endif
+                            <br>
+                            <br>
                             Klikněte <a href="#">zde</a>, pokud si nepřejete dostávat od společnosti winfolio žádná obchodní sdělení.
                         </p>
                     </td>
@@ -50,7 +55,7 @@
             <table align="center" width="450" style="width:450px;max-width:450px;">
                 <tr>
                     <td>
-                        <p>© 2025 winfolio</p>
+                        <p>© 2025 winfolio - Kostky tvého investičního impéria padají správně</p>
                     </td>
                 </tr>
             </table>

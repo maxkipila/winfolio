@@ -21,7 +21,7 @@ class ScrapeBrickEconomy implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public $products = [], public $daily = false, public $historical = false, public $images = false)
+    public function __construct(public $products = [], public $daily = false, public $historical = false, public $images = false) 
     {
         //
     }
@@ -47,10 +47,12 @@ class ScrapeBrickEconomy implements ShouldQueue
         try {
             $pages = $this->proxyRequest($urls);
             Log::info('finished the scraping', ['pages' => ($pages ?? 0)]);
+            Product::whereIn('id', $this->products)
+                ->update([
+                    'scraped_at' => now()
+                ]);
         } catch (\Exception $e) {
             $this->fail($e);
         }
     }
-
-    
 }

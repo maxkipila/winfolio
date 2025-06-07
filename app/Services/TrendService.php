@@ -61,53 +61,6 @@ class TrendService
         return $trends;
     }
 
-    /* public function calculateTrendingProducts(int $limit = 8, int $days = 30): array
-    {
-
-        $startDate = Carbon::now()->subDays($days);
-        $today = Carbon::today();
-
-
-        $trendingProductIds = DB::table('product_user')
-            ->select('product_id', DB::raw('COUNT(*) as favorites_count'))
-            ->where('created_at', '>=', $startDate)
-            ->groupBy('product_id')
-            ->orderBy('favorites_count', 'desc')
-            ->limit($limit)
-            ->get();
-
-        $trends = [];
-
-        foreach ($trendingProductIds as $item) {
-
-            $weeklyGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 7);
-            $annualGrowth = $this->calculateGrowthForProductOptimized($item->product_id, 365);
-
-            $trend = Trend::updateOrCreate(
-                [
-                    'product_id' => $item->product_id,
-                    'type' => 'trending',
-                    'calculated_at' => $today,
-                ],
-                [
-                    'weekly_growth' => $this->calculateGrowthForProductOptimized($item->product_id, 7),
-                    'monthly_growth' => $weeklyGrowth,
-                    'annual_growth' => $annualGrowth,
-                    'favorites_count' => $item->favorites_count,
-                ]
-            );
-
-            $trend->load('product.latest_price', 'product.theme');
-            $trends[] = $trend;
-
-            unset($trend);
-            gc_collect_cycles();
-        }
-
-        return $trends;
-    } */
-
-
     public function getTrendingProducts(Request $request, int $days = 7)
     {
         $startDate = Carbon::now()->subDays($days);
@@ -225,13 +178,13 @@ class TrendService
             p2.value as past_value,
             ROUND(((p1.value - p2.value) / p2.value) * 100, 1) as growth_percentage
         FROM 
-            (SELECT product_id, value FROM prices WHERE (product_id, created_at) IN 
-                (SELECT product_id, MAX(created_at) FROM prices GROUP BY product_id)
+            (SELECT product_id, value FROM prices WHERE (product_id, date) IN 
+                (SELECT product_id, MAX(date) FROM prices GROUP BY product_id)
             ) p1
         JOIN 
-            (SELECT product_id, value FROM prices WHERE (product_id, created_at) IN 
-                (SELECT product_id, MAX(created_at) FROM prices 
-                 WHERE created_at <= ? GROUP BY product_id)
+            (SELECT product_id, value FROM prices WHERE (product_id, date) IN 
+                (SELECT product_id, MAX(date) FROM prices 
+                 WHERE date <= ? GROUP BY product_id)
             ) p2 ON p1.product_id = p2.product_id
         WHERE 
             p2.value > 0
@@ -239,6 +192,7 @@ class TrendService
             ABS(growth_percentage) DESC
         LIMIT ?
     ";
+
 
         $topMovers = DB::select($query, [$monthAgo, $limit]);
 
@@ -266,180 +220,61 @@ class TrendService
 
         return $results;
     }
-    protected function getSimpleGrowth(int $productId, int $days): ?float
+
+    public function getSimpleGrowth(int $productId, int $days): ?float
     {
-        $today = Carbon::today();
-        $pastDate = Carbon::today()->subDays($days);
+        $latest = Price::where('product_id', $productId)
+            ->orderBy('date', 'desc')
+            ->first();
 
-        // Aktuální cena
-        $currentPrice = Price::where('product_id', $productId)
-            ->latest('created_at')
-            ->value('value');
+        if (!$latest)
+            return 0;
 
-        // Historická cena
-        $pastPrice = Price::where('product_id', $productId)
-            ->where('created_at', '<=', $pastDate)
-            ->latest('created_at')
-            ->value('value');
+        $before = Carbon::parse($latest->date)->subDays($days);
 
-        // Pokud nemáme obě hodnoty, nemůžeme spočítat růst
-        if (!$currentPrice || !$pastPrice || $pastPrice <= 0) {
+        $old = Price::where('product_id', $productId)
+            ->where('date', '<=', $before)
+            ->orderBy('date', 'desc')
+            ->first() ??
+            Price::where('product_id', $productId)
+            ->orderBy('date', 'asc')
+            ->first();
+
+        if (!$latest || !$old || $old->value < 0.5) {
             return null;
         }
 
-        // Výpočet růstu v procentech
-        $growth = (($currentPrice - $pastPrice) / $pastPrice) * 100;
-
-        // Omezení na rozumné hodnoty
-        if ($days <= 7) {
-            return min(50, max(-30, round($growth, 1)));
-        } elseif ($days <= 30) {
-            return min(75, max(-50, round($growth, 1)));
-        } else {
-            return min(100, max(-75, round($growth, 1)));
-        }
+        return round((($latest->value - $old->value) / $old->value) * 100, 2);
     }
-    /*    public function calculateTopMovers(int $limit = 8): array
-    {
-        $today = Carbon::today();
-        $monthAgo = Carbon::today()->subDays(30);
 
-        // Optimalizovaný SQL dotaz
-        $topMovers = DB::select("
-        WITH product_prices AS (
-            SELECT 
-                p1.product_id,
-                p1.value as current_value,
-                p2.value as month_old_value
-            FROM
-                (SELECT product_id, MAX(created_at) as latest_date
-                 FROM prices
-                 GROUP BY product_id) latest
-            JOIN prices p1 ON p1.product_id = latest.product_id AND p1.created_at = latest.latest_date
-            LEFT JOIN (
-                SELECT product_id, value, created_at
-                FROM prices p
-                WHERE created_at <= ?
-                AND created_at = (
-                    SELECT MAX(created_at)
-                    FROM prices
-                    WHERE product_id = p.product_id AND created_at <= ?
-                )
-            ) p2 ON p2.product_id = p1.product_id
-            WHERE p2.value IS NOT NULL AND p2.value > 0
-        )
-        SELECT 
-            product_id,
-            current_value,
-            month_old_value,
-            ROUND(((current_value - month_old_value) / month_old_value) * 100, 1) as growth
-        FROM product_prices
-        ORDER BY ABS(growth) DESC
-        LIMIT ?
-    ", [$monthAgo, $monthAgo, $limit]);
-
-        // Zpracování výsledků a vytvoření trendů
-        $results = [];
-        foreach ($topMovers as $mover) {
-            $trend = Trend::updateOrCreate(
-                [
-                    'product_id' => $mover->product_id,
-                    'type' => 'top_mover',
-                    'calculated_at' => $today,
-                ],
-                [
-                    'weekly_growth' => $this->calculateGrowthForProductOptimized($mover->product_id, 7),
-                    'monthly_growth' => $mover->growth,
-                    'annual_growth' => $this->calculateGrowthForProductOptimized($mover->product_id, 365),
-                ]
-            );
-
-            $trend->load('product.latest_price', 'product.theme');
-            $results[] = $trend;
-        }
-
-        return $results;
-    } */
-    /*   private function ensureIndexesForPriceQueries(): void
-    {
-
-        $schemaBuilder = DB::getSchemaBuilder();
-        $pricesTable = 'prices';
-
-
-        $indexes = collect(DB::select("SHOW INDEXES FROM {$pricesTable}"))->pluck('Key_name');
-
-        if (!$indexes->contains('prices_product_id_created_at_index')) {
-
-            Schema::table($pricesTable, function (Blueprint $table) {
-                $table->index(['product_id', 'created_at'], 'prices_product_id_created_at_index');
-            });
-        }
-
-        if (!$indexes->contains('prices_product_id_type_created_at_index')) {
-            Schema::table($pricesTable, function (Blueprint $table) {
-                $table->index(['product_id', 'type', 'created_at'], 'prices_product_id_type_created_at_index');
-            });
-        }
-
-        if (!$indexes->contains('prices_type_created_at_index')) {
-            Schema::table($pricesTable, function (Blueprint $table) {
-                $table->index(['type', 'created_at'], 'prices_type_created_at_index');
-            });
-        }
-    } */
     public function calculateGrowthForProductOptimized(int $productId, int $days): ?float
     {
-        $fromDate = Carbon::now()->subDays($days);
-        $result = DB::selectOne("
-        WITH current_price AS (
-            SELECT value
-            FROM prices
-            WHERE product_id = ?
-            ORDER BY created_at DESC
-            LIMIT 1
-        ),
-        old_price AS (
-            SELECT value
-            FROM prices
-            WHERE product_id = ? AND created_at <= ?
-            ORDER BY created_at DESC
-            LIMIT 1
-        )
-        SELECT 
-            (SELECT value FROM current_price) as current_value,
-            (SELECT value FROM old_price) as old_value
-    ", [$productId, $productId, $fromDate]);
+        return $this->getSimpleGrowth($productId, $days);
+    }
 
-        // Logování výsledků
-        Log::info("Growth calculation result:", [
-            'current_value' => $result->current_value ?? 'NULL',
-            'old_value' => $result->old_value ?? 'NULL'
-        ]);
+    public function getAnnualizedGrowth($productId)
+    {
+        $oldest = Price::where('product_id', $productId)
+            ->orderBy('date', 'asc')
+            ->first();
 
-        if (!$result || !$result->current_value || !$result->old_value || $result->old_value < 0.1) {
-            Log::info("Unable to calculate growth: missing or invalid data");
+        $latest = Price::where('product_id', $productId)
+            ->orderBy('date', 'desc')
+            ->first();
+
+        if (!$oldest || !$latest || $oldest->id === $latest->id || $oldest->value < 0.5) {
             return null;
         }
 
-        $growthPercentage = (($result->current_value - $result->old_value) / $result->old_value) * 100;
-        Log::info("Raw growth percentage: {$growthPercentage}%");
-
-        $maxGrowth = 100;
-        $minGrowth = -75;
-
-        if ($days <= 7) {
-            $maxGrowth = 50;
-            $minGrowth = -30;
-        } else if ($days <= 30) {
-            $maxGrowth = 75;
-            $minGrowth = -50;
+        $days = Carbon::parse($oldest->date)->diffInDays(Carbon::parse($latest->date));
+        if ($days <= 0) {
+            return null;
         }
 
-        $finalGrowth = min($maxGrowth, max($minGrowth, round($growthPercentage, 1)));
-        Log::info("Final growth percentage (after limits): {$finalGrowth}%");
+        $growth = (($latest->value - $oldest->value) / $oldest->value) * 100;
+        $annualized = (pow($latest->value / $oldest->value, 365 / $days) - 1) * 100;
 
-        return $finalGrowth;
+        return round($annualized, 2);
     }
 
 
@@ -472,8 +307,8 @@ class TrendService
 
         // Získání ceny k danému datu nebo před ním
         $price = Price::where('product_id', $productId)
-            ->where('created_at', '<=', $queryDate)
-            ->orderByDesc('created_at')
+            ->where('date', '<=', $queryDate)
+            ->orderByDesc('date')
             ->first();
 
         if ($price) {
@@ -481,8 +316,8 @@ class TrendService
         }
 
         $futurePrice = Price::where('product_id', $productId)
-            ->where('created_at', '>', $queryDate)
-            ->orderBy('created_at')
+            ->where('date', '>', $queryDate)
+            ->orderBy('date')
             ->first();
 
         return $futurePrice ? $futurePrice->value : null;
@@ -499,7 +334,7 @@ class TrendService
         $dayEnd = $queryDate->copy()->endOfDay();
 
         $dailyPrices = Price::where('product_id', $productId)
-            ->whereBetween('created_at', [$dayStart, $dayEnd])
+            ->whereBetween('date', [$dayStart, $dayEnd])
             ->pluck('value')
             ->toArray();
 
@@ -630,13 +465,12 @@ class TrendService
     } */
     public function getPriceHistoryWithMedian(int $productId, int $months = 24): array
     {
-        $endDate = now();
-        $startDate = $endDate->copy()->subMonths($months);
+        // $endDate = now();
+        // $startDate = $endDate->copy()->subMonths($months);
 
         // všechny cenové body 
         $pricePoints = Price::where('product_id', $productId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at')
+            ->orderBy('date')
             ->get(['value', 'date']);
 
         $formattedPoints = $pricePoints->map(function ($point) {
@@ -669,7 +503,7 @@ class TrendService
     {
         // Najdeme nejstarší a nejnovější cenu
         $priceRange = Price::where('product_id', $productId)
-            ->selectRaw('MIN(created_at) as min_date, MAX(created_at) as max_date')
+            ->selectRaw('MIN(date) as min_date, MAX(date) as max_date')
             ->first();
 
         if (!$priceRange->min_date) {
@@ -687,7 +521,7 @@ class TrendService
             $monthEnd = $current->copy()->endOfMonth();
 
             $prices = Price::where('product_id', $productId)
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->whereBetween('date', [$monthStart, $monthEnd])
                 ->pluck('value')
                 ->toArray();
 
@@ -705,7 +539,8 @@ class TrendService
                     'product_id' => $productId,
                     'value' => $medianValue,
                     'condition' => 'New',
-                    'created_at' => $monthStart,
+                    'date' => $monthStart,
+                    'created_at' => now(),
                     'updated_at' => now()
                 ];
             }
@@ -822,13 +657,13 @@ class TrendService
 
         // Získání aktuální ceny
         $latestPrice = Price::where('product_id', $productId)
-            ->latest('created_at')
+            ->latest('date')
             ->first();
 
         // Získání ceny před rokem
         $yearAgoPrice = Price::where('product_id', $productId)
-            ->where('created_at', '<=', now()->subYear())
-            ->latest('created_at')
+            ->where('date', '<=', now()->subYear())
+            ->latest('date')
             ->first();
 
         // Vypočet ročního růstu

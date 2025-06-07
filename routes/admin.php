@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware(['auth:admins'])->group(function () {
+
+        Route::get('/', function () {
+            return redirect(route('admin.dashboard'));
+        })->name('index');
+
         Route::match(['POST', 'GET'], '/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroyAdmin'])->name('auth.logout');
 
@@ -75,7 +80,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         /*   Route::post('/import', [ImportController::class, 'import'])->name('import');
         Route::get('/user', fn(Request $request) => $request->user())->middleware('auth:sanctum'); */
-    })->middleware('auth:sanctum');
+    });
 
     /*  Route::post('/users-import', [ImportController::class, 'import']);
     Route::get('/users-export', [ImportController::class, 'export']); */
