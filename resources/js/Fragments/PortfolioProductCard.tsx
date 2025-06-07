@@ -31,11 +31,12 @@ function PortfolioProductCard(props: Props) {
                 prices_count > 0 &&
                 <div className={`p-16px w-full grid ${wide ? "grid-cols-4" : "grid-cols-2"} gap-16px`}>
                     {
-                        prices_count > 0 &&
-                        <div>
-                            <div className='text-[#4D4D4D]'>{t('Retail')}</div>
-                            <div className='mt-6px font-bold'>$ {latest_price?.retail}</div>
-                        </div>
+                        prices_count > 0 && latest_price?.retail && (
+                            <div>
+                                <div className='text-[#4D4D4D]'>{t('Retail')}</div>
+                                <div className='mt-6px font-bold'>$ {latest_price.retail}</div>
+                            </div>
+                        )
                     }
                     {
                         prices_count > 0 &&

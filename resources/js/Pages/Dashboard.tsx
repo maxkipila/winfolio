@@ -10,6 +10,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowDownRight, ArrowUpRight, LegoSmiley, Ranking, TelegramLogo } from '@phosphor-icons/react';
 import { useContext, useState } from 'react';
+import { number } from '@/utils';
+
+function splitParts(value: number): [string, string] {
+    const formatted = String(number(value, 2, 'en-US'));
+    const [intPart, decPart = ''] = formatted.split('.');
+    return [intPart, decPart];
+}
 
 function SmallBlogCard() {
 
@@ -35,14 +42,18 @@ function CardsDesktop(props: CardsProps) {
     wishListValues.map((wV) => wishlistValue += parseFloat(wV))
     // console.log('wishlist values',auth?.user?.favourites?.flatMap((f) => f.favourite.latest_price.value))
     let { open } = useContext(ModalsContext)
+    const [portfolioInt, portfolioDec] = splitParts(portfolioValue);
+    const [wishInt, wishDec] = splitParts(wishlistValue);
+    const [highInt, highDec] = splitParts(auth.user.highest_portfolio ?? 0);
+
     return (
         <div className='flex border-b border-[#DEDFE5] px-24px mob:hidden'>
             <div className='w-full py-48px'>
                 <div className='font-nunito font-semibold'>{t('Hodnota portfolia')}</div>
                 <div className='flex items-center'>
                     <div className='font-bold text-7xl'>$</div>
-                    <div className='font-bold text-9xl'>{Math.round(portfolioValue * 100) / 100}</div>
-                    <div className='text-[#999999] font-bold text-7xl'>.{((Math.round(portfolioValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                    <div className='font-bold text-9xl'>{portfolioInt}</div>
+                    {portfolioDec && <div className='text-[#999999] font-bold text-7xl'>.{portfolioDec}</div>}
                 </div>
                 {
                     portfolioValue > 0 &&
@@ -63,8 +74,8 @@ function CardsDesktop(props: CardsProps) {
                     <div className='font-nunito font-semibold'>{t('Hodnota wishlistu')}</div>
                     <div className='flex items-center py-34px'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
-                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                        <div className='font-bold text-6xl'>{wishInt}</div>
+                        {wishDec && <div className='text-[#999999] font-bold text-4xl'>.{wishDec}</div>}
                     </div>
 
                 </div>
@@ -75,8 +86,8 @@ function CardsDesktop(props: CardsProps) {
                     <div className='font-nunito font-semibold'>{t("All time high portfolia")}</div>
                     <div className='flex items-center py-34px'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
-                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                        <div className='font-bold text-6xl'>{highInt}</div>
+                        {highDec && <div className='text-[#999999] font-bold text-4xl'>.{highDec}</div>}
                     </div>
                 </div>
             }
@@ -122,6 +133,10 @@ function CardsMobile(props: CardsProps) {
     }
 
 
+    const [pInt, pDec] = splitParts(portfolioValue);
+    const [wInt, wDec] = splitParts(wishlistValue);
+    const [hInt, hDec] = splitParts(auth.user.highest_portfolio ?? 0);
+
     return (
         <div id="scrollable" className='nMob:hidden w-full px-24px py-16px flex overflow-auto gap-24px'>
             <div className='w-full flex-shrink-0'>
@@ -136,8 +151,8 @@ function CardsMobile(props: CardsProps) {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(portfolioValue * 100) / 100}</div>
-                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(portfolioValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                        <div className='font-bold text-6xl'>{pInt}</div>
+                        {pDec && <div className='text-[#999999] font-bold text-4xl'>.{pDec}</div>}
                     </div>
                     <div className={`${portfolioStats?.growth_percentage ?? 0 > 0 ? "bg-[#46BD0F]" : "bg-[#ED2E1B]"}  flex items-center  py-2px rounded w-[78px] text-center justify-center`}>
                         {
@@ -164,8 +179,8 @@ function CardsMobile(props: CardsProps) {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(wishlistValue * 100) / 100}</div>
-                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(wishlistValue * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                        <div className='font-bold text-6xl'>{wInt}</div>
+                        {wDec && <div className='text-[#999999] font-bold text-4xl'>.{wDec}</div>}
                     </div>
                 </div>
             </div>
@@ -183,8 +198,8 @@ function CardsMobile(props: CardsProps) {
                 <div className='flex items-center w-full justify-between'>
                     <div className='flex items-center'>
                         <div className='font-bold text-4xl'>$</div>
-                        <div className='font-bold text-6xl'>{Math.round(auth.user.highest_portfolio * 100) / 100}</div>
-                        <div className='text-[#999999] font-bold text-4xl'>.{((Math.round(auth.user.highest_portfolio * 100) / 100) % 1).toFixed(2).substring(2)}</div>
+                        <div className='font-bold text-6xl'>{hInt}</div>
+                        {hDec && <div className='text-[#999999] font-bold text-4xl'>.{hDec}</div>}
                     </div>
                 </div>
             </div>
